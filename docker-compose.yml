@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  ai_trading_dev-analysis:
+    container_name: ai_trading_dev-analysis
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai_trading_dev-analysis:latest
+
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - TZ=UTC
+
+    ports:
+      - "8888:8888"
+
+    volumes:
+      - .:/workspace
+
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+    command:
+      [
+        "jupyter", "lab",
+        "--ip=0.0.0.0",
+        "--port=8888",
+        "--no-browser",
+        "--NotebookApp.token=",
+        "--NotebookApp.allow_origin=*",
+        "--NotebookApp.allow_root=True"
+      ]
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/api || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5

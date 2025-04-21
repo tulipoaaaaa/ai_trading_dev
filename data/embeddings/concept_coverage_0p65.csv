@@ -1,0 +1,204 @@
+concept,covered,distance,source,page,priority?
+limit order book,True,0.604126,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",157,True
+market depth,False,0.79757273,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",121,False
+order book imbalance,False,0.7047969,Pairs trading quantitative methods and analysis.pdf,7,False
+order matching engine,False,0.9564235,An Introduction to Microstructure Theory Andreaas Krause.pdf,39,False
+price discovery,False,0.81910723,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",406,True
+bid-ask spread,True,0.5897287,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",394,True
+tick size,False,0.7823049,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,122,False
+quote stuffing,False,0.83947337,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",320,True
+market impact,True,0.45835614,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",165,True
+adverse selection,True,0.52695984,Mark_Douglas_Trading_in_the_Zone.pdf,9,False
+hidden liquidity,True,0.6825243,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",191,True
+latency arbitrage,False,0.7833861,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63,False
+maker-taker fees,False,0.7884743,Trading-Volatility.pdf,198,False
+high-frequency trading,True,1.882928e-13,high frequency trading Irene.pdf,29,False
+flash crash dynamics,False,0.8106344,Trading-Volatility.pdf,206,False
+order book spoofing,False,0.83289206,gpt deep dive gaps.pdf,100,True
+fill probability,False,1.0025375,risk management and financial institutions.pdf,503,True
+queue position,False,0.85878205,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",158,True
+liquidity fragmentation,True,0.6029306,ChatGPT Advanced Trading Handbook.pdf,8,True
+trading halts,True,0.68915683,gpt deep dive gaps.pdf,34,True
+short-term auction effects,True,0.57048154,"Mind over markets - power trading with market generated -- James F_ Dalton, Eric T_ Jones, Robert Bevan Dalton -- 2nd edition, May 25, 1999 -- Traders.pdf",280,True
+execution algorithms,False,0.7398318,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",152,True
+TWAP,False,0.97202396,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",104,True
+VWAP,True,0.68506455,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",297,True
+implementation shortfall,False,0.85874194,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",402,True
+slippage,False,0.9829265,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",13,True
+smart order routing,False,0.9421593,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,110,False
+parent/child order logic,False,0.8694167,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",153,True
+iceberg orders,True,0.5476189,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",294,True
+passive vs aggressive order flow,True,0.63041234,Order-Flow-Trading-Setups-1.pdf,79,False
+cancel-replace ratio,False,1.1070834,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",392,True
+execution latency,False,0.8083353,gpt deep dive gaps.pdf,22,True
+fill ratio,False,1.0509928,gpt deep dive gaps.pdf,123,True
+trade execution certainty,True,0.655064,Unknown,0,False
+trade sequencing,False,0.8799474,Trading-Volatility.pdf,312,False
+order flow imbalance,True,0.5007518,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",304,True
+quote-to-trade ratio,False,0.8103867,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",66,True
+multi-leg order routing,False,1.0429423,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,110,False
+moving average crossover,False,0.7130699,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",171,True
+relative strength index,False,0.81944495,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",184,True
+macd,False,0.76973915,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",111,True
+bollinger bands,False,0.8371168,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",269,False
+fibonacci retracement,False,0.8075978,Mastering Ethereum- Building Smart Contracts and DApps -- Andreas M_ Antonopoulos & Gavin Wood Ph_ D_ -- 2018 -- O'Reilly Media.pdf,344,True
+volume profile,True,0.5846533,orderflow trading and high frequency trading pecchiari.pdf,5,False
+trendlines,True,0.6146352,Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,175,False
+candlestick reversal patterns,True,0.44030717,"Encyclopedia of Candlestick Charts (Wiley Trading) -- Thomas N_ Bulkowski, Thomas N_ Bulkowski -- Wiley trading series, Hoboken, N_J, New Jersey, 2008.pdf",30,True
+momentum divergence,False,0.7523175,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",162,True
+price action,True,0.6524558,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",36,True
+trend following,True,0.5515543,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",69,True
+mean reversion,True,0.6742428,meanreversionins.pdf,35,False
+chart pattern recognition,True,0.4658612,Thomas N. Bulkowski-Encyclopedia Of Chart Patterns.pdf,473,False
+indicator lag,False,0.86415946,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",160,True
+supply and demand zones,False,0.86000645,PrinciplesofMacroeconomics-LR.pdf,359,False
+volume weighted indicators,True,0.6815071,Trading algos and systems.pdf,1036,False
+fractals in price data,False,0.7317895,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",74,True
+value at risk,True,0.59560174,risk management and financial institutions.pdf,312,True
+conditional value at risk,False,0.7926738,risk management and financial institutions.pdf,301,True
+maximum drawdown,False,0.8888813,algorithmic trading how to build your own algo business.pdf,43,False
+risk-adjusted return,False,0.706274,risk management and financial institutions.pdf,30,True
+sharpe ratio,True,0.66304743,DesignandDevelopmentofMeanReversionStrategiesonQuantConnectPlatform.pdf,30,False
+sortino ratio,False,0.9046106,Unknown,0,False
+omega ratio,False,1.1022648,Trading-Volatility.pdf,80,False
+tail risk,False,0.78565747,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",359,False
+liquidity risk,True,0.38143203,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",28,True
+credit risk,True,0.55267465,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",43,True
+counterparty risk,True,0.31624627,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",24,True
+position sizing,False,1.0090184,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",350,False
+kelly criterion,False,0.7104152,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",181,True
+exposure management,True,0.63363594,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",51,True
+stress testing,True,0.49274755,risk management and financial institutions.pdf,498,True
+scenario analysis,True,0.6586257,risk management and financial institutions.pdf,516,True
+margin risk,True,0.6479056,risk management and financial institutions.pdf,495,False
+portfolio volatility,True,0.6816269,Unknown,0,False
+correlation matrix,True,0.6010956,risk management and financial institutions.pdf,331,True
+beta exposure,False,0.9276477,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",165,True
+concentration risk,False,0.80956924,risk management and financial institutions.pdf,596,True
+regulatory capital,True,0.5468099,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",186,True
+drawdown control,False,0.90980446,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",278,True
+trading halts and kill switches,False,0.9477255,gpt deep dive gaps.pdf,34,True
+value decay over drawdowns,False,0.8993658,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",97,True
+stop loss engineering,False,0.8607711,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",238,True
+loss aversion,False,0.7374654,Unknown,0,False
+confirmation bias,True,0.49995255,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",104,True
+recency bias,True,0.57336724,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",106,True
+overconfidence bias,True,0.50001705,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",103,True
+anchoring bias,True,0.5579942,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",105,True
+emotional trading,True,0.5013845,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",431,False
+overtrading,False,1.0365194,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",327,True
+revenge trading,True,0.62737197,Trading in the Zone - Master the Market with Confidence by Mark Douglas.pdf,45,True
+fear and greed cycles,True,0.68996876,Trading in the Zone - Master the Market with Confidence by Mark Douglas.pdf,56,True
+trader discipline,True,0.5773262,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",472,False
+decision fatigue,False,1.0767328,Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,319,False
+mental stop loss,False,0.9760252,Trading in the Zone - Master the Market with Confidence by Mark Douglas.pdf,6,True
+self-sabotage in trading,True,0.5952349,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",309,True
+cognitive dissonance,False,0.80672765,Taleb_The-Black-Swan.pdf,396,False
+regret minimization,False,0.971986,Trading in the Zone - Master the Market with Confidence by Mark Douglas.pdf,108,True
+risk appetite profiling,False,0.8917972,risk management and financial institutions.pdf,596,True
+on-chain liquidity,False,0.83540416,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",134,True
+cex vs dex,False,1.0243521,crypto markets.pdf,15,False
+impermanent loss,True,0.5496164,gpt deep dive gaps.pdf,25,True
+oracle latency,False,0.9808993,Mastering Ethereum- Building Smart Contracts and DApps -- Andreas M_ Antonopoulos & Gavin Wood Ph_ D_ -- 2018 -- O'Reilly Media.pdf,464,True
+stablecoin depegging risk,False,0.75713515,gpt deep dive gaps.pdf,23,True
+MEV (maximal extractable value),False,1.1322072,risk management and financial institutions.pdf,246,True
+rug pull,False,0.7688782,gpt deep dive gaps.pdf,88,True
+slashing risk,False,0.92782676,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",28,True
+smart contract risk,True,0.6419716,Mastering Ethereum- Building Smart Contracts and DApps -- Andreas M_ Antonopoulos & Gavin Wood Ph_ D_ -- 2018 -- O'Reilly Media.pdf,320,True
+liquidity mining,False,0.7676908,gpt deep dive gaps.pdf,117,True
+staking derivatives,False,1.0721545,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",380,True
+yield farming,False,0.88646066,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",102,True
+token vesting cliffs,False,1.1768229,"Mind over markets - power trading with market generated -- James F_ Dalton, Eric T_ Jones, Robert Bevan Dalton -- 2nd edition, May 25, 1999 -- Traders.pdf",296,True
+governance attacks,True,0.62972105,gpt deep dive gaps.pdf,147,True
+cross-chain bridge risk,False,0.9806927,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",297,True
+custody vs self custody,False,0.9678582,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",150,True
+flash loan attacks,True,0.44436347,gpt deep dive gaps.pdf,13,True
+TVL manipulation,False,1.2675146,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",294,True
+gas fee volatility,False,0.9689249,Unknown,0,False
+proof of reserves,False,0.770172,risk management and financial institutions.pdf,67,True
+validator concentration risk,False,1.0398395,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",337,True
+exchange insolvency risk,False,0.76675713,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",41,True
+interest rate risk,True,0.51375294,risk management and financial institutions.pdf,203,True
+yield curve inversion,False,0.841444,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",212,True
+inflation targeting,False,0.7771939,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",187,True
+quantitative tightening,False,1.0710917,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",320,False
+quantitative easing,False,0.73855937,PrinciplesofMacroeconomics-LR.pdf,442,False
+federal funds rate,False,0.7094205,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",321,True
+liquidity trap,False,0.84939563,risk management and financial institutions.pdf,635,False
+repo operations,True,0.6270292,risk management and financial institutions.pdf,712,True
+reverse repo facility,False,0.76297504,risk management and financial institutions.pdf,712,True
+dollar liquidity cycles,False,0.7365469,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",294,True
+cross-currency basis swap,True,0.6128956,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",152,True
+USD collateral tightening,True,0.6689887,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",130,True
+global risk-on risk-off,False,0.75370574,"Optimal trading strategies - quantitative approaches for -- Robert Kissell; Morton Glantz; Roberto Malamut -- 1st, First Edition, PS, 2003.pdf",263,True
+monetary policy divergence,False,0.93847704,PrinciplesofMacroeconomics-LR.pdf,446,False
+macro liquidity regime shifts,False,0.8164077,Empirical market structure.pdf,195,False
+CB balance sheet expansion,False,0.9632925,risk management and financial institutions.pdf,58,True
+eurodollar system,False,0.84223014,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",17,True
+shadow banking system,False,0.83011734,risk management and financial institutions.pdf,422,True
+global USD shortage,False,0.8310079,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",78,True
+overfitting,False,0.9429096,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",181,True
+cross-validation,False,0.834682,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",131,True
+feature importance,True,0.60244954,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,170,False
+hyperparameter tuning,False,0.70068073,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",156,True
+gradient boosting trees,True,0.59517133,The Elements of Statistical Learning.pdf,533,False
+long short-term memory networks,False,0.92041117,price impact of orderbook events Kukanov.pdf,42,False
+temporal convolutional networks,False,0.7823238,Deep learning and decision making.pdf,19,False
+transformer models for trading,False,0.94617903,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",30,True
+walk forward validation,False,0.91632557,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",18,True
+sliding window retraining,False,1.2834201,"Encyclopedia of Candlestick Charts (Wiley Trading) -- Thomas N_ Bulkowski, Thomas N_ Bulkowski -- Wiley trading series, Hoboken, N_J, New Jersey, 2008.pdf",922,True
+online learning,False,1.0874901,"The Art and Science of Technical Analysis- Market Structure, -- Adam Grimes -- 2012 -- Wiley.pdf",129,True
+non-stationary time series,True,0.6738205,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",103,True
+target leakage,False,0.9503233,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",132,True
+ensemble methods,True,0.42535648,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",120,True
+reinforcement learning for trade execution,True,0.47625995,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",299,True
+meta-labeling,False,0.74821603,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",81,True
+probabilistic confidence calibration,False,1.0731723,risk management and financial institutions.pdf,449,True
+covariate shift detection,False,1.0478647,Deep learning and decision making.pdf,137,False
+signal decay tracking,False,0.95417523,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",97,True
+option greeks,False,0.83625233,VPIN and the flas crash.pdf,36,False
+gamma exposure,False,0.9230282,risk management and financial institutions.pdf,224,True
+delta hedging,True,0.6671272,risk management and financial institutions.pdf,200,True
+theta decay,False,0.7670146,risk management and financial institutions.pdf,192,True
+vega compression,False,1.1125762,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",85,True
+skew arbitrage,True,0.67394316,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63,False
+implied vs realized volatility,False,0.8256166,Volatility+Trading+-+Euan+Sinclair.pdf,130,False
+volatility surface modeling,False,0.7631695,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",195,True
+straddle,False,1.1044445,beatthemarket.pdf,176,False
+strangle,False,1.3174827,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",310,True
+covered call,False,0.8786094,Thomas N. Bulkowski-Encyclopedia Of Chart Patterns.pdf,370,False
+iron condor,False,1.2483163,edwards-magee-technical-analysis-of-stock-trends-9th-edition.pdf,632,False
+volatility term structure,True,0.678252,risk management and financial institutions.pdf,252,True
+option open interest dynamics,False,0.78199303,Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,291,False
+tail hedging,False,0.84512854,dynamic hedging.pdf,28,False
+volatility crush,False,0.81927526,Unknown,0,False
+synthetic replication,False,1.21052,"The Financial Mathematics of Market Liquidity- From Optimal -- Gueant, Olivier -- Chapman & Hall-CRC financial mathematics series.pdf",293,True
+OTM skew behavior,False,0.90094715,Volatility+Trading+-+Euan+Sinclair.pdf,216,False
+insider trading,True,0.5289318,TradingOrderFlow768.pdf,2,False
+wash trading,False,0.8510513,edwards-magee-technical-analysis-of-stock-trends-9th-edition.pdf,200,False
+pump and dump,False,1.2299827,risk management and financial institutions.pdf,139,True
+front-running bots,False,0.95744634,gpt deep dive gaps.pdf,147,True
+exchange outage risk,False,0.91610175,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",239,True
+flash crash regulation,False,0.83720195,gpt deep dive gaps.pdf,39,True
+spoofing and layering,True,0.6706907,gpt deep dive gaps.pdf,91,True
+market manipulation,True,0.66656494,Trading-Volatility.pdf,141,False
+dark pool reporting rules,False,0.85279226,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,60,False
+KYC AML enforcement,False,1.0030129,"Clearing, settlement, and custody -- David Loader -- 3, 2019 -- Butterworth-Heinemann, an imprint of Elsevier.pdf",238,True
+regulatory arbitrage,True,0.5992785,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63,False
+jurisdictional risk,False,0.90202755,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",156,True
+market surveillance,True,0.6805907,gpt deep dive gaps.pdf,92,True
+algo trading compliance,True,0.6985128,gpt deep dive gaps.pdf,95,True
+post-trade transparency,True,0.49689126,gpt deep dive gaps.pdf,27,True
+circuit breaker logic,False,1.2635412,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,219,False
+reasoning under uncertainty,False,0.9113814,Taleb_The-Black-Swan.pdf,389,False
+meta-cognition in strategy switching,False,0.9067155,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",36,True
+confidence scoring,False,0.97999275,"Candlestick and pivot point trading triggers - setups for -- John L_ Person -- Wiley trading series, Hoboken, N_J, c2007 -- Wiley & Sons.pdf",306,True
+backtest overfitting detection,False,0.7735642,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",180,True
+real vs simulated performance tracking,False,1.0975568,"The xVA Challenge- Counterparty Credit Risk, Funding, -- Jon Gregory -- The Wiley Finance Series, 3rd Edition 2015, 2015 -- Wiley & Sons, Limited.pdf",428,True
+regime detection,False,1.1543788,gpt deep dive gaps.pdf,14,True
+behavioral edge extraction,False,1.1796551,the-man-who-solved-the-market-how-jim-simons-launched-the-quant-revolution-hardcovernbsped-073521798x-9780735217980.pdf,82,False
+reward shaping for AI agents,False,0.9922245,Trading algos and systems.pdf,213,False
+agent burn-in period,False,1.2367513,"The structure of clearing and settlement -- David Loader (Auth_) -- Clearing, Settlement and Custody, 2, 2014 -- Elsevier Science & Technology Books.pdf",167,True
+decision tree vs ensemble path tracing,False,0.9848943,"Advances in Financial Machine Learning by López de Prado, Marcos -- 2018 .pdf",125,True
+multi-agent coordination risk,False,1.0526437,"Counterparty Credit Risk- The new challenge for global -- Jon Gregory -- The Wiley Finance Series, 1, 2010 -- John Wiley & Sons, Incorporated.pdf",37,True
+agent self-correction heuristics,False,1.0359972,Trading algos and systems.pdf,1219,False

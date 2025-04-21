@@ -1,0 +1,8 @@
+Loading model: gpt2
+Setting up LoRA configuration
+Applying LoRA adapters to the model
+trainable params: 811,008 || all params: 125,250,816 || trainable%: 0.6475071587557562
+Loading dataset: wikitext/wikitext-2-raw-v1
+Setting up SFT trainer configuration
+Initializing SFTTrainer
+Starting training

@@ -1,0 +1,204 @@
+concept
+limit order book
+market depth
+order book imbalance
+order matching engine
+price discovery
+bid-ask spread
+tick size
+quote stuffing
+market impact
+adverse selection
+hidden liquidity
+latency arbitrage
+maker-taker fees
+high-frequency trading
+flash crash dynamics
+order book spoofing
+fill probability
+queue position
+liquidity fragmentation
+trading halts
+short-term auction effects
+execution algorithms
+TWAP
+VWAP
+implementation shortfall
+slippage
+smart order routing
+parent/child order logic
+iceberg orders
+passive vs aggressive order flow
+cancel-replace ratio
+execution latency
+fill ratio
+trade execution certainty
+trade sequencing
+order flow imbalance
+quote-to-trade ratio
+multi-leg order routing
+moving average crossover
+relative strength index
+macd
+bollinger bands
+fibonacci retracement
+volume profile
+trendlines
+candlestick reversal patterns
+momentum divergence
+price action
+trend following
+mean reversion
+chart pattern recognition
+indicator lag
+supply and demand zones
+volume weighted indicators
+fractals in price data
+value at risk
+conditional value at risk
+maximum drawdown
+risk-adjusted return
+sharpe ratio
+sortino ratio
+omega ratio
+tail risk
+liquidity risk
+credit risk
+counterparty risk
+position sizing
+kelly criterion
+exposure management
+stress testing
+scenario analysis
+margin risk
+portfolio volatility
+correlation matrix
+beta exposure
+concentration risk
+regulatory capital
+drawdown control
+trading halts and kill switches
+value decay over drawdowns
+stop loss engineering
+loss aversion
+confirmation bias
+recency bias
+overconfidence bias
+anchoring bias
+emotional trading
+overtrading
+revenge trading
+fear and greed cycles
+trader discipline
+decision fatigue
+mental stop loss
+self-sabotage in trading
+cognitive dissonance
+regret minimization
+risk appetite profiling
+on-chain liquidity
+cex vs dex
+impermanent loss
+oracle latency
+stablecoin depegging risk
+MEV (maximal extractable value)
+rug pull
+slashing risk
+smart contract risk
+liquidity mining
+staking derivatives
+yield farming
+token vesting cliffs
+governance attacks
+cross-chain bridge risk
+custody vs self custody
+flash loan attacks
+TVL manipulation
+gas fee volatility
+proof of reserves
+validator concentration risk
+exchange insolvency risk
+interest rate risk
+yield curve inversion
+inflation targeting
+quantitative tightening
+quantitative easing
+federal funds rate
+liquidity trap
+repo operations
+reverse repo facility
+dollar liquidity cycles
+cross-currency basis swap
+USD collateral tightening
+global risk-on risk-off
+monetary policy divergence
+macro liquidity regime shifts
+CB balance sheet expansion
+eurodollar system
+shadow banking system
+global USD shortage
+overfitting
+cross-validation
+feature importance
+hyperparameter tuning
+gradient boosting trees
+long short-term memory networks
+temporal convolutional networks
+transformer models for trading
+walk forward validation
+sliding window retraining
+online learning
+non-stationary time series
+target leakage
+ensemble methods
+reinforcement learning for trade execution
+meta-labeling
+probabilistic confidence calibration
+covariate shift detection
+signal decay tracking
+option greeks
+gamma exposure
+delta hedging
+theta decay
+vega compression
+skew arbitrage
+implied vs realized volatility
+volatility surface modeling
+straddle
+strangle
+covered call
+iron condor
+volatility term structure
+option open interest dynamics
+tail hedging
+volatility crush
+synthetic replication
+OTM skew behavior
+insider trading
+wash trading
+pump and dump
+front-running bots
+exchange outage risk
+flash crash regulation
+spoofing and layering
+market manipulation
+dark pool reporting rules
+KYC AML enforcement
+regulatory arbitrage
+jurisdictional risk
+market surveillance
+algo trading compliance
+post-trade transparency
+circuit breaker logic
+reasoning under uncertainty
+meta-cognition in strategy switching
+confidence scoring
+backtest overfitting detection
+real vs simulated performance tracking
+regime detection
+behavioral edge extraction
+reward shaping for AI agents
+agent burn-in period
+decision tree vs ensemble path tracing
+multi-agent coordination risk
+agent self-correction heuristics
