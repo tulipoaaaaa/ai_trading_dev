@@ -1,0 +1,199 @@
+concept,covered,distance,best_chunk,source,page
+liquidity risk,False,0.5504458,"Liquidity Risk 523 Bangia, A., F. Diebold, T. Schuermann, and J. Stroughair. “Liquidity on the Outsi...",risk management and financial institutions.pdf,635
+candlestick reversal patterns,False,0.56049156,"79 CANdLESTICkS A close‐up of the same chart, in Figure 4.9, on a weekly basis shows some of the can...",Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,104
+trader discipline,False,0.5773262,"398 THE INDIVIDUAL, SELF-DIRECTED TRADER psychological errors and weaknesses. In addition, the proce...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",472
+credit risk,False,0.5809343,PART Four Credit Risk...,risk management and financial institutions.pdf,493
+volume profile,False,0.5846533,121 What Does Volume Profile Look Like? Volume Profile can have many shapes depending on how the vol...,orderflow trading and high frequency trading pecchiari.pdf,5
+gradient boosting trees,False,0.59517133,10.2 Boosting Fits an Additive Model 341 very similar to the (negative) binomial log-likelihood (Sec...,The Elements of Statistical Learning.pdf,533
+regulatory arbitrage,False,0.5992785,Statistical Arbitrage...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63
+feature importance,False,0.60244954,114 FEATURE IMPORTANCE natural question is to try to understand what features contributed to that pe...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,170
+counterparty risk,False,0.6043651,Counterparty Risk Counterparty risk is the risk that the other party in a transaction will fail to m...,mastering-ethereum.pdf,463
+limit order book,False,0.61286414,85 Example #5: Big Limit Orders Example #6: Big Limit Orders...,Order-Flow-Trading-Setups-1.pdf,142
+trendlines,False,0.6146352,"www.Fxborssa.com Basic Concepts of Trend 65 In other words, protective stops on long positions shoul...",Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,175
+stress testing,False,0.6199828,"464 OTHER TOPICS covered by the data, are not taken into account. Stress testing is an attempt to ov...",risk management and financial institutions.pdf,573
+order flow imbalance,False,0.6239709,35 Imbalances Imbalances are a great way of tracking market sentiment. Only with Order Flow will you...,Order-Flow-Trading-Setups-1.pdf,92
+passive vs aggressive order flow,False,0.63041234,22 Active and Passive in One Chart The distinction between passive and aggressive market participant...,Order-Flow-Trading-Setups-1.pdf,79
+post-trade transparency,False,0.6392374,"Market Transparency (p.284) whereas in the opaque market, it is: Using again inequality (8.4), we se...",Market Liquidity Theory evidence Policy Alisa Roel Foucault Marco Pagano.pdf,293
+ensemble methods,False,0.6472974,CHAPTER 6 Ensemble Methods 6.1 MOTIVATION In this chapter we will discuss two of the most popular ML...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,148
+margin risk,False,0.6479056,384 CREDIT RISK 2. The trader is entering into a derivatives transaction that could lead to the trad...,risk management and financial institutions.pdf,495
+smart contract risk,False,0.6525042,"Security Risks and Antipatterns As a smart contract programmer, you should be familiar with the most...",mastering-ethereum.pdf,366
+trade execution certainty,False,0.655064,Page 122 of 150 PROPER TRADE EXECUTION Proper trade execution is the ability to act on an opportunit...,Unknown,0
+short-term auction effects,False,0.65770376,diﬀerences across the bidding patterns of dealers that do not vary from auction-to-auction. Note tha...,Order-Flow-Trading-Setups-1.pdf,28
+liquidity fragmentation,False,0.6610404,Market Fragmentation entry fee on market orders until the end of July and even offered a rebate on t...,Market Liquidity Theory evidence Policy Alisa Roel Foucault Marco Pagano.pdf,267
+sharpe ratio,False,0.66304743,6 2. Translate the Rules into a Definitive Form (Section 2.1) 3. Choosing Tech Stack (Sections 3 & 4...,DesignandDevelopmentofMeanReversionStrategiesonQuantConnectPlatform.pdf,30
+market manipulation,False,0.66656494,﻿Trading and Electronic Market﻿ 12 ©2015 The CFA Institute Research Foundation. All Rights Reserved...,Trading-Volatility.pdf,141
+skew arbitrage,False,0.67394316,Statistical Arbitrage...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63
+mean reversion,False,0.6742428,What is Mean Reversion in Trading? The Mean Reversion Trading Strategy Best 5 Indicators for the Rev...,meanreversionins.pdf,35
+volume weighted indicators,False,0.6815071,"Volume, Open Interest, and Breadth 553 expectations, then the indicator needs to be applied differen...",Trading algos and systems.pdf,1036
+portfolio volatility,False,0.6816269,Volatility Trading...,Unknown,0
+self-sabotage in trading,False,0.6872675,"398 THE INDIVIDUAL, SELF-DIRECTED TRADER psychological errors and weaknesses. In addition, the proce...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",472
+volatility term structure,False,0.68923414,"VOLATILITY Trading Volatility, Correlation, Term Structure and Skew TRADING Colin Bennett...",volatility in cryptocurrencies.pdf,5
+interest rate risk,False,0.6912824,CHAPTER9 Interest Rate Risk I nterest rate risk is more difficult to manage than the risk arising fr...,risk management and financial institutions.pdf,286
+delta hedging,False,0.69668365,"Hedging 71 For a short option position, the adjusted volatility is ˆσ = σ  1 + λ σ  8 πt (4.8) Wh...",Unknown,0
+reinforcement learning for trade execution,False,0.7008222,ALGORITHMIC TRADING...,Algorithmic Trading - Winning Strategies and Their Rationale 2013.pdf,3
+order book imbalance,False,0.7047969,29 2.4 Orderflow Imbalance The limit order book contains all the information available to investigat...,Pairs trading quantitative methods and analysis.pdf,7
+trend following,False,0.7060097,139 Example #3: Trend Setup Example #4: Trend Setup...,orderflow trading and high frequency trading pecchiari.pdf,23
+iceberg orders,False,0.7304057,Page 84 of 150 ICEBERG ORDERS One of the tricks that traders use to disguise their intentions in the...,Unknown,0
+loss aversion,False,0.7374654,Psychology 157 us into trouble. Nassim Taleb (2004) has written that this is the basis for most trad...,Unknown,0
+quantitative easing,False,0.73855937,Reserve will need to stop making these additional loans and sell off the financial securities it has...,PrinciplesofMacroeconomics-LR.pdf,442
+market impact,False,0.7479218,"arXiv:0903.2428v1 [q-fin.TR] 13 Mar 2009 PRICE IMPACT J. P. Bouchaud, Capital Fund Management August...",PrinciplesofMacroeconomics-LR.pdf,48
+moving average crossover,False,0.7573197,"T rend Systems 367 will change. If a moving average trading strategy uses a single trend, the foreca...",Trading algos and systems.pdf,850
+algo trading compliance,False,0.75780094,Page 78 of 150 The reason these “algos” were created was for institutional players to hide their act...,Unknown,0
+market surveillance,False,0.77396643,"optimally. Furthermore, an important byproduct of trading is “price discovery”. Prices reveal inform...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,41
+bid-ask spread,False,0.774993,How could HFT lower the spread without changing execution costs? One major argument given by HFT pro...,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,202
+option open interest dynamics,False,0.78199303,"www.Fxborssa.com 780 Chapter 7 options, and stocks. Open interest applies only to futures and option...",Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,291
+tick size,False,0.7823049,It is really obvious that most of S&P500 stocks with a price below $20 will have a nominal spread eq...,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,122
+temporal convolutional networks,False,0.7823238,3 rsta.royalsocietypublishing.org Phil. Trans. R. Soc. A 0000000 . . . . . . . . . . . . . . . . . ....,Deep learning and decision making.pdf,19
+latency arbitrage,False,0.7833861,Statistical Arbitrage...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,63
+tail risk,False,0.78565747,"Risk Management 287 FIGURE 9.4 Daily Chart of PG During the 2010 Flash Crash instance, the cost of f...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",359
+overconfidence bias,False,0.7875787,The Trader’s Mind 355 possibly be justiﬁed by their results. We are never as good as we think we are...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",428
+maker-taker fees,False,0.7884743,﻿Trading and Electronic Market﻿ 68 ©2015 The CFA Institute Research Foundation. All Rights Reserved...,Trading-Volatility.pdf,198
+market depth,False,0.79757273,P A R T I I Market Structure...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",121
+cognitive dissonance,False,0.80672765,"2 8 0 T H O S E G R A Y S W A N S O F E X T R E M I S T A N attack against an intellectual, not agai...",Taleb_The-Black-Swan.pdf,396
+flash crash dynamics,False,0.8106344,76 ©2015 The CFA Institute Research Foundation. All Rights Reserved. Appendix A. The Flash Crash Th...,Trading-Volatility.pdf,206
+macro liquidity regime shifts,False,0.8164077,Note the large variation relative to the mean. 22.d Stochastic liquidity Most of the development to ...,Empirical market structure.pdf,195
+trading halts,False,0.8188973,Trade Examples: Trading Parabolic Climaxes 325 D: “I have moved the stop to just below yesterday’s l...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",400
+volatility crush,False,0.81927526,Volatility Trading...,Unknown,0
+quote-to-trade ratio,False,0.82298076,88 Chapter 3. Dealer Markets quote the same price it is assigned to one of them randomly. Market mak...,An Introduction to Microstructure Theory Andreaas Krause.pdf,109
+risk-adjusted return,False,0.82371545,Introduction 3 there are several sources of systematic risk. The key insights of these researchers h...,risk management and financial institutions.pdf,114
+implied vs realized volatility,False,0.8256166,130 CHAPTER 4: FORWARD STARTING PRODUCTS AND VOLATILITY INDICES VOLATILITY TERM STRUCTURE IS VERY NE...,Volatility+Trading+-+Euan+Sinclair.pdf,130
+price action,False,0.82562387,"www.Fxborssa.com 2 Chapter 1 cian—price, volume, and open interest. (Open interest is used only in f...",Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,114
+relative strength index,False,0.8342123,768 Technical Analysis of Stock Trends WEDGE — A chart formation in which the price ﬂuctuations are ...,Empirical asset pricing via machine learning.pdf,3
+fractals in price data,False,0.8360931,12 TRADING SYSTEMS AND METHODS which prices fi ll a box. If we take a 10-day period of price movemen...,Trading algos and systems.pdf,495
+option greeks,False,0.83625233,A.8: Greeks and Their Meaning 257 A.8: GREEKS AND THEIR MEANING Greeks is the name given to the (usu...,VPIN and the flas crash.pdf,36
+bollinger bands,False,0.8371168,Tools for Conﬁrmation 197 FIGURE 7.6 Bollinger Bands on Weekly Wheat: Notice How Bands Expand and Co...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",269
+inflation targeting,False,0.84145343,"Second, an argument is sometimes made that moderate inflation may help the economy by making wages i...",PrinciplesofMacroeconomics-LR.pdf,301
+hidden liquidity,False,0.84192115,"Introduction University Press Scholarship Online Oxford Scholarship Online Market Liquidity: Theory,...",Market Liquidity Theory evidence Policy Alisa Roel Foucault Marco Pagano.pdf,38
+tail hedging,False,0.84512854,P art I Review of Dynamic Hedging ...,dynamic hedging.pdf,28
+revenge trading,False,0.84699005,Volatility Trading...,Unknown,0
+liquidity trap,False,0.84939563,"Liquidity Risk 523 Bangia, A., F. Diebold, T. Schuermann, and J. Stroughair. “Liquidity on the Outsi...",risk management and financial institutions.pdf,635
+VWAP,False,0.84968454,Page 81 of 150 VWAP VWAP stands for Volume Weighted Average Price and is perhaps the most commonly u...,Unknown,0
+wash trading,False,0.8510513,"132 Technical Analysis of Stock Trends Their buying would, sooner or later, engender a rally, but th...",edwards-magee-technical-analysis-of-stock-trends-9th-edition.pdf,200
+correlation matrix,False,0.85237193,"Moreover, the following inequalities holds for any i > 0, j > 0, T > 0 and δ > 0: Z T 0 ⇥ 'ii(u) +...",TradingOrderFlow768.pdf,42
+dark pool reporting rules,False,0.85279226,thresholds” will be set to define liquid products (that will be submitted to a regulation similar to...,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,60
+federal funds rate,False,0.8555266,15 | Monetary Policy and Bank Regulation Figure 15.1 Marriner S. Eccles Federal Reserve Headquarters...,PrinciplesofMacroeconomics-LR.pdf,427
+anchoring bias,False,0.85686255,The Trader’s Mind 355 possibly be justiﬁed by their results. We are never as good as we think we are...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",428
+supply and demand zones,False,0.86000645,"zone occurs at the right of the SRAS curve where it is fairly vertical, and so movements in AD will ...",PrinciplesofMacroeconomics-LR.pdf,359
+backtest overfitting detection,False,0.86542135,154 THE DANGERS OF BACKTESTING monetizing random historical patterns. Because those random patterns ...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,208
+value at risk,False,0.86741704,PART Two Market Risk...,risk management and financial institutions.pdf,262
+liquidity mining,False,0.8728173,"Foreword Robert Almgren, President and Cofounder of Quantitative Brokers Fragmentation, the search f...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,37
+global risk-on risk-off,False,0.87694013,PART Two Market Risk...,risk management and financial institutions.pdf,262
+covered call,False,0.8786094,145 145 hedging is very small. = = = = Covered calls [ buying a stock and selling a call against it]...,Thomas N. Bulkowski-Encyclopedia Of Chart Patterns.pdf,370
+conditional value at risk,False,0.87934214,PART Two Market Risk...,risk management and financial institutions.pdf,262
+trade sequencing,False,0.8799474,Professor Larry Harris Trading and Exchanges Draft Copy ©2002 Oxford University Press Draft: March 5...,Trading-Volatility.pdf,312
+fear and greed cycles,False,0.88506484,323 Market Psychology/Sentiment market ended in 1942 you know that Hitler was at the gates of Moscow...,Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,348
+theta decay,False,0.88654333,A.8: Greeks and Their Meaning 259 Figure 148. Gamma Theta THETA MEASURES TIME DECAY (COST OF LONG GA...,VPIN and the flas crash.pdf,38
+price discovery,False,0.88669455,"optimally. Furthermore, an important byproduct of trading is “price discovery”. Prices reveal inform...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,41
+eurodollar system,False,0.8875183,"Spreads and Arbitrage 593 funds, and commercials make a business of arbitraging individual Eurodolla...",Trading algos and systems.pdf,1076
+maximum drawdown,False,0.8888813,"Fishing for Ideas 21 As a rule of thumb, any strategy that has a Sharpe ratio of less than 1 is not ...",algorithmic trading how to build your own algo business.pdf,43
+stop loss engineering,False,0.89080834,182 ALGORITHMIC TRADING Note that this scheme should only be applied to an account with one strategy...,Algorithmic Trading - Winning Strategies and Their Rationale 2013.pdf,200
+fibonacci retracement,False,0.8951825,"400 index Fibonacci (continued ) extensions, targets, 203 and Gann readings, 257–267 golden spiral, ...",Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,425
+global USD shortage,False,0.8990774,"428 TRADING SYSTEMS AND METHODS Many commodities are priced in U.S. dollars, such as gold, oil, and ...",Trading algos and systems.pdf,911
+volatility surface modeling,False,0.89936674,534 OTHER TOPICS TABLE 25.1 Volatility Surface Strike Price 0.90 0.95 1.00 1.05 1.10 1 month 14.2 13...,risk management and financial institutions.pdf,650
+OTM skew behavior,False,0.90094715,7.5: Skew Trading 211 Figure 121. Vol When Equities Fall 10% Vol When Equities Rise 10% LONG SKEW TR...,Volatility+Trading+-+Euan+Sinclair.pdf,216
+value decay over drawdowns,False,0.901113,"70 SAMPLE WEIGHTS 4.7 TIME DECAY Markets are adaptive systems (Lo [2017]). As markets evolve, older ...",Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,126
+execution latency,False,0.9014811,﻿Trading and Electronic Market﻿ 54 ©2015 The CFA Institute Research Foundation. All Rights Reserved...,Trading-Volatility.pdf,184
+indicator lag,False,0.9016008,87 Divergences C h a p t e r 5 I t was the original intent of this chapter to help the multitudes of...,Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,112
+kelly criterion,False,0.9040736,7 appropriate percentage of their bankroll or capital to allocate in each bet or trade for optimal l...,DesignandDevelopmentofMeanReversionStrategiesonQuantConnectPlatform.pdf,31
+sortino ratio,False,0.9046106,"A.11: Sortino Ratio 269 A.11: SORTINO RATIO If an underlying is distributed normally, standard devia...",Unknown,0
+execution algorithms,False,0.9111636,CHAPTER 20 Multiprocessing and Vectorization 20.1 MOTIVATION Multiprocessing is essential to ML. ML ...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,358
+reasoning under uncertainty,False,0.9113814,"T H E A E S T H E T I C S O F R A N D O M N E S S 2 7 3 seems to correspond to my epistemic opacity,...",Taleb_The-Black-Swan.pdf,389
+cross-currency basis swap,False,0.91431344,"108 ALGORITHMIC TRADING point move in another currency pair; otherwise, the results will not make se...",Algorithmic Trading - Winning Strategies and Their Rationale 2013.pdf,126
+hyperparameter tuning,False,0.9155333,The Review of Financial Studies / v 33 n 5 2020 1.1 Sample splitting and tuning via validation Impor...,Empirical asset pricing via machine learning.pdf,33
+on-chain liquidity,False,0.9177911,"Liquidity Risk 523 Bangia, A., F. Diebold, T. Schuermann, and J. Stroughair. “Liquidity on the Outsi...",risk management and financial institutions.pdf,635
+dollar liquidity cycles,False,0.9180635,Liquidity and Asset Prices occurs especially when noise trading is correlated among investors and ov...,Market Liquidity Theory evidence Policy Alisa Roel Foucault Marco Pagano.pdf,314
+long short-term memory networks,False,0.92041117,h1 t−1 hn−m t−1 hn t−1 Yt−1 Xt−1 h1 t−1(1) hn−m t−1(1) hn t−1(1) h1 t−1(2) hn−m t−1(2) hn t−1(2) h1 ...,price impact of orderbook events Kukanov.pdf,42
+scenario analysis,False,0.92339134,"Operational Risk 489 However, the loss frequency estimates should always be specific to a bank and r...",risk management and financial institutions.pdf,599
+order book spoofing,False,0.9275874,"Every trade is shown to all other participants, and the order book moves in real time in response to...",The Basics of Bitcoins and Blockchains.pdf,319
+queue position,False,0.9293883,viii Contents 4.4 Order Arrivals and Cancellations 63 4.5 Order Size Distributions 66 4.6 Volume at ...,Trading algos and systems.pdf,428
+implementation shortfall,False,0.9336029,"Measuring Liquidity 103, then the implementation shortfall is To put this figure in perspective, con...",Market Liquidity Theory evidence Policy Alisa Roel Foucault Marco Pagano.pdf,96
+flash crash regulation,False,0.93538934,76 ©2015 The CFA Institute Research Foundation. All Rights Reserved. Appendix A. The Flash Crash Th...,Trading-Volatility.pdf,206
+stablecoin depegging risk,False,0.93574923,The crypto ecosystem: key elements and risks 9 A case in point has been the above-mentioned implosio...,crypto markets.pdf,13
+monetary policy divergence,False,0.93847704,"demand to AD1 only creates an inflationary increase in the price level, but it does not alter GDP or...",PrinciplesofMacroeconomics-LR.pdf,446
+smart order routing,False,0.9421593,Figure 1.13. Functional diagram of a smart order router. • It obtains a price better than or equal t...,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,110
+proof of reserves,False,0.9510884,"receive a stream of payments in the future. In our example, the Safe and Secure Bank holds bonds wor...",PrinciplesofMacroeconomics-LR.pdf,414
+non-stationary time series,False,0.954159,"Special Topics in Quantitative Trading 131 If a price series (of a stock, a pair of stocks, or, in g...",algorithmic trading how to build your own algo business.pdf,153
+order matching engine,False,0.9564235,18 Chapter 1. The organization of trading in stock markets Investor Trading Decision Broker Market m...,An Introduction to Microstructure Theory Andreaas Krause.pdf,39
+trading halts and kill switches,False,0.95780486,Trade Examples: Trading Parabolic Climaxes 325 D: “I have moved the stop to just below yesterday’s l...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",400
+momentum divergence,False,0.9584637,208 TRADING STRATEGIES the reality of market action. Clearly deﬁne how and when you will use momentu...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",281
+cross-validation,False,0.96339846,"7.10 Cross-Validation 245 The quantity trace(S) is the eﬀective number of parameters, as deﬁned in S...",The Elements of Statistical Learning.pdf,434
+slashing risk,False,0.9650265,PART Two Market Risk...,risk management and financial institutions.pdf,262
+concentration risk,False,0.9667444,PART Two Market Risk...,risk management and financial institutions.pdf,262
+gas fee volatility,False,0.9689249,Volatility Trading...,Unknown,0
+meta-labeling,False,0.9726772,THE QUANTAMENTAL WAY 53 Meta-labeling will increase your F1-score by filtering out the false positiv...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,109
+USD collateral tightening,False,0.97378117,"CHAPTER18 Managing Credit Risk: Margin, OTC Markets, and CCPs C redit risk arises from the possibili...",risk management and financial institutions.pdf,494
+regulatory capital,False,0.97624063,42 FINANCIAL INSTITUTIONS AND THEIR TRADING risk arises primarily from the bank’s trading operations...,risk management and financial institutions.pdf,153
+CB balance sheet expansion,False,0.97698677,360 REGULATION TABLE 16.3 Dividend Restrictions Arising from the Capital Conservation Buffer and 2.5...,risk management and financial institutions.pdf,470
+meta-cognition in strategy switching,False,0.9771434,"356 THE INDIVIDUAL, SELF-DIRECTED TRADER line, as only one of many possible outcomes, and avoid atta...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",429
+risk appetite profiling,False,0.97857547,568 OTHER TOPICS institution wanting to preserve its AA rating might decide that the probability of ...,risk management and financial institutions.pdf,685
+shadow banking system,False,0.9803668,572 OTHER TOPICS 27.3 IDENTIFYING MAJOR RISKS An important part of ERM is identifying key exposures ...,risk management and financial institutions.pdf,689
+macd,False,0.9832856,4 2.1.2.1 Basic Calculation - MACD MACD is derived from the differences between two exponential movi...,DesignandDevelopmentofMeanReversionStrategiesonQuantConnectPlatform.pdf,28
+reward shaping for AI agents,False,0.9922245,11 rsta.royalsocietypublishing.org Phil. Trans. R. Soc. A 0000000 . . . . . . . . . . . . . . . . . ...,Trading algos and systems.pdf,213
+transformer models for trading,False,0.9999884,Volatility Trading...,Unknown,0
+exchange insolvency risk,False,1.0009818,396 CREDIT RISK It is also the case that exchanges are increasingly trying to offer less standard pr...,risk management and financial institutions.pdf,507
+signal decay tracking,False,1.0019739,"70 SAMPLE WEIGHTS 4.7 TIME DECAY Markets are adaptive systems (Lo [2017]). As markets evolve, older ...",Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,126
+jurisdictional risk,False,1.0057901,496 OTHER TOPICS as time passes is likely to depend on the claims made and other indicators that the...,risk management and financial institutions.pdf,606
+position sizing,False,1.0090184,"278 TRADING STRATEGIES random sizer could have gotten lucky, but he usually will not be lucky, which...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",350
+confirmation bias,False,1.0199518,58 U M B E R T O E C O ' S A N T I L I B R A R Y equipment causing optical illusions; or he could be...,Taleb_The-Black-Swan.pdf,172
+recency bias,False,1.0221583,The Trader’s Mind 355 possibly be justiﬁed by their results. We are never as good as we think we are...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",428
+cex vs dex,False,1.0243521,The crypto ecosystem: key elements and risks 11 oracle has the ability to corrupt the system by misr...,crypto markets.pdf,15
+flash loan attacks,False,1.0302521,The crypto ecosystem: key elements and risks 13 Crypto is probably also used for illicit activities ...,crypto markets.pdf,17
+exchange outage risk,False,1.031119,396 CREDIT RISK It is also the case that exchanges are increasingly trying to offer less standard pr...,risk management and financial institutions.pdf,507
+mental stop loss,False,1.0317168,"The Trader’s Mind 351 across many time frames, with different objectives and perspectives; everythin...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",424
+agent self-correction heuristics,False,1.0359972,736 TRADING SYSTEMS AND METHODS The closest practical approach to artifi cial intelligence is heuris...,Trading algos and systems.pdf,1219
+reverse repo facility,False,1.038475,684 GLOSSARY Repo Repurchase agreement. A procedure for borrowing money by selling securities to a c...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,20
+gamma exposure,False,1.0402098,162 MARKET RISK Gamma K Stock price FIGURE 8.5 Relationship between Gamma of an Option and Price of ...,risk management and financial institutions.pdf,272
+multi-leg order routing,False,1.0429423,Figure 1.13. Functional diagram of a smart order router. • It obtains a price better than or equal t...,market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,110
+decision tree vs ensemble path tracing,False,1.0475006,"98 ENSEMBLE METHODS one, as excessive partitioning would again place in the testing set samples too ...",Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,153
+covariate shift detection,False,1.0478647,"Chapter 6 Extracting Useful Features From High Frequency Data Publications Included • B. Lim, S. Zoh...",Deep learning and decision making.pdf,137
+confidence scoring,False,1.052959,"T H E S C A N D A L O F P R E D I C T I O N 1 3 9 kers in western Ukraine, the sales of this book du...",Taleb_The-Black-Swan.pdf,254
+oracle latency,False,1.0563688,"Computation Oracles So far, we have only discussed oracles in the context of requesting and deliveri...",mastering-ethereum.pdf,520
+spoofing and layering,False,1.0606791,A Taxonomy of Why People Trade ©2015 The CFA Institute Research Foundation. All Rights Reserved.  1...,Trading-Volatility.pdf,142
+repo operations,False,1.0650184,684 GLOSSARY Repo Repurchase agreement. A procedure for borrowing money by selling securities to a c...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,20
+impermanent loss,False,1.0654197,"pragma ^0.4.22 contract MEContract { constructor () { // This is the constructor } } To summarize, a...",mastering-ethereum.pdf,319
+quantitative tightening,False,1.0710917,"Trade Management 247 Tightening Stops At ﬁrst glance, it would seem that tightening stops is a simpl...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",320
+regret minimization,False,1.072901,"a unique value for xN. On the one hand, if it is greater than zero, it means that the choice of x1 w...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,308
+decision fatigue,False,1.0767328,"294 Psychology in, you’ll always count on someone else to tell you what to buy and when to buy it. A...",Breakthrough_Strategies_for_Predicting_Any_Market__Charting_Elliott_Wave_Lucas_Fibonacci_Gann_and_Ti.pdf,319
+yield farming,False,1.0778308,590 TRADING SYSTEMS AND METHODS The theory behind an intercrop spread is that prices must come toget...,Trading algos and systems.pdf,1073
+cross-chain bridge risk,False,1.0849442,436 CREDIT RISK dealers. This is because the company’s financial position and therefore its probabil...,risk management and financial institutions.pdf,547
+overfitting,False,1.0867758,CHAPTER 7 Cross-Validation in Finance 7.1 MOTIVATION The purpose of cross-validation (CV) is to dete...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,158
+overtrading,False,1.100764,The Vulnerability An over/underflow occurs when an operation is performed that requires a fixed-size...,mastering-ethereum.pdf,376
+omega ratio,False,1.1022648,1172 APPENDIX 3 41 -3.02 4.96 14.75 24.86 45 25.65 28.88 -14.15 -6.10 49 -9.92 -10.79 -6.77 -6.32 53...,Trading-Volatility.pdf,80
+straddle,False,1.1044445,ably have gained the entire premium of $400. This is a 44% return on his investment in 65 days. Sell...,beatthemarket.pdf,176
+yield curve inversion,False,1.1086046,Answers to Questions and Problems 643 9.10 We can (a) perturb points on the yield curve (see Figure ...,SSRN-id3682487.pdf,13
+front-running bots,False,1.1133451,Professor Larry Harris Trading and Exchanges Draft Copy ©2002 Oxford University Press Draft: March 5...,Trading-Volatility.pdf,261
+online learning,False,1.1304376,1. Introduction 7 Who Should Read this Book This book is designed for researchers and students in a ...,The Elements of Statistical Learning.pdf,117
+real vs simulated performance tracking,False,1.1410351,"On a benchmark-by-benchmark basis, such a decomposition can be refined towards where the Planned pri...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,234
+governance attacks,False,1.1412685,"of writing. Note that it’s not ‘millions and millions’ of computers as some claim, for instance Don ...",The Elements of Statistical Learning.pdf,72
+multi-agent coordination risk,False,1.146244,"380 THE INDIVIDUAL, SELF-DIRECTED TRADER There is great potential for reinforcement of weaknesses an...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",452
+quote stuffing,False,1.1529663,9  Quote stuffers: They engage in ‘latency arbitrage’. The strategy involves overwhelming an exchan...,Thomas N. Bulkowski-Encyclopedia Of Chart Patterns.pdf,459
+walk forward validation,False,1.1565697,"162 BACKTESTING THROUGH CROSS-VALIDATION common mistake to find leakage in WF backtests, where t1.in...",Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,216
+parent/child order logic,False,1.1584501,1.5. Trading priority rules 21 are executed ﬁrst and only after all market orders have been executed...,An Introduction to Microstructure Theory Andreaas Krause.pdf,42
+KYC AML enforcement,False,1.1589537,"PAGE 6 | THE DIGITAL ASSET DATA GUIDE FOR FINANCIAL PROFESSIONALS Compliance Of course, maintaining ...",220001-The-Digital-Asset-Guide-For-Financial-Professionals-eBook-v3.pdf,6
+validator concentration risk,False,1.1616896,CRYPTO ASSETS MARKET STUDY 32 2. Operating the infrastructure and validating transactions 1. Permiss...,Crypto Market Study.pdf,33
+behavioral edge extraction,False,1.1796551,"14.5 Principal Components, Curves and Surfaces 545 Alternatively, a fully connected graph includes a...",the-man-who-solved-the-market-how-jim-simons-launched-the-quant-revolution-hardcovernbsped-073521798x-9780735217980.pdf,82
+slippage,False,1.1835549,"126 MARKET STRUCTURE increased volume, activity, and interest associated with the actual breakout. I...","pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",199
+probabilistic confidence calibration,False,1.1840025,This is page 261 Printer: Opaque this 8 Model Inference and Averaging 8.1 Introduction For most of t...,The Elements of Statistical Learning.pdf,450
+cancel-replace ratio,False,1.1860428,"www.Fxborssa.com Elliott Wave Theory 335 1/1 is 1.00, 1/2 is .50, 2/3 is .67, 3/5 is .60, 5/8 is .62...",Technical-Analysis-of-the-Futures-Markets-John-J.-Murphy.pdf,458
+fill ratio,False,1.1861695,"Figure 3.17. Typical fill rates (x-axis is the distance to the best opposite, y-axis is the expected...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,272
+regime detection,False,1.1907103,"Special Topics in Quantitative Trading 121 model to past prices, using standard statistical methods ...",algorithmic trading how to build your own algo business.pdf,143
+beta exposure,False,1.1957126,"8 K. Daniel, T.J. Moskowitz / Journal of Financial Economics 0 0 0 (2016) 1–27 ARTICLE IN PRESS JID:...",order flow and price formation.pdf,12
+drawdown control,False,1.2041881,266 TRADING STRATEGIES 3 percent on a trade and have a disastrous situation where you have a 5× loss...,"pcmbrokers_(Wiley finance series) Adam Grimes-The art and science of technical analysis _ market structure, price action, and trading strategies-J. Wiley  &  Sons  (2012).pdf",338
+exposure management,False,1.2071296,2.9 what to do? 33 Figure 2.22: A hierarchy for survival. Higher entities have a longer life expecta...,STATISTICAL_CONSEQUENCES_OF_FAT_TAILS_TE.pdf,129
+MEV (maximal extractable value),False,1.2109504,272 ENTROPY FEATURES 1.55 1.50 1.45 (a) 1.40 1.35 1.30 0 5 10 15 Degree 20 25 30 h = 1.42 None count...,Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,327
+fill probability,False,1.2199848,"66 SAMPLE WEIGHTS The procedure starts with 𝜑(0) = ∅, and a uniform distribution of probability, 𝛿i ...",Marcos Lopez de Prado - Advances in Financial Machine Learning-Wiley (2018).pdf,122
+TWAP,False,1.2260106,Page 81 of 150 VWAP VWAP stands for Volume Weighted Average Price and is perhaps the most commonly u...,Unknown,0
+vega compression,False,1.2435216,"How Traders Manage Their Risks 163 The vega of a portfolio, V, is the rate of change of the value of...",risk management and financial institutions.pdf,273
+iron condor,False,1.2483163,"Chapter thirty-seven: “The Same Old Patterns” 563 FIGURE 272. From a 1967 high of 48½, “FLY” started...",edwards-magee-technical-analysis-of-stock-trends-9th-edition.pdf,632
+staking derivatives,False,1.2499214,"Basel II.5, Basel III, and Other Post-Crisis Changes 369 should be cleared through central clearing ...",risk management and financial institutions.pdf,479
+circuit breaker logic,False,1.2635412,"breakers are triggered only after a trade occurs outside of the applicable percentage threshold, the...",market-microstructure-in-practice-second-edition-2nbsped-9789813231146-9789813231122.pdf,219
+target leakage,False,1.2654499,"286 The Rule of Multiple Technical Techniques On Monday, March 5, I suggested a buy at $21.38. The t...",Taleb_The-Black-Swan.pdf,57
+token vesting cliffs,False,1.2705815,Where the underlying item is an asset you could think of the token as a digital version of a cloakro...,The Basics of Bitcoins and Blockchains.pdf,101
+synthetic replication,False,1.2786136,System Testing 915 Synthetic Data The ultimate answer to getting test data is to create it yourself....,Trading and exchanges Market Microstructure for Practitioners.pdf,77
+sliding window retraining,False,1.2854686,120 The Basics ----- '\\ Closed Window I But No Selling Follow Through EXHIBIT 7.1. Window in an Uptr...,stevie-nison-candlestick-(KohanFx.com).pdf,216
+custody vs self custody,False,1.3004894,"Custody and counterparty risk In the traditional fund management space, using an independent third-p...",3rd-annual-pwc-elwood-aima-crypto-hedge-fund-report-(may-2021).pdf,27
+agent burn-in period,False,1.3069468,9 8 U M B E R T O E C O ' S A N T I U B R A R Y ingly harmless stressors do not strengthen you; they...,Taleb_The-Black-Swan.pdf,212
+TVL manipulation,False,1.3297625,V aluing American Binary Calls in the Blac k-Sc holes Mo del(con'd)  Recall that the p o w er pla y...,dynamic hedging.pdf,60
+pump and dump,False,1.3671005,"19 Drawing Lines Something else has to be mentioned regarding up‐channels. Bob Evans, one of the mos...",Trading algos and systems.pdf,243
+rug pull,False,1.4143047,"115 Absorption few days. On the reflex rally to the April 27 high, the range narrows and volume drop...",Trading algos and systems.pdf,336
+strangle,False,1.4310361,. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ...,The Elements of Statistical Learning.pdf,124
