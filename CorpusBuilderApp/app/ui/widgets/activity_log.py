@@ -1,110 +1,199 @@
-"""
-Activity Log Widget for Dashboard
-"""
+# File: app/ui/widgets/activity_log.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, 
-                            QTableWidgetItem, QHeaderView, QFrame, QLabel)
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QColor, QIcon
-import logging
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
+                             QLabel, QHBoxLayout, QPushButton, QComboBox, QMenu,
+                             QAction)
+from PyQt6.QtCore import Qt, pyqtSignal, QDateTime
+from PyQt6.QtGui import QIcon, QColor, QFont
 
-class ActivityLogWidget(QFrame):
-    """Widget displaying recent activity log"""
+import datetime
+
+class ActivityLogItem(QListWidgetItem):
+    """Custom list widget item for activity log entries."""
     
-    def __init__(self, config):
+    def __init__(self, timestamp, activity_type, message, details=None):
         super().__init__()
-        self.config = config
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.timestamp = timestamp
+        self.activity_type = activity_type
+        self.message = message
+        self.details = details
         
-        # Set frame styling
-        self.setFrameShape(QFrame.Shape.StyledPanel)
-        self.setFrameShadow(QFrame.Shadow.Raised)
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #ffffff;
-                border-radius: 6px;
-                border: 1px solid #e0e0e0;
-            }
-            QTableWidget {
-                border: none;
-                gridline-color: #f0f0f0;
-            }
-            QHeaderView::section {
-                background-color: #f0f0f0;
-                padding: 4px;
-                font-weight: bold;
-                border: none;
-                border-bottom: 1px solid #d0d0d0;
-            }
-        """)
+        # Set display text
+        time_str = timestamp.toString("hh:mm:ss")
+        self.setText(f"[{time_str}] {activity_type}: {message}")
         
-        # Initialize UI
-        self.init_ui()
+        # Set icon based on activity type
+        if activity_type == "Collection":
+            self.setIcon(QIcon("app/resources/icons/download.png"))
+        elif activity_type == "Processing":
+            self.setIcon(QIcon("app/resources/icons/process.png"))
+        elif activity_type == "Error":
+            self.setIcon(QIcon("app/resources/icons/error.png"))
+            self.setForeground(QColor("red"))
+        elif activity_type == "Warning":
+            self.setIcon(QIcon("app/resources/icons/warning.png"))
+            self.setForeground(QColor("orange"))
+        elif activity_type == "Success":
+            self.setIcon(QIcon("app/resources/icons/success.png"))
+            self.setForeground(QColor("green"))
+        else:
+            self.setIcon(QIcon("app/resources/icons/info.png"))
+
+class ActivityLog(QWidget):
+    """Widget for displaying activity log entries."""
     
-    def init_ui(self):
-        """Initialize the user interface"""
-        # Main layout
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(15, 15, 15, 15)
-        
-        # Activity table
-        self.activity_table = QTableWidget()
-        self.activity_table.setColumnCount(4)
-        self.activity_table.setHorizontalHeaderLabels(["Time", "Action", "Status", "Details"])
-        
-        # Set column widths
-        self.activity_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        self.activity_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-        self.activity_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        self.activity_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        
-        # Set table properties
-        self.activity_table.setAlternatingRowColors(True)
-        self.activity_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
-        self.activity_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.activity_table.setShowGrid(True)
-        
-        layout.addWidget(self.activity_table)
+    item_selected = pyqtSignal(ActivityLogItem)
     
-    def update_activity_log(self, activities):
-        """Update activity log display"""
-        try:
-            # Clear existing rows
-            self.activity_table.setRowCount(0)
-            
-            # Add activities
-            for activity in activities:
-                row = self.activity_table.rowCount()
-                self.activity_table.insertRow(row)
-                
-                # Time
-                time_item = QTableWidgetItem(activity.get("time", ""))
-                self.activity_table.setItem(row, 0, time_item)
-                
-                # Action
-                action_item = QTableWidgetItem(activity.get("action", ""))
-                self.activity_table.setItem(row, 1, action_item)
-                
-                # Status
-                status = activity.get("status", "")
-                status_item = QTableWidgetItem(status)
-                
-                # Set status color
-                if status == "success":
-                    status_item.setForeground(QColor("#2e7d32"))  # Green
-                elif status == "running":
-                    status_item.setForeground(QColor("#1976d2"))  # Blue
-                elif status == "error" or status == "failed":
-                    status_item.setForeground(QColor("#c62828"))  # Red
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setup_ui()
+        
+    def setup_ui(self):
+        """Set up the UI components."""
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Header with controls
+        header_layout = QHBoxLayout()
+        
+        header_label = QLabel("Activity Log")
+        header_label.setFont(QFont("Arial", 12, QFont.Weight.Bold))
+        header_layout.addWidget(header_label)
+        
+        # Filter by type
+        self.type_filter = QComboBox()
+        self.type_filter.addItems(["All", "Collection", "Processing", "Error", "Warning", "Success", "Info"])
+        self.type_filter.currentTextChanged.connect(self.apply_filters)
+        header_layout.addWidget(self.type_filter)
+        
+        # Clear button
+        clear_button = QPushButton("Clear")
+        clear_button.clicked.connect(self.clear_log)
+        header_layout.addWidget(clear_button)
+        
+        # Export button
+        export_button = QPushButton("Export")
+        export_button.clicked.connect(self.export_log)
+        header_layout.addWidget(export_button)
+        
+        main_layout.addLayout(header_layout)
+        
+        # Log list
+        self.log_list = QListWidget()
+        self.log_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.log_list.customContextMenuRequested.connect(self.show_context_menu)
+        self.log_list.itemClicked.connect(self.on_item_clicked)
+        main_layout.addWidget(self.log_list)
+    
+    def add_activity(self, activity_type, message, details=None):
+        """Add a new activity to the log."""
+        timestamp = QDateTime.currentDateTime()
+        item = ActivityLogItem(timestamp, activity_type, message, details)
+        
+        # Add to the top of the list (most recent first)
+        self.log_list.insertItem(0, item)
+        
+        # Apply current filter
+        self.apply_filters()
+        
+        return item
+    
+    def apply_filters(self):
+        """Apply filters to the log list."""
+        filter_type = self.type_filter.currentText()
+        
+        for i in range(self.log_list.count()):
+            item = self.log_list.item(i)
+            if isinstance(item, ActivityLogItem):
+                if filter_type == "All" or item.activity_type == filter_type:
+                    item.setHidden(False)
                 else:
-                    status_item.setForeground(QColor("#757575"))  # Gray
+                    item.setHidden(True)
+    
+    def clear_log(self):
+        """Clear all log entries."""
+        self.log_list.clear()
+    
+    def export_log(self):
+        """Export the log entries to a file."""
+        from PyQt6.QtWidgets import QFileDialog
+        import csv
+        
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Log", "", "CSV Files (*.csv);;Text Files (*.txt)"
+        )
+        
+        if file_path:
+            try:
+                with open(file_path, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(["Timestamp", "Type", "Message", "Details"])
+                    
+                    for i in range(self.log_list.count()):
+                        item = self.log_list.item(i)
+                        if isinstance(item, ActivityLogItem):
+                            writer.writerow([
+                                item.timestamp.toString("yyyy-MM-dd hh:mm:ss"),
+                                item.activity_type,
+                                item.message,
+                                item.details or ""
+                            ])
                 
-                self.activity_table.setItem(row, 2, status_item)
-                
-                # Details
-                details_item = QTableWidgetItem(activity.get("details", ""))
-                self.activity_table.setItem(row, 3, details_item)
+                self.add_activity("Success", f"Log exported to {file_path}")
+            except Exception as e:
+                self.add_activity("Error", f"Failed to export log: {str(e)}")
+    
+    def on_item_clicked(self, item):
+        """Handle item click."""
+        if isinstance(item, ActivityLogItem):
+            self.item_selected.emit(item)
+    
+    def show_context_menu(self, position):
+        """Show context menu for log items."""
+        item = self.log_list.itemAt(position)
+        if not item:
+            return
             
-        except Exception as e:
-            self.logger.error(f"Error updating activity log: {e}")
-```
+        menu = QMenu()
+        
+        # Copy action
+        copy_action = QAction("Copy Message", self)
+        copy_action.triggered.connect(lambda: self.copy_item_text(item))
+        menu.addAction(copy_action)
+        
+        # View details action (if details exist)
+        if isinstance(item, ActivityLogItem) and item.details:
+            view_details_action = QAction("View Details", self)
+            view_details_action.triggered.connect(lambda: self.view_item_details(item))
+            menu.addAction(view_details_action)
+        
+        # Delete action
+        delete_action = QAction("Delete", self)
+        delete_action.triggered.connect(lambda: self.delete_item(item))
+        menu.addAction(delete_action)
+        
+        menu.exec(self.log_list.mapToGlobal(position))
+    
+    def copy_item_text(self, item):
+        """Copy the item text to clipboard."""
+        from PyQt6.QtGui import QClipboard
+        from PyQt6.QtWidgets import QApplication
+        
+        QApplication.clipboard().setText(item.text())
+    
+    def view_item_details(self, item):
+        """View the details of an item."""
+        from PyQt6.QtWidgets import QMessageBox
+        
+        if isinstance(item, ActivityLogItem) and item.details:
+            QMessageBox.information(
+                self, 
+                f"{item.activity_type} Details",
+                item.details
+            )
+    
+    def delete_item(self, item):
+        """Delete an item from the log."""
+        row = self.log_list.row(item)
+        if row >= 0:
+            self.log_list.takeItem(row)

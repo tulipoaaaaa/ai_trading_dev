@@ -18,7 +18,7 @@ import json
 import threading
 
 # Import UI components
-from ..widgets.corpus_statistics import CorpusStatisticsWidget
+from ..widgets.deprecated.corpus_statistics import CorpusStatisticsWidget
 from ..widgets.activity_log import ActivityLogWidget
 from ..widgets.domain_distribution import DomainDistributionWidget
 from ..widgets.storage_usage import StorageUsageWidget
