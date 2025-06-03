@@ -1,3 +1,4 @@
 # Build context for RTX 5090 bitsandbytes
 /bnb_build_sm120
 .env
+.Trash-1000/
