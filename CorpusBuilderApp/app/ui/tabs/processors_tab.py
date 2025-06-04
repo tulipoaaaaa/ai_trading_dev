@@ -1,8 +1,9 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, 
                              QLabel, QProgressBar, QPushButton, QCheckBox, 
-                             QSpinBox, QListWidget, QGroupBox, QFileDialog)
+                             QSpinBox, QListWidget, QGroupBox, QFileDialog, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSlot
 import os
+import shutil
 
 from shared_tools.ui_wrappers.processors.batch_nonpdf_extractor_enhanced_wrapper import BatchNonPDFExtractorEnhancedWrapper
 from shared_tools.ui_wrappers.processors.pdf_extractor_wrapper import PDFExtractorWrapper
@@ -21,6 +22,7 @@ from shared_tools.ui_wrappers.processors.language_confidence_detector_wrapper im
 from shared_tools.ui_wrappers.processors.financial_symbol_processor_wrapper import FinancialSymbolProcessorWrapper
 from shared_tools.ui_wrappers.processors.chart_image_extractor_wrapper import ChartImageExtractorWrapper
 from shared_tools.ui_wrappers.processors.formula_extractor_wrapper import FormulaExtractorWrapper
+from CorpusBuilderApp.app.ui.tabs.corpus_manager_tab import NotificationManager
 
 
 class ProcessorsTab(QWidget):
@@ -29,6 +31,7 @@ class ProcessorsTab(QWidget):
         self.project_config = project_config
         self.processor_wrappers = {}
         self.file_queue = []
+        self.notification_manager = NotificationManager(self)
         self.setup_ui()
         self.init_processors()
         self.connect_signals()
@@ -64,6 +67,8 @@ class ProcessorsTab(QWidget):
         status_layout.addWidget(stop_all_btn)
         
         main_layout.addWidget(status_group)
+        # Add notification area at the bottom
+        main_layout.addWidget(self.notification_manager)
 
     def create_pdf_tab(self):
         tab = QWidget()
@@ -645,3 +650,65 @@ class ProcessorsTab(QWidget):
         self.batch_stop_btn.setEnabled(False)
         
         self.processing_status_label.setText("All processors stopped")
+
+    def run_batch_operation(self, operation_type):
+        selected_files = self.get_selected_files()
+        if not selected_files:
+            QMessageBox.warning(self, f"No files selected", f"Please select files to {operation_type}.")
+            return
+        try:
+            if operation_type == "copy":
+                target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
+                if not target_dir:
+                    return
+                for file_path in selected_files:
+                    try:
+                        shutil.copy2(file_path, target_dir)
+                    except Exception as e:
+                        self.notification_manager.add_notification(f"copy_{file_path}", "Copy Error", str(e), "error", auto_hide=True)
+                self.notification_manager.add_notification("batch_copy", "Batch Copy", f"Copied {len(selected_files)} files.", "success", auto_hide=True)
+            elif operation_type == "move":
+                target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
+                if not target_dir:
+                    return
+                for file_path in selected_files:
+                    try:
+                        shutil.move(file_path, target_dir)
+                    except Exception as e:
+                        self.notification_manager.add_notification(f"move_{file_path}", "Move Error", str(e), "error", auto_hide=True)
+                self.notification_manager.add_notification("batch_move", "Batch Move", f"Moved {len(selected_files)} files.", "success", auto_hide=True)
+            elif operation_type == "delete":
+                confirm = QMessageBox.question(self, "Confirm Delete", f"Delete {len(selected_files)} files?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                if confirm == QMessageBox.StandardButton.Yes:
+                    for file_path in selected_files:
+                        try:
+                            os.remove(file_path)
+                        except Exception as e:
+                            self.notification_manager.add_notification(f"delete_{file_path}", "Delete Error", str(e), "error", auto_hide=True)
+                    self.notification_manager.add_notification("batch_delete", "Batch Delete", f"Deleted {len(selected_files)} files.", "success", auto_hide=True)
+            # Add more operations as needed
+            self.refresh_file_view()
+        except Exception as e:
+            QMessageBox.critical(self, f"Batch {operation_type.capitalize()} Error", str(e))
+
+    def get_selected_files(self):
+        """Return the list of selected files from the active tab's file list."""
+        current_tab = self.processor_tabs.currentIndex()
+        if current_tab == 0:  # PDF tab
+            return [self.pdf_file_list.item(i).text() for i in range(self.pdf_file_list.count()) if self.pdf_file_list.item(i).isSelected()]
+        elif current_tab == 1:  # Text tab
+            return [self.text_file_list.item(i).text() for i in range(self.text_file_list.count()) if self.text_file_list.item(i).isSelected()]
+        elif current_tab == 3:  # Batch tab
+            # In batch tab, select all files found in the last batch operation (if any)
+            # For now, return empty list (could be extended to support selection)
+            return []
+        else:
+            return []
+
+    def refresh_file_view(self):
+        """Refresh the file lists in the UI after batch operations."""
+        # For PDF and Text tabs, just clear and reload the lists
+        self.pdf_file_list.clear()
+        self.text_file_list.clear()
+        # Optionally, could reload from disk or keep a cache of last directory
+        # For now, just clear the lists

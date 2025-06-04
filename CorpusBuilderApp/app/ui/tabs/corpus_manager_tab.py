@@ -965,155 +965,98 @@ class CorpusManagerTab(QWidget):
         self.refresh_file_view()
 
     def batch_copy_files(self):
-        """Copy selected files to a target directory"""
         selected_files = self.get_selected_files()
         if not selected_files:
             QMessageBox.warning(self, "No files selected", "Please select files to copy.")
             return
-        
-        target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
-        if not target_dir:
-            return
-        
-        options = {
-            'overwrite': False,
-            'rename_conflicts': True
-        }
-        
-        self.worker = BatchOperationWorker("copy", selected_files, target_dir, options)
-        self.connect_worker_signals()
-        self.worker.start()
-    
+        try:
+            target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
+            if not target_dir:
+                return
+            for file_path in selected_files:
+                try:
+                    shutil.copy2(file_path, target_dir)
+                except Exception as e:
+                    self.notification_manager.add_notification(f"copy_{file_path}", "Copy Error", str(e), "error", auto_hide=True)
+            self.notification_manager.add_notification("batch_copy", "Batch Copy", f"Copied {len(selected_files)} files.", "success", auto_hide=True)
+            self.refresh_file_view()
+        except Exception as e:
+            QMessageBox.critical(self, "Batch Copy Error", str(e))
+
     def batch_move_files(self):
-        """Move selected files to a target directory"""
         selected_files = self.get_selected_files()
         if not selected_files:
             QMessageBox.warning(self, "No files selected", "Please select files to move.")
             return
-        
-        target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
-        if not target_dir:
-            return
-        
-        options = {
-            'overwrite': False,
-            'rename_conflicts': True
-        }
-        
-        self.worker = BatchOperationWorker("move", selected_files, target_dir, options)
-        self.connect_worker_signals()
-        self.worker.start()
-    
+        try:
+            target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
+            if not target_dir:
+                return
+            for file_path in selected_files:
+                try:
+                    shutil.move(file_path, target_dir)
+                except Exception as e:
+                    self.notification_manager.add_notification(f"move_{file_path}", "Move Error", str(e), "error", auto_hide=True)
+            self.notification_manager.add_notification("batch_move", "Batch Move", f"Moved {len(selected_files)} files.", "success", auto_hide=True)
+            self.refresh_file_view()
+        except Exception as e:
+            QMessageBox.critical(self, "Batch Move Error", str(e))
+
     def batch_rename_files(self):
-        """Rename selected files according to a pattern"""
         selected_files = self.get_selected_files()
         if not selected_files:
             QMessageBox.warning(self, "No files selected", "Please select files to rename.")
             return
-        
-        pattern, ok = QInputDialog.getText(
-            self, "Rename Pattern",
-            "Enter rename pattern (use {index}, {original}, {extension}, {date}):",
-            text="{original}_{index}"
-        )
+        pattern, ok = QInputDialog.getText(self, "Rename Pattern", "Enter rename pattern (use {index}, {original}, {extension}, {date}):", text="{original}_{index}")
         if not ok or not pattern:
             return
-        
-        options = {
-            'pattern': pattern,
-            'overwrite': False,
-            'rename_conflicts': True
-        }
-        
-        self.worker = BatchOperationWorker("rename", selected_files, "", options)
-        self.connect_worker_signals()
-        self.worker.start()
-    
+        try:
+            for i, file_path in enumerate(selected_files):
+                try:
+                    dir_path = os.path.dirname(file_path)
+                    base, ext = os.path.splitext(os.path.basename(file_path))
+                    new_name = pattern.format(index=i+1, original=base, extension=ext[1:], date=time.strftime("%Y%m%d"))
+                    new_path = os.path.join(dir_path, new_name)
+                    if os.path.exists(new_path):
+                        raise FileExistsError(f"File {new_name} already exists.")
+                    os.rename(file_path, new_path)
+                except Exception as e:
+                    self.notification_manager.add_notification(f"rename_{file_path}", "Rename Error", str(e), "error", auto_hide=True)
+            self.notification_manager.add_notification("batch_rename", "Batch Rename", f"Renamed {len(selected_files)} files.", "success", auto_hide=True)
+            self.refresh_file_view()
+        except Exception as e:
+            QMessageBox.critical(self, "Batch Rename Error", str(e))
+
     def batch_organize_files(self):
-        """Organize selected files into subdirectories"""
         selected_files = self.get_selected_files()
         if not selected_files:
             QMessageBox.warning(self, "No files selected", "Please select files to organize.")
             return
-        
-        criteria, ok = QInputDialog.getItem(
-            self, "Organization Criteria",
-            "Select organization criteria:",
-            ["extension", "date"],
-            editable=False
-        )
+        criteria, ok = QInputDialog.getItem(self, "Organization Criteria", "Select organization criteria:", ["extension", "date"], editable=False)
         if not ok:
             return
-        
-        options = {
-            'criteria': criteria,
-            'overwrite': False,
-            'rename_conflicts': True
-        }
-        
-        self.worker = BatchOperationWorker("organize", selected_files, "", options)
-        self.connect_worker_signals()
-        self.worker.start()
-    
-    def connect_worker_signals(self):
-        """Connect worker signals to UI update methods"""
-        self.worker.progress_updated.connect(self.update_batch_progress)
-        self.worker.file_processed.connect(self.handle_file_processed)
-        self.worker.operation_completed.connect(self.handle_operation_completed)
-        self.worker.error_occurred.connect(self.handle_operation_error)
-    
-    def update_batch_progress(self, progress: int, message: str, stats: dict):
-        """Update progress bar and status message"""
-        self.batch_progress.setValue(progress)
-        self.batch_status.setText(message)
-    
-    def handle_file_processed(self, operation: str, file_path: str, success: bool, message: str):
-        """Handle individual file processing result"""
-        if success:
-            self.notification_manager.add_notification(
-                f"{operation}_{file_path}",
-                f"{operation.capitalize()} Success",
-                message,
-                "success",
-                auto_hide=True
-            )
-        else:
-            self.notification_manager.add_notification(
-                f"{operation}_{file_path}",
-                f"{operation.capitalize()} Error",
-                message,
-                "error",
-                auto_hide=True
-            )
-    
-    def handle_operation_completed(self, operation: str, stats: dict):
-        """Handle batch operation completion"""
-        success = stats['successful_files']
-        failed = stats['failed_files']
-        skipped = stats['skipped_files']
-        
-        message = f"Operation completed: {success} succeeded, {failed} failed, {skipped} skipped"
-        self.notification_manager.add_notification(
-            f"{operation}_complete",
-            f"{operation.capitalize()} Complete",
-            message,
-            "success" if failed == 0 else "warning",
-            auto_hide=True
-        )
-        
-        self.batch_progress.setValue(100)
-        self.batch_status.setText("Ready")
-        self.refresh_file_view()
-    
-    def handle_operation_error(self, error_type: str, error_message: str):
-        """Handle batch operation error"""
-        self.notification_manager.add_notification(
-            "operation_error",
-            error_type,
-            error_message,
-            "error",
-            auto_hide=True
-        )
-        
-        self.batch_progress.setValue(0)
-        self.batch_status.setText("Error occurred")
+        try:
+            for file_path in selected_files:
+                try:
+                    dir_path = os.path.dirname(file_path)
+                    filename = os.path.basename(file_path)
+                    if criteria == 'extension':
+                        _, ext = os.path.splitext(filename)
+                        subdir = ext[1:].upper() if ext else 'NO_EXTENSION'
+                    elif criteria == 'date':
+                        mtime = os.path.getmtime(file_path)
+                        subdir = time.strftime("%Y-%m", time.localtime(mtime))
+                    else:
+                        subdir = 'OTHER'
+                    target_dir = os.path.join(dir_path, subdir)
+                    os.makedirs(target_dir, exist_ok=True)
+                    target_file = os.path.join(target_dir, filename)
+                    if os.path.exists(target_file):
+                        raise FileExistsError(f"File {filename} already exists in {subdir}.")
+                    shutil.move(file_path, target_file)
+                except Exception as e:
+                    self.notification_manager.add_notification(f"organize_{file_path}", "Organize Error", str(e), "error", auto_hide=True)
+            self.notification_manager.add_notification("batch_organize", "Batch Organize", f"Organized {len(selected_files)} files.", "success", auto_hide=True)
+            self.refresh_file_view()
+        except Exception as e:
+            QMessageBox.critical(self, "Batch Organize Error", str(e))
