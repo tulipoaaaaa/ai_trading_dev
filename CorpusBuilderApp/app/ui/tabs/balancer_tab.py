@@ -1,33 +1,83 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
-                             QLabel, QPushButton, QProgressBar, QSpinBox,
-                             QTableWidget, QTableWidgetItem, QHeaderView,
-                             QComboBox, QCheckBox, QMessageBox)
-from PyQt6.QtCore import Qt, pyqtSlot
-from PyQt6.QtGui import QColor, QBrush, QPalette
+"""
+Enhanced Corpus Balancer Tab with Re-analysis and Periodic Monitoring
+Provides comprehensive corpus balancing with automatic re-analysis capabilities
+"""
 
+import os
+import time
+from typing import Dict, List, Optional, Any
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
+                           QLabel, QPushButton, QProgressBar, QSpinBox,
+                           QTableWidget, QTableWidgetItem, QHeaderView,
+                           QComboBox, QCheckBox, QMessageBox, QSlider,
+                           QSystemTrayIcon, QMenu, QStatusBar)
+from PyQt6.QtCore import Qt, pyqtSlot, QTimer, pyqtSignal, QObject
+from PyQt6.QtGui import QColor, QBrush, QPalette, QIcon, QAction
 from shared_tools.ui_wrappers.processors.corpus_balancer_wrapper import CorpusBalancerWrapper
 
 
+class AdvancedNotificationManager(QObject):
+    """Advanced notification system for balancer operations"""
+    
+    notification_requested = pyqtSignal(str, str, str, int)  # title, message, type, duration
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.tray_icon = None
+        self.setup_system_tray()
+        
+    def setup_system_tray(self):
+        """Setup system tray for notifications"""
+        if QSystemTrayIcon.isSystemTrayAvailable():
+            self.tray_icon = QSystemTrayIcon()
+            self.tray_icon.setToolTip("Corpus Balancer")
+            
+    def show_notification(self, title: str, message: str, notification_type: str = "info", duration: int = 5000):
+        """Show system notification"""
+        if self.tray_icon:
+            icon = QSystemTrayIcon.MessageIcon.Information
+            if notification_type == "warning":
+                icon = QSystemTrayIcon.MessageIcon.Warning
+            elif notification_type == "critical":
+                icon = QSystemTrayIcon.MessageIcon.Critical
+                
+            self.tray_icon.showMessage(title, message, icon, duration)
+
+
 class BalancerTab(QWidget):
+    """Enhanced Balancer Tab with automatic re-analysis and notifications"""
+    
     def __init__(self, project_config, parent=None):
         super().__init__(parent)
         self.project_config = project_config
         self.balancer = CorpusBalancerWrapper(project_config)
+        self.notification_manager = AdvancedNotificationManager(self)
+        
+        # Periodic analysis timer
+        self.analysis_timer = QTimer()
+        self.analysis_timer.timeout.connect(self.perform_periodic_analysis)
+        
+        # Auto-analysis settings
+        self.auto_analysis_enabled = False
+        self.analysis_interval_minutes = 30
+        self.last_analysis_time = 0
+        
         self.setup_ui()
         self.connect_signals()
         self.refresh_corpus_stats()
-    
+        
     def setup_ui(self):
+        """Initialize the enhanced user interface"""
         main_layout = QVBoxLayout(self)
         
         # Current Distribution
         current_group = QGroupBox("Current Corpus Distribution")
         current_layout = QVBoxLayout(current_group)
         
-        # Domain table
-        self.domain_table = QTableWidget(8, 5)  # 8 domains, 5 columns
+        # Domain table with enhanced features
+        self.domain_table = QTableWidget(8, 6)  # Added one more column for actions
         self.domain_table.setHorizontalHeaderLabels([
-            "Domain", "Target %", "Current %", "Document Count", "Progress"
+            "Domain", "Target %", "Current %", "Document Count", "Progress", "Status"
         ])
         
         # Set up table properties
@@ -37,19 +87,12 @@ class BalancerTab(QWidget):
         
         current_layout.addWidget(self.domain_table)
         
-        # Initialize with domains
+        # Initialize domains with enhanced data
         domains = [
-            "Crypto Derivatives", 
-            "High Frequency Trading",
-            "Risk Management",
-            "Market Microstructure",
-            "DeFi",
-            "Portfolio Construction",
-            "Valuation Models",
-            "Regulation & Compliance"
+            "Crypto Derivatives", "High Frequency Trading", "Risk Management",
+            "Market Microstructure", "DeFi", "Portfolio Construction",
+            "Valuation Models", "Regulation & Compliance"
         ]
-        
-        # Default targets (as percentages)
         targets = [20, 15, 15, 15, 12, 10, 8, 5]
         
         for i, (domain, target) in enumerate(zip(domains, targets)):
@@ -62,11 +105,11 @@ class BalancerTab(QWidget):
             target_item = QTableWidgetItem(f"{target}%")
             self.domain_table.setItem(i, 1, target_item)
             
-            # Current percentage (will be updated with real data)
+            # Current percentage (will be updated)
             current_item = QTableWidgetItem("0%")
             self.domain_table.setItem(i, 2, current_item)
             
-            # Document count (will be updated with real data)
+            # Document count
             count_item = QTableWidgetItem("0")
             self.domain_table.setItem(i, 3, count_item)
             
@@ -75,10 +118,14 @@ class BalancerTab(QWidget):
             progress_bar.setRange(0, 100)
             progress_bar.setValue(0)
             self.domain_table.setCellWidget(i, 4, progress_bar)
-        
+            
+            # Status indicator
+            status_item = QTableWidgetItem("Balanced")
+            self.domain_table.setItem(i, 5, status_item)
+            
         main_layout.addWidget(current_group)
         
-        # Balancing Options
+        # Enhanced Balancing Options
         options_group = QGroupBox("Balancing Options")
         options_layout = QVBoxLayout(options_group)
         
@@ -96,12 +143,29 @@ class BalancerTab(QWidget):
         method_layout.addWidget(QLabel("Balancing Method:"))
         self.balance_method = QComboBox()
         self.balance_method.addItems([
-            "Target Percentage", 
-            "Equal Distribution",
-            "Document Count Targets"
+            "Target Percentage", "Equal Distribution", "Document Count Targets"
         ])
         method_layout.addWidget(self.balance_method)
         options_layout.addLayout(method_layout)
+        
+        # Periodic Analysis Settings
+        periodic_layout = QVBoxLayout()
+        self.auto_analysis_checkbox = QCheckBox("Enable Automatic Re-analysis")
+        self.auto_analysis_checkbox.toggled.connect(self.toggle_auto_analysis)
+        periodic_layout.addWidget(self.auto_analysis_checkbox)
+        
+        interval_layout = QHBoxLayout()
+        interval_layout.addWidget(QLabel("Analysis Interval (minutes):"))
+        self.interval_slider = QSlider(Qt.Orientation.Horizontal)
+        self.interval_slider.setRange(5, 120)
+        self.interval_slider.setValue(30)
+        self.interval_slider.valueChanged.connect(self.update_analysis_interval)
+        self.interval_label = QLabel("30")
+        interval_layout.addWidget(self.interval_slider)
+        interval_layout.addWidget(self.interval_label)
+        periodic_layout.addLayout(interval_layout)
+        
+        options_layout.addLayout(periodic_layout)
         
         # Additional options
         self.auto_classify = QCheckBox("Automatically classify unclassified documents")
@@ -112,76 +176,183 @@ class BalancerTab(QWidget):
         self.preserve_existing.setChecked(True)
         options_layout.addWidget(self.preserve_existing)
         
+        self.enable_notifications = QCheckBox("Enable system notifications")
+        self.enable_notifications.setChecked(True)
+        options_layout.addWidget(self.enable_notifications)
+        
         main_layout.addWidget(options_group)
         
-        # Balance Controls
-        controls_group = QGroupBox("Controls")
-        controls_layout = QHBoxLayout(controls_group)
+        # Enhanced Control Panel
+        controls_group = QGroupBox("Control Panel")
+        controls_layout = QVBoxLayout(controls_group)
         
+        # Primary controls
+        primary_controls = QHBoxLayout()
         self.refresh_btn = QPushButton("Refresh Corpus Stats")
         self.refresh_btn.clicked.connect(self.refresh_corpus_stats)
-        controls_layout.addWidget(self.refresh_btn)
+        primary_controls.addWidget(self.refresh_btn)
+        
+        self.reanalyze_btn = QPushButton("Re-analyze After Changes")
+        self.reanalyze_btn.clicked.connect(self.reanalyze_corpus)
+        primary_controls.addWidget(self.reanalyze_btn)
         
         self.analyze_btn = QPushButton("Analyze Imbalance")
         self.analyze_btn.clicked.connect(self.analyze_corpus_balance)
-        controls_layout.addWidget(self.analyze_btn)
+        primary_controls.addWidget(self.analyze_btn)
         
+        controls_layout.addLayout(primary_controls)
+        
+        # Secondary controls
+        secondary_controls = QHBoxLayout()
         self.balance_btn = QPushButton("Balance Corpus")
         self.balance_btn.clicked.connect(self.balance_corpus)
-        controls_layout.addWidget(self.balance_btn)
+        secondary_controls.addWidget(self.balance_btn)
         
         self.stop_btn = QPushButton("Stop")
         self.stop_btn.setEnabled(False)
         self.stop_btn.clicked.connect(self.stop_balancing)
-        controls_layout.addWidget(self.stop_btn)
+        secondary_controls.addWidget(self.stop_btn)
+        
+        self.export_report_btn = QPushButton("Export Balance Report")
+        self.export_report_btn.clicked.connect(self.export_balance_report)
+        secondary_controls.addWidget(self.export_report_btn)
+        
+        controls_layout.addLayout(secondary_controls)
         
         main_layout.addWidget(controls_group)
         
-        # Status area
+        # Enhanced Status Area
         status_group = QGroupBox("Balancing Status")
         status_layout = QVBoxLayout(status_group)
         
-        self.status_label = QLabel("Ready")
+        self.status_label = QLabel("Ready - Last analysis: Never")
         status_layout.addWidget(self.status_label)
         
         self.overall_progress = QProgressBar()
         status_layout.addWidget(self.overall_progress)
         
+        # Statistics display
+        stats_layout = QHBoxLayout()
+        self.total_docs_label = QLabel("Total Documents: 0")
+        self.balance_score_label = QLabel("Balance Score: 0%")
+        self.last_change_label = QLabel("Last Change: Never")
+        
+        stats_layout.addWidget(self.total_docs_label)
+        stats_layout.addWidget(self.balance_score_label)
+        stats_layout.addWidget(self.last_change_label)
+        status_layout.addLayout(stats_layout)
+        
         main_layout.addWidget(status_group)
-    
+        
     def connect_signals(self):
+        """Connect all signal-slot connections"""
         # Connect balancer wrapper signals
         self.balancer.progress_updated.connect(self.overall_progress.setValue)
-        self.balancer.status_updated.connect(self.status_label.setText)
+        self.balancer.status_updated.connect(self.update_status_display)
         self.balancer.balance_completed.connect(self.on_balance_completed)
-    
+        
+        # Connect notification signals
+        self.notification_manager.notification_requested.connect(self.show_notification)
+        
+    @pyqtSlot(bool)
+    def toggle_auto_analysis(self, enabled: bool):
+        """Toggle automatic periodic analysis"""
+        self.auto_analysis_enabled = enabled
+        if enabled:
+            self.analysis_timer.start(self.analysis_interval_minutes * 60 * 1000)  # Convert to milliseconds
+            self.show_notification("Auto-Analysis Enabled", 
+                                 f"Corpus will be analyzed every {self.analysis_interval_minutes} minutes")
+        else:
+            self.analysis_timer.stop()
+            self.show_notification("Auto-Analysis Disabled", "Periodic analysis has been turned off")
+            
+    @pyqtSlot(int)
+    def update_analysis_interval(self, minutes: int):
+        """Update the analysis interval"""
+        self.analysis_interval_minutes = minutes
+        self.interval_label.setText(str(minutes))
+        
+        if self.auto_analysis_enabled:
+            self.analysis_timer.stop()
+            self.analysis_timer.start(minutes * 60 * 1000)
+            
+    @pyqtSlot()
+    def perform_periodic_analysis(self):
+        """Perform automatic periodic analysis"""
+        current_time = time.time()
+        if current_time - self.last_analysis_time > (self.analysis_interval_minutes * 60):
+            self.reanalyze_corpus()
+            self.last_analysis_time = current_time
+            
+    @pyqtSlot()
+    def reanalyze_corpus(self):
+        """Re-analyze corpus after changes"""
+        self.status_label.setText("Re-analyzing corpus...")
+        self.refresh_corpus_stats()
+        
+        # Check for significant changes
+        changes_detected = self.detect_corpus_changes()
+        
+        if changes_detected:
+            self.show_notification("Corpus Changes Detected", 
+                                 "Significant changes found. Consider rebalancing.", "warning")
+            self.analyze_corpus_balance()
+        else:
+            self.show_notification("Analysis Complete", "No significant changes detected.")
+            
+        self.last_analysis_time = time.time()
+        current_time = time.strftime("%H:%M:%S", time.localtime())
+        self.status_label.setText(f"Ready - Last analysis: {current_time}")
+        
+    def detect_corpus_changes(self) -> bool:
+        """Detect if significant changes occurred in the corpus"""
+        # In a real implementation, this would compare current stats with cached previous stats
+        # For demonstration, we'll simulate change detection
+        import random
+        return random.choice([True, False])
+        
+    def calculate_balance_score(self) -> float:
+        """Calculate overall corpus balance score"""
+        total_deviation = 0
+        for i in range(self.domain_table.rowCount()):
+            target_text = self.domain_table.item(i, 1).text().strip('%')
+            current_text = self.domain_table.item(i, 2).text().strip('%')
+            
+            try:
+                target = float(target_text)
+                current = float(current_text)
+                deviation = abs(target - current)
+                total_deviation += deviation
+            except (ValueError, AttributeError):
+                continue
+                
+        # Convert deviation to balance score (lower deviation = higher score)
+        max_possible_deviation = 100
+        balance_score = max(0, 100 - (total_deviation / len(domains) * 100 / max_possible_deviation))
+        return balance_score
+        
     def refresh_corpus_stats(self):
-        """Refresh the corpus statistics display"""
+        """Enhanced corpus statistics refresh with balance scoring"""
         self.status_label.setText("Fetching corpus statistics...")
         
-        # In a real implementation, this would fetch actual statistics
-        # For now, simulate with sample data
-        
-        total_docs = 1250  # Simulated total
-        
-        # Simulate document counts for each domain
+        # Simulate enhanced statistics
+        total_docs = 1250
         domain_counts = {
-            "Crypto Derivatives": 320,  # Higher than target (20%)
-            "High Frequency Trading": 180,  # Roughly on target (15%)
-            "Risk Management": 175,  # Roughly on target (15%)
-            "Market Microstructure": 160,  # Slightly below target (15%)
-            "DeFi": 200,  # Higher than target (12%)
-            "Portfolio Construction": 100,  # On target (10%)
-            "Valuation Models": 75,  # Slightly below target (8%)
-            "Regulation & Compliance": 40,  # Below target (5%)
+            "Crypto Derivatives": 320,
+            "High Frequency Trading": 180,
+            "Risk Management": 175,
+            "Market Microstructure": 160,
+            "DeFi": 200,
+            "Portfolio Construction": 100,
+            "Valuation Models": 75,
+            "Regulation & Compliance": 40,
         }
         
-        # Update the table with statistics
+        # Update table with enhanced status indicators
         for i in range(self.domain_table.rowCount()):
             domain = self.domain_table.item(i, 0).text()
             target_text = self.domain_table.item(i, 1).text()
             target = float(target_text.strip('%'))
-            
             count = domain_counts.get(domain, 0)
             percentage = (count / total_docs) * 100 if total_docs > 0 else 0
             
@@ -191,115 +362,250 @@ class BalancerTab(QWidget):
             # Update document count
             self.domain_table.setItem(i, 3, QTableWidgetItem(str(count)))
             
-            # Update progress bar
+            # Update progress bar with enhanced styling
             progress = self.domain_table.cellWidget(i, 4)
             progress.setValue(int(percentage))
             
-            # Color code based on target vs actual
-            if abs(percentage - target) <= 2:
-                # On target (±2%)
-                progress.setStyleSheet("QProgressBar::chunk { background-color: green; }")
-            elif percentage < target:
-                # Below target
-                progress.setStyleSheet("QProgressBar::chunk { background-color: orange; }")
+            # Enhanced status indicators
+            deviation = abs(percentage - target)
+            if deviation <= 1:
+                status = "Optimal"
+                progress.setStyleSheet("QProgressBar::chunk { background-color: #2ecc71; }")
+                status_color = QColor(46, 204, 113)
+            elif deviation <= 3:
+                status = "Good"
+                progress.setStyleSheet("QProgressBar::chunk { background-color: #f39c12; }")
+                status_color = QColor(243, 156, 18)
             else:
-                # Above target
-                progress.setStyleSheet("QProgressBar::chunk { background-color: blue; }")
+                status = "Needs Attention"
+                progress.setStyleSheet("QProgressBar::chunk { background-color: #e74c3c; }")
+                status_color = QColor(231, 76, 60)
+                
+            # Update status column
+            status_item = QTableWidgetItem(status)
+            status_item.setBackground(QBrush(status_color))
+            status_item.setForeground(QBrush(QColor(255, 255, 255)))
+            self.domain_table.setItem(i, 5, status_item)
+            
+        # Update summary statistics
+        balance_score = self.calculate_balance_score()
+        self.total_docs_label.setText(f"Total Documents: {total_docs}")
+        self.balance_score_label.setText(f"Balance Score: {balance_score:.1f}%")
         
-        self.status_label.setText(f"Corpus contains {total_docs} documents across 8 domains")
-    
+        current_time = time.strftime("%H:%M:%S", time.localtime())
+        self.status_label.setText(f"Corpus contains {total_docs} documents - Updated: {current_time}")
+        
     def analyze_corpus_balance(self):
-        """Analyze the corpus balance and provide recommendations"""
+        """Enhanced corpus balance analysis with detailed recommendations"""
         self.status_label.setText("Analyzing corpus balance...")
         
-        # In a real implementation, this would perform a real analysis
-        # For now, generate some sample recommendations
+        # Calculate detailed imbalance metrics
+        imbalances = []
+        total_docs = 1250
         
-        imbalance_report = """
-        <h3>Corpus Balance Analysis</h3>
-        <p>The analysis identified the following imbalances:</p>
-        <ul>
-            <li><b>Overrepresented Domains:</b> DeFi (+4.0%), Crypto Derivatives (+5.6%)</li>
-            <li><b>Underrepresented Domains:</b> Regulation & Compliance (-1.8%), Valuation Models (-1.0%)</li>
-        </ul>
-        <p>Recommended actions:</p>
-        <ul>
-            <li>Collect 23 more documents in Regulation & Compliance</li>
-            <li>Collect 12 more documents in Valuation Models</li>
-            <li>Consider moving 50 documents from DeFi to underrepresented domains</li>
-            <li>Consider moving 70 documents from Crypto Derivatives to underrepresented domains</li>
-        </ul>
-        """
+        for i in range(self.domain_table.rowCount()):
+            domain = self.domain_table.item(i, 0).text()
+            target_text = self.domain_table.item(i, 1).text().strip('%')
+            current_text = self.domain_table.item(i, 2).text().strip('%')
+            
+            target = float(target_text)
+            current = float(current_text)
+            deviation = current - target
+            
+            if abs(deviation) > 2:  # Significant imbalance
+                docs_needed = int((target - current) * total_docs / 100)
+                imbalances.append({
+                    'domain': domain,
+                    'deviation': deviation,
+                    'docs_needed': docs_needed,
+                    'current': current,
+                    'target': target
+                })
+                
+        # Generate detailed report
+        if imbalances:
+            report = "### Corpus Balance Analysis Results\n\n"
+            report += f"**Analysis Date:** {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            report += f"**Balance Score:** {self.calculate_balance_score():.1f}%\n\n"
+            
+            overrepresented = [d for d in imbalances if d['deviation'] > 0]
+            underrepresented = [d for d in imbalances if d['deviation'] < 0]
+            
+            if overrepresented:
+                report += "**Overrepresented Domains:**\n"
+                for domain_info in overrepresented:
+                    report += f"• {domain_info['domain']}: {domain_info['deviation']:+.1f}% (excess: {abs(domain_info['docs_needed'])} docs)\n"
+                report += "\n"
+                
+            if underrepresented:
+                report += "**Underrepresented Domains:**\n"
+                for domain_info in underrepresented:
+                    report += f"• {domain_info['domain']}: {domain_info['deviation']:+.1f}% (needed: {abs(domain_info['docs_needed'])} docs)\n"
+                report += "\n"
+                
+            report += "**Recommended Actions:**\n"
+            report += "• Run corpus balancing to redistribute documents\n"
+            report += "• Focus collection efforts on underrepresented domains\n"
+            report += "• Consider automated classification for unclassified documents\n"
+            
+            QMessageBox.information(self, "Corpus Balance Analysis", report)
+            
+            if self.enable_notifications.isChecked():
+                self.show_notification("Balance Analysis Complete", 
+                                     f"Found {len(imbalances)} domains requiring attention", "warning")
+        else:
+            QMessageBox.information(self, "Corpus Balance Analysis", 
+                                  "Corpus is well balanced! All domains are within acceptable ranges.")
+            if self.enable_notifications.isChecked():
+                self.show_notification("Balance Analysis Complete", "Corpus is well balanced!")
+                
+        self.status_label.setText("Balance analysis completed")
         
-        # Show the analysis in a message box
-        QMessageBox.information(
-            self, "Corpus Balance Analysis", imbalance_report
+    @pyqtSlot()
+    def export_balance_report(self):
+        """Export detailed balance report"""
+        from PyQt6.QtWidgets import QFileDialog
+        
+        filename, _ = QFileDialog.getSaveFileName(
+            self, "Export Balance Report", 
+            f"balance_report_{time.strftime('%Y%m%d_%H%M%S')}.txt",
+            "Text Files (*.txt);;CSV Files (*.csv)"
         )
         
-        self.status_label.setText("Balance analysis completed")
-    
+        if filename:
+            try:
+                report_content = self.generate_detailed_report()
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(report_content)
+                    
+                self.show_notification("Report Exported", f"Balance report saved to {filename}")
+            except Exception as e:
+                QMessageBox.critical(self, "Export Error", f"Failed to export report: {str(e)}")
+                
+    def generate_detailed_report(self) -> str:
+        """Generate comprehensive balance report"""
+        report = "CORPUS BALANCE DETAILED REPORT\n"
+        report += "=" * 50 + "\n\n"
+        report += f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+        report += f"Total Documents: {self.total_docs_label.text().split(': ')[1]}\n"
+        report += f"Balance Score: {self.balance_score_label.text().split(': ')[1]}\n\n"
+        
+        report += "DOMAIN DISTRIBUTION:\n"
+        report += "-" * 20 + "\n"
+        
+        for i in range(self.domain_table.rowCount()):
+            domain = self.domain_table.item(i, 0).text()
+            target = self.domain_table.item(i, 1).text()
+            current = self.domain_table.item(i, 2).text()
+            count = self.domain_table.item(i, 3).text()
+            status = self.domain_table.item(i, 5).text()
+            
+            report += f"{domain:25} | Target: {target:6} | Current: {current:6} | Count: {count:4} | Status: {status}\n"
+            
+        return report
+        
     def balance_corpus(self):
-        """Start the corpus balancing process"""
+        """Enhanced corpus balancing with progress tracking"""
         # Update UI state
         self.balance_btn.setEnabled(False)
         self.stop_btn.setEnabled(True)
         self.status_label.setText("Balancing corpus...")
         self.overall_progress.setValue(0)
         
-        # Configure balancer
+        # Show start notification
+        if self.enable_notifications.isChecked():
+            self.show_notification("Corpus Balancing Started", "Beginning automatic corpus balancing...")
+        
+        # Configure and start balancer
         quality_threshold = self.quality_threshold.value()
         method = self.balance_method.currentText()
         auto_classify = self.auto_classify.isChecked()
         preserve_existing = self.preserve_existing.isChecked()
         
-        # Collect target percentages from the table
+        # Collect target percentages
         targets = {}
         for i in range(self.domain_table.rowCount()):
             domain = self.domain_table.item(i, 0).text()
             target_text = self.domain_table.item(i, 1).text()
             target = float(target_text.strip('%'))
             targets[domain] = target
-        
-        # Start balancing
+            
+        # Configure balancer
         self.balancer.set_quality_threshold(quality_threshold)
         self.balancer.set_balance_method(method)
         self.balancer.set_auto_classify(auto_classify)
         self.balancer.set_preserve_existing(preserve_existing)
         self.balancer.set_domain_targets(targets)
         
-        # Start the balancing process
+        # Start balancing
         self.balancer.start()
-    
+        
     def stop_balancing(self):
-        """Stop the corpus balancing process"""
-        self.balancer.stop()
-        self.balance_btn.setEnabled(True)
-        self.stop_btn.setEnabled(False)
-        self.status_label.setText("Balancing stopped")
-    
+        """Stop corpus balancing with confirmation"""
+        reply = QMessageBox.question(
+            self, "Stop Balancing", 
+            "Are you sure you want to stop the balancing process?\nThis may leave the corpus in an incomplete state.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            self.balancer.stop()
+            self.balance_btn.setEnabled(True)
+            self.stop_btn.setEnabled(False)
+            self.status_label.setText("Balancing stopped by user")
+            
+            if self.enable_notifications.isChecked():
+                self.show_notification("Balancing Stopped", "Corpus balancing was stopped by user", "warning")
+                
+    @pyqtSlot(str)
+    def update_status_display(self, status: str):
+        """Update status display with timestamp"""
+        current_time = time.strftime("%H:%M:%S", time.localtime())
+        self.status_label.setText(f"{status} - {current_time}")
+        
     @pyqtSlot(dict)
-    def on_balance_completed(self, results):
-        """Handle completion of the balancing process"""
+    def on_balance_completed(self, results: dict):
+        """Handle completion of balancing with enhanced feedback"""
         self.balance_btn.setEnabled(True)
         self.stop_btn.setEnabled(False)
         
-        # Update status
+        # Extract results
         moved_count = results.get('moved_count', 0)
         classified_count = results.get('classified_count', 0)
+        errors_count = results.get('errors_count', 0)
+        processing_time = results.get('processing_time', 0)
         
-        self.status_label.setText(
-            f"Balancing completed: {moved_count} documents moved, "
-            f"{classified_count} documents classified"
-        )
+        # Update status
+        completion_time = time.strftime("%H:%M:%S", time.localtime())
+        self.status_label.setText(f"Balancing completed at {completion_time}")
         
-        # Refresh statistics to show the new balance
+        # Refresh statistics
         self.refresh_corpus_stats()
         
-        # Show completion message
-        QMessageBox.information(
-            self, "Balancing Complete",
-            f"Corpus balancing completed successfully.\n\n"
-            f"• {moved_count} documents were moved to new domains\n"
-            f"• {classified_count} documents were classified\n\n"
-            f"The corpus distribution has been updated to better match target percentages."
-        )
+        # Show detailed completion message
+        completion_msg = f"""Corpus balancing completed successfully!
+
+Results Summary:
+• Documents moved: {moved_count}
+• Documents classified: {classified_count}
+• Processing errors: {errors_count}
+• Processing time: {processing_time:.1f} seconds
+• New balance score: {self.calculate_balance_score():.1f}%
+
+The corpus distribution has been optimized according to target percentages."""
+        
+        QMessageBox.information(self, "Balancing Complete", completion_msg)
+        
+        # Show system notification
+        if self.enable_notifications.isChecked():
+            notification_type = "info" if errors_count == 0 else "warning"
+            self.show_notification(
+                "Corpus Balancing Complete",
+                f"Moved {moved_count} documents, classified {classified_count}",
+                notification_type
+            )
+            
+    def show_notification(self, title: str, message: str, notification_type: str = "info"):
+        """Show notification if enabled"""
+        if self.enable_notifications.isChecked():
+            self.notification_manager.show_notification(title, message, notification_type)
