@@ -5,6 +5,9 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                              QCheckBox, QComboBox, QTabWidget, QWidget, QSpinBox,
                              QFileDialog, QGroupBox)
 from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from app.helpers.theme_manager import ThemeManager
+import json
+import os
 
 class SettingsDialog(QDialog):
     """Dialog for application settings."""
@@ -65,6 +68,7 @@ class SettingsDialog(QDialog):
         self.theme_selector = QComboBox()
         self.theme_selector.addItems(["System", "Light", "Dark"])
         ui_layout.addRow("Theme:", self.theme_selector)
+        self.theme_selector.currentIndexChanged.connect(self.on_theme_changed)
         
         self.show_tooltips = QCheckBox()
         self.show_tooltips.setChecked(True)
@@ -73,6 +77,9 @@ class SettingsDialog(QDialog):
         self.auto_refresh = QCheckBox()
         self.auto_refresh.setChecked(True)
         ui_layout.addRow("Auto-refresh Dashboard:", self.auto_refresh)
+        
+        self.sound_checkbox = QCheckBox("Enable sound notifications")
+        ui_layout.addRow("Sound Notifications:", self.sound_checkbox)
         
         general_layout.addWidget(ui_group)
         
@@ -196,6 +203,19 @@ class SettingsDialog(QDialog):
         
         processing_layout.addWidget(advanced_group)
         
+        # Load sound setting from config
+        config_path = os.path.join(os.path.dirname(__file__), '../../theme_config.json')
+        if os.path.exists(config_path):
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    self.sound_checkbox.setChecked(data.get('sound_enabled', True))
+            except Exception:
+                self.sound_checkbox.setChecked(True)
+        else:
+            self.sound_checkbox.setChecked(True)
+        self.sound_checkbox.stateChanged.connect(self.on_sound_setting_changed)
+        
         # Add tabs to main layout
         main_layout.addWidget(self.tabs)
         
@@ -270,12 +290,15 @@ class SettingsDialog(QDialog):
             'detect_language': self.detect_language.isChecked(),
             'min_quality': self.min_quality.value(),
             'batch_size': self.batch_size.value(),
-            'timeout': self.timeout.value()
+            'timeout': self.timeout.value(),
+            'sound_enabled': self.sound_checkbox.isChecked()
         }
     
     def accept(self):
         """Handle dialog acceptance."""
         settings = self.get_settings()
+        # Save the selected theme to current_settings
+        self.current_settings['theme'] = self.theme_selector.currentText()
         self.settings_updated.emit(settings)
         super().accept()
     
@@ -333,3 +356,26 @@ class SettingsDialog(QDialog):
         )
         if directory:
             line_edit.setText(directory)
+
+    def on_theme_changed(self):
+        theme = self.theme_selector.currentText().lower()
+        if theme == "system":
+            theme = "light"  # Default to light for now
+        ThemeManager.apply_theme(theme)
+        self.current_settings['theme'] = self.theme_selector.currentText()
+
+    def on_sound_setting_changed(self):
+        # Save sound setting to config
+        config_path = os.path.join(os.path.dirname(__file__), '../../theme_config.json')
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except Exception:
+            data = {}
+        data['sound_enabled'] = self.sound_checkbox.isChecked()
+        try:
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f)
+        except Exception:
+            pass
+        # Emit a signal or call a method to update sound_enabled in all tabs if needed

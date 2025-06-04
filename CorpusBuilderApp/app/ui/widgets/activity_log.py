@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
                              QAction)
 from PyQt6.QtCore import Qt, pyqtSignal, QDateTime
 from PyQt6.QtGui import QIcon, QColor, QFont
+from app.helpers.icon_manager import IconManager
 
 import datetime
 
@@ -22,22 +23,26 @@ class ActivityLogItem(QListWidgetItem):
         time_str = timestamp.toString("hh:mm:ss")
         self.setText(f"[{time_str}] {activity_type}: {message}")
         
-        # Set icon based on activity type
-        if activity_type == "Collection":
-            self.setIcon(QIcon("app/resources/icons/download.png"))
-        elif activity_type == "Processing":
-            self.setIcon(QIcon("app/resources/icons/process.png"))
-        elif activity_type == "Error":
-            self.setIcon(QIcon("app/resources/icons/error.png"))
+        # Set icon based on activity type using IconManager
+        icon_manager = IconManager()
+        icon_map = {
+            "Collection": ('Data collection and processing', 'Function'),
+            "Processing": ('Start/play operation control', 'Function'),
+            "Error": ('Warning and alert notifications', 'Function'),
+            "Warning": ('Warning and alert notifications', 'Function'),
+            "Success": ('Success status and completion indicator', 'Function'),
+            "Info": ('Information and help messages', 'Function'),
+        }
+        icon_info = icon_map.get(activity_type, ('Information and help messages', 'Function'))
+        icon_path = icon_manager.get_icon_path(*icon_info)
+        if icon_path:
+            self.setIcon(QIcon(icon_path))
+        if activity_type == "Error":
             self.setForeground(QColor("red"))
         elif activity_type == "Warning":
-            self.setIcon(QIcon("app/resources/icons/warning.png"))
             self.setForeground(QColor("orange"))
         elif activity_type == "Success":
-            self.setIcon(QIcon("app/resources/icons/success.png"))
             self.setForeground(QColor("green"))
-        else:
-            self.setIcon(QIcon("app/resources/icons/info.png"))
 
 class ActivityLog(QWidget):
     """Widget for displaying activity log entries."""
@@ -46,6 +51,7 @@ class ActivityLog(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("card")
         self.setup_ui()
         
     def setup_ui(self):

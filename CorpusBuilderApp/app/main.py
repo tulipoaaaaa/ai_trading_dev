@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtCore import QDir, QStandardPaths
 from PyQt6.QtGui import QIcon
 import traceback
+import json
 
 # Add shared_tools to path for imports
 current_dir = Path(__file__).parent.parent
@@ -17,6 +18,36 @@ sys.path.insert(0, str(current_dir))
 
 from main_window import CryptoCorpusMainWindow
 from shared_tools.project_config import ProjectConfig
+from app.helpers.theme_manager import ThemeManager
+
+THEME_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'theme_config.json')
+
+def load_user_theme():
+    if os.path.exists(THEME_CONFIG_PATH):
+        try:
+            with open(THEME_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('theme', 'light')
+        except Exception:
+            return 'light'
+    return 'light'
+
+def save_user_theme(theme):
+    try:
+        with open(THEME_CONFIG_PATH, 'w', encoding='utf-8') as f:
+            json.dump({'theme': theme}, f)
+    except Exception:
+        pass
+
+def load_user_sound_setting():
+    if os.path.exists(THEME_CONFIG_PATH):
+        try:
+            with open(THEME_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                return data.get('sound_enabled', True)
+        except Exception:
+            return True
+    return True
 
 class CryptoCorpusApp(QApplication):
     """Main application class"""
@@ -156,7 +187,22 @@ def main():
     )
     
     app = CryptoCorpusApp(sys.argv)
-    
+
+    # Load and apply theme from config
+    user_theme = load_user_theme()
+    ThemeManager.apply_theme(user_theme)
+
+    # Connect settings dialog to save theme changes
+    def on_settings_updated(settings):
+        theme = settings.get('theme', None)
+        if theme:
+            save_user_theme(theme.lower())
+    if hasattr(app, 'main_window') and hasattr(app.main_window, 'settings_dialog'):
+        app.main_window.settings_dialog.settings_updated.connect(on_settings_updated)
+    # If settings dialog is created dynamically, ensure this connection is made after creation.
+
+    sound_enabled = load_user_sound_setting()
+
     # Run the application
     exit_code = app.exec()
     
@@ -166,4 +212,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```

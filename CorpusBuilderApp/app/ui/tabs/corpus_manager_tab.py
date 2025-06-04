@@ -11,6 +11,8 @@ import json
 import shutil
 import time
 from typing import List, Dict, Any
+from app.helpers.icon_manager import IconManager
+from app.helpers.notifier import Notifier
 
 class NotificationManager(QWidget):
     def __init__(self, parent=None):
@@ -369,9 +371,11 @@ class CorpusManagerTab(QWidget):
         self.notification_manager = NotificationManager(self)
         self.selected_files = []
         self.batch_metadata_editor = None
+        self.sound_enabled = True  # Will be set from user settings
         
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
+        icon_manager = IconManager()
         
         # Create a splitter for file browser and metadata panel
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -447,10 +451,16 @@ class CorpusManagerTab(QWidget):
         # Add controls at the bottom
         controls_layout = QHBoxLayout()
         self.create_folder_btn = QPushButton("Create Folder")
+        create_icon = icon_manager.get_icon_path('Data collection and processing', by='Function')
+        if create_icon:
+            self.create_folder_btn.setIcon(QIcon(create_icon))
         self.create_folder_btn.clicked.connect(self.create_folder)
         controls_layout.addWidget(self.create_folder_btn)
         
         self.refresh_btn = QPushButton("Refresh")
+        refresh_icon = icon_manager.get_icon_path('Loading and processing indicator', by='Function')
+        if refresh_icon:
+            self.refresh_btn.setIcon(QIcon(refresh_icon))
         self.refresh_btn.clicked.connect(self.refresh_file_view)
         controls_layout.addWidget(self.refresh_btn)
         
@@ -462,6 +472,7 @@ class CorpusManagerTab(QWidget):
         
         # File info
         file_info_group = QGroupBox("File Information")
+        file_info_group.setObjectName("card")
         file_info_layout = QVBoxLayout(file_info_group)
         
         self.file_name_label = QLabel("No file selected")
@@ -529,6 +540,7 @@ class CorpusManagerTab(QWidget):
         
         # Add batch operations panel with progress
         batch_ops_group = QGroupBox("Batch Operations")
+        batch_ops_group.setObjectName("card")
         batch_ops_layout = QVBoxLayout(batch_ops_group)
         
         # Operation buttons
@@ -568,6 +580,7 @@ class CorpusManagerTab(QWidget):
         progress_layout.addWidget(self.batch_progress)
         
         self.batch_status = QLabel("Ready")
+        self.batch_status.setObjectName("status-info")
         progress_layout.addWidget(self.batch_status)
         
         batch_ops_layout.addLayout(progress_layout)
@@ -910,7 +923,11 @@ class CorpusManagerTab(QWidget):
                     os.remove(file_path)
                 except Exception as e:
                     self.notification_manager.add_notification(f"delete_{file_path}", "Delete Error", str(e), "error", auto_hide=True)
+                    if self.sound_enabled:
+                        Notifier.notify("Delete Error", str(e), level="error")
             self.notification_manager.add_notification("batch_delete", "Batch Delete", f"Deleted {len(selected_files)} files.", "success", auto_hide=True)
+            if self.sound_enabled:
+                Notifier.notify("Batch Delete", f"Deleted {len(selected_files)} files.", level="success")
             self.refresh_file_view()
 
     def get_selected_files(self):

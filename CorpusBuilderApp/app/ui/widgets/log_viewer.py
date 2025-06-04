@@ -234,6 +234,7 @@ class LogViewer(QWidget):
         
         # Status bar
         self.status_label = QLabel("No log file loaded")
+        self.status_label.setObjectName("status-info")
         main_layout.addWidget(self.status_label)
         
     def browse_log_file(self):

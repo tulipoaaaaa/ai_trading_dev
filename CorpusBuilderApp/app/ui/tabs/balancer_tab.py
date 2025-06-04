@@ -14,6 +14,8 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
 from PyQt6.QtCore import Qt, pyqtSlot, QTimer, pyqtSignal, QObject
 from PyQt6.QtGui import QColor, QBrush, QPalette, QIcon, QAction
 from shared_tools.ui_wrappers.processors.corpus_balancer_wrapper import CorpusBalancerWrapper
+from app.helpers.icon_manager import IconManager
+from app.helpers.notifier import Notifier
 
 
 class AdvancedNotificationManager(QObject):
@@ -50,8 +52,10 @@ class BalancerTab(QWidget):
     def __init__(self, project_config, parent=None):
         super().__init__(parent)
         self.project_config = project_config
+        self.setObjectName("card")
         self.balancer = CorpusBalancerWrapper(project_config)
         self.notification_manager = AdvancedNotificationManager(self)
+        self.sound_enabled = True  # Will be set from user settings
         
         # Periodic analysis timer
         self.analysis_timer = QTimer()
@@ -69,6 +73,7 @@ class BalancerTab(QWidget):
     def setup_ui(self):
         """Initialize the enhanced user interface"""
         main_layout = QVBoxLayout(self)
+        icon_manager = IconManager()
         
         # Current Distribution
         current_group = QGroupBox("Current Corpus Distribution")
@@ -189,14 +194,23 @@ class BalancerTab(QWidget):
         # Primary controls
         primary_controls = QHBoxLayout()
         self.refresh_btn = QPushButton("Refresh Corpus Stats")
+        refresh_icon = icon_manager.get_icon_path('Loading and processing indicator', by='Function')
+        if refresh_icon:
+            self.refresh_btn.setIcon(QIcon(refresh_icon))
         self.refresh_btn.clicked.connect(self.refresh_corpus_stats)
         primary_controls.addWidget(self.refresh_btn)
         
         self.reanalyze_btn = QPushButton("Re-analyze After Changes")
+        reanalyze_icon = icon_manager.get_icon_path('Success status and completion indicator', by='Function')
+        if reanalyze_icon:
+            self.reanalyze_btn.setIcon(QIcon(reanalyze_icon))
         self.reanalyze_btn.clicked.connect(self.reanalyze_corpus)
         primary_controls.addWidget(self.reanalyze_btn)
         
         self.analyze_btn = QPushButton("Analyze Imbalance")
+        analyze_icon = icon_manager.get_icon_path('Data analytics and visualization', by='Function')
+        if analyze_icon:
+            self.analyze_btn.setIcon(QIcon(analyze_icon))
         self.analyze_btn.clicked.connect(self.analyze_corpus_balance)
         primary_controls.addWidget(self.analyze_btn)
         
@@ -205,15 +219,24 @@ class BalancerTab(QWidget):
         # Secondary controls
         secondary_controls = QHBoxLayout()
         self.balance_btn = QPushButton("Balance Corpus")
+        balance_icon = icon_manager.get_icon_path('Load balancing and data distribution', by='Function')
+        if balance_icon:
+            self.balance_btn.setIcon(QIcon(balance_icon))
         self.balance_btn.clicked.connect(self.balance_corpus)
         secondary_controls.addWidget(self.balance_btn)
         
         self.stop_btn = QPushButton("Stop")
+        stop_icon = icon_manager.get_icon_path('Stop operation control', by='Function')
+        if stop_icon:
+            self.stop_btn.setIcon(QIcon(stop_icon))
         self.stop_btn.setEnabled(False)
         self.stop_btn.clicked.connect(self.stop_balancing)
         secondary_controls.addWidget(self.stop_btn)
         
         self.export_report_btn = QPushButton("Export Balance Report")
+        export_icon = icon_manager.get_icon_path('Main dashboard and analytics view', by='Function')
+        if export_icon:
+            self.export_report_btn.setIcon(QIcon(export_icon))
         self.export_report_btn.clicked.connect(self.export_balance_report)
         secondary_controls.addWidget(self.export_report_btn)
         
@@ -226,6 +249,7 @@ class BalancerTab(QWidget):
         status_layout = QVBoxLayout(status_group)
         
         self.status_label = QLabel("Ready - Last analysis: Never")
+        self.status_label.setObjectName("status-info")
         status_layout.addWidget(self.status_label)
         
         self.overall_progress = QProgressBar()
@@ -583,16 +607,7 @@ class BalancerTab(QWidget):
         self.refresh_corpus_stats()
         
         # Show detailed completion message
-        completion_msg = f"""Corpus balancing completed successfully!
-
-Results Summary:
-• Documents moved: {moved_count}
-• Documents classified: {classified_count}
-• Processing errors: {errors_count}
-• Processing time: {processing_time:.1f} seconds
-• New balance score: {self.calculate_balance_score():.1f}%
-
-The corpus distribution has been optimized according to target percentages."""
+        completion_msg = f"""Corpus balancing completed successfully!\n\nResults Summary:\n• Documents moved: {moved_count}\n• Documents classified: {classified_count}\n• Processing errors: {errors_count}\n• Processing time: {processing_time:.1f} seconds\n• New balance score: {self.calculate_balance_score():.1f}%\n\nThe corpus distribution has been optimized according to target percentages."""
         
         QMessageBox.information(self, "Balancing Complete", completion_msg)
         
@@ -605,6 +620,10 @@ The corpus distribution has been optimized according to target percentages."""
                 notification_type
             )
             
+        if self.sound_enabled:
+            level = "success" if errors_count == 0 else "error"
+            Notifier.notify("Corpus Balancing Complete", completion_msg, level=level)
+        
     def show_notification(self, title: str, message: str, notification_type: str = "info"):
         """Show notification if enabled"""
         if self.enable_notifications.isChecked():

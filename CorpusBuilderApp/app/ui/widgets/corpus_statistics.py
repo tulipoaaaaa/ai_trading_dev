@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QProgressBar, QFrame, QSizePolicy)
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QFont, QColor, QPalette
+from app.helpers.icon_manager import IconManager
 
 class CorpusStatistics(QWidget):
     """Widget for displaying corpus statistics."""
@@ -12,6 +13,7 @@ class CorpusStatistics(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("card")
         self.setup_ui()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh_requested)

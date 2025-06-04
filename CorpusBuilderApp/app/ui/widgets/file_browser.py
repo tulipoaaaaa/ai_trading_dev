@@ -4,9 +4,10 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTreeView,
                              QPushButton, QLineEdit, QLabel, QComboBox, QMessageBox,
                              QFileDialog, QMenu, QInputDialog)
 from PyQt6.QtCore import Qt, pyqtSignal, QDir, QFileSystemModel, QSortFilterProxyModel, QMimeData, QUrl
-from PyQt6.QtGui import QAction, QDragEnterEvent, QDropEvent
+from PyQt6.QtGui import QAction, QDragEnterEvent, QDropEvent, QIcon
 import os
 import shutil
+from app.helpers.icon_manager import IconManager
 
 class FileBrowser(QWidget):
     """Reusable file browser widget with drag-and-drop support."""
@@ -17,6 +18,7 @@ class FileBrowser(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("card")
         self.current_directory = QDir.homePath()
         self.setup_ui()
         self.setup_file_model()
@@ -24,6 +26,7 @@ class FileBrowser(QWidget):
     def setup_ui(self):
         """Set up the user interface."""
         main_layout = QVBoxLayout(self)
+        icon_manager = IconManager()
         
         # Navigation bar
         nav_layout = QHBoxLayout()
@@ -32,16 +35,25 @@ class FileBrowser(QWidget):
         self.back_btn = QPushButton("←")
         self.back_btn.setMaximumWidth(30)
         self.back_btn.clicked.connect(self.go_back)
+        back_icon = icon_manager.get_icon_path('Start/play operation control', by='Function')
+        if back_icon:
+            self.back_btn.setIcon(QIcon(back_icon))
         nav_layout.addWidget(self.back_btn)
         
         self.forward_btn = QPushButton("→")
         self.forward_btn.setMaximumWidth(30)
         self.forward_btn.clicked.connect(self.go_forward)
+        forward_icon = icon_manager.get_icon_path('Next/forward navigation control', by='Function')
+        if forward_icon:
+            self.forward_btn.setIcon(QIcon(forward_icon))
         nav_layout.addWidget(self.forward_btn)
         
         self.up_btn = QPushButton("↑")
         self.up_btn.setMaximumWidth(30)
         self.up_btn.clicked.connect(self.go_up)
+        up_icon = icon_manager.get_icon_path('Data collection and processing', by='Function')
+        if up_icon:
+            self.up_btn.setIcon(QIcon(up_icon))
         nav_layout.addWidget(self.up_btn)
         
         # Address bar
@@ -52,6 +64,9 @@ class FileBrowser(QWidget):
         # Browse button
         self.browse_btn = QPushButton("Browse...")
         self.browse_btn.clicked.connect(self.browse_directory)
+        browse_icon = icon_manager.get_icon_path('File management and organization', by='Function')
+        if browse_icon:
+            self.browse_btn.setIcon(QIcon(browse_icon))
         nav_layout.addWidget(self.browse_btn)
         
         main_layout.addLayout(nav_layout)
@@ -234,36 +249,44 @@ class FileBrowser(QWidget):
         index = self.tree_view.indexAt(position)
         if not index.isValid():
             return
-            
+        icon_manager = IconManager()
         source_index = self.proxy_model.mapToSource(index)
         file_path = self.file_model.filePath(source_index)
         is_dir = self.file_model.isDir(source_index)
-        
         menu = QMenu(self)
-        
         if is_dir:
             open_action = QAction("Open", self)
+            open_icon = icon_manager.get_icon_path('File management and organization', by='Function')
+            if open_icon:
+                open_action.setIcon(QIcon(open_icon))
             open_action.triggered.connect(lambda: self.set_directory(file_path))
             menu.addAction(open_action)
-            
             new_folder_action = QAction("New Folder", self)
+            folder_icon = icon_manager.get_icon_path('Data collection and processing', by='Function')
+            if folder_icon:
+                new_folder_action.setIcon(QIcon(folder_icon))
             new_folder_action.triggered.connect(lambda: self.create_new_folder(file_path))
             menu.addAction(new_folder_action)
         else:
             open_action = QAction("Open", self)
+            open_icon = icon_manager.get_icon_path('File management and organization', by='Function')
+            if open_icon:
+                open_action.setIcon(QIcon(open_icon))
             open_action.triggered.connect(lambda: self.open_file(file_path))
             menu.addAction(open_action)
-            
         menu.addSeparator()
-        
         copy_action = QAction("Copy Path", self)
+        copy_icon = icon_manager.get_icon_path('File management and organization', by='Function')
+        if copy_icon:
+            copy_action.setIcon(QIcon(copy_icon))
         copy_action.triggered.connect(lambda: self.copy_path_to_clipboard(file_path))
         menu.addAction(copy_action)
-        
         delete_action = QAction("Delete", self)
+        delete_icon = icon_manager.get_icon_path('Warning and alert notifications', by='Function')
+        if delete_icon:
+            delete_action.setIcon(QIcon(delete_icon))
         delete_action.triggered.connect(lambda: self.delete_item(file_path))
         menu.addAction(delete_action)
-        
         menu.exec(self.tree_view.mapToGlobal(position))
         
     def create_new_folder(self, parent_path):

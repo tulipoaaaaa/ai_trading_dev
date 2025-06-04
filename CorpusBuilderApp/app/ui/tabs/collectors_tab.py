@@ -12,6 +12,7 @@ from shared_tools.ui_wrappers.collectors.bitmex_wrapper import BitMEXWrapper
 from shared_tools.ui_wrappers.collectors.quantopian_wrapper import QuantopianWrapper
 from shared_tools.ui_wrappers.collectors.scidb_wrapper import SciDBWrapper
 from shared_tools.ui_wrappers.collectors.web_wrapper import WebWrapper
+from app.helpers.notifier import Notifier
 
 
 class CollectorsTab(QWidget):
@@ -22,6 +23,7 @@ class CollectorsTab(QWidget):
         self.setup_ui()
         self.init_collectors()
         self.connect_signals()
+        self.sound_enabled = True  # Will be set from user settings
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -46,7 +48,8 @@ class CollectorsTab(QWidget):
         status_group = QGroupBox("Collection Status")
         status_layout = QVBoxLayout(status_group)
         
-        self.collection_status_label = QLabel("Ready to collect data")
+        self.collection_status_label = QLabel("")
+        self.collection_status_label.setObjectName("status-info")
         status_layout.addWidget(self.collection_status_label)
         
         # Overall progress bar
@@ -150,12 +153,10 @@ class CollectorsTab(QWidget):
     def on_isda_collection_completed(self, results):
         self.isda_start_btn.setEnabled(True)
         self.isda_stop_btn.setEnabled(False)
-        
-        # Update status and possibly show a notification
         message = f"ISDA collection completed: {len(results.get('documents', []))} documents collected"
         self.collection_status_label.setText(message)
-        
-        # You could emit a signal here to notify other parts of the application
+        if self.sound_enabled:
+            Notifier.notify("ISDA Collection Complete", message, level="success")
 
     @pyqtSlot(dict)
     def on_github_collection_completed(self, results):

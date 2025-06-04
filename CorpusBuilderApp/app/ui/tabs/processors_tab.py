@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
                              QLabel, QProgressBar, QPushButton, QCheckBox, 
                              QSpinBox, QListWidget, QGroupBox, QFileDialog, QMessageBox)
 from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtGui import QIcon
 import os
 import shutil
 
@@ -23,6 +24,8 @@ from shared_tools.ui_wrappers.processors.financial_symbol_processor_wrapper impo
 from shared_tools.ui_wrappers.processors.chart_image_extractor_wrapper import ChartImageExtractorWrapper
 from shared_tools.ui_wrappers.processors.formula_extractor_wrapper import FormulaExtractorWrapper
 from CorpusBuilderApp.app.ui.tabs.corpus_manager_tab import NotificationManager
+from app.helpers.icon_manager import IconManager
+from app.helpers.notifier import Notifier
 
 
 class ProcessorsTab(QWidget):
@@ -32,19 +35,25 @@ class ProcessorsTab(QWidget):
         self.processor_wrappers = {}
         self.file_queue = []
         self.notification_manager = NotificationManager(self)
+        self.sound_enabled = True  # Will be set from user settings
         self.setup_ui()
         self.init_processors()
         self.connect_signals()
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
+        icon_manager = IconManager()
         
-        # Create tabs for different processor types
+        # Create tabs for different processor types with icons
+        pdf_icon = icon_manager.get_icon_path('PDF document', by='Description') or icon_manager.get_icon_path('Main dashboard and analytics view', by='Function')
+        text_icon = icon_manager.get_icon_path('Text Files', by='Description') or icon_manager.get_icon_path('File management and organization', by='Function')
+        advanced_icon = icon_manager.get_icon_path('Analytics line chart icon with dark blue styling', by='Description') or icon_manager.get_icon_path('Data analytics and visualization', by='Function')
+        batch_icon = icon_manager.get_icon_path('Data collection and processing', by='Function')
         self.processor_tabs = QTabWidget()
-        self.processor_tabs.addTab(self.create_pdf_tab(), "PDF Processing")
-        self.processor_tabs.addTab(self.create_text_tab(), "Text Processing")
-        self.processor_tabs.addTab(self.create_advanced_tab(), "Advanced Processing")
-        self.processor_tabs.addTab(self.create_batch_tab(), "Batch Operations")
+        self.processor_tabs.addTab(self.create_pdf_tab(), QIcon(pdf_icon) if pdf_icon else QIcon(), "PDF Processing")
+        self.processor_tabs.addTab(self.create_text_tab(), QIcon(text_icon) if text_icon else QIcon(), "Text Processing")
+        self.processor_tabs.addTab(self.create_advanced_tab(), QIcon(advanced_icon) if advanced_icon else QIcon(), "Advanced Processing")
+        self.processor_tabs.addTab(self.create_batch_tab(), QIcon(batch_icon) if batch_icon else QIcon(), "Batch Operations")
         
         main_layout.addWidget(self.processor_tabs)
         
@@ -73,6 +82,7 @@ class ProcessorsTab(QWidget):
     def create_pdf_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        icon_manager = IconManager()
         
         # Configuration group
         config_group = QGroupBox("PDF Processor Configuration")
@@ -125,10 +135,17 @@ class ProcessorsTab(QWidget):
         
         # Controls
         controls_group = QGroupBox("Controls")
+        controls_group.setObjectName("card")
         controls_layout = QHBoxLayout(controls_group)
         
         self.pdf_start_btn = QPushButton("Start Processing")
+        start_icon = icon_manager.get_icon_path('Start/play operation control', by='Function')
+        if start_icon:
+            self.pdf_start_btn.setIcon(QIcon(start_icon))
         self.pdf_stop_btn = QPushButton("Stop")
+        stop_icon = icon_manager.get_icon_path('Stop operation control', by='Function')
+        if stop_icon:
+            self.pdf_stop_btn.setIcon(QIcon(stop_icon))
         self.pdf_stop_btn.setEnabled(False)
         
         controls_layout.addWidget(self.pdf_start_btn)
@@ -138,9 +155,11 @@ class ProcessorsTab(QWidget):
         
         # Progress
         progress_group = QGroupBox("Progress")
+        progress_group.setObjectName("card")
         progress_layout = QVBoxLayout(progress_group)
         
         self.pdf_status = QLabel("Ready")
+        self.pdf_status.setObjectName("status-info")
         progress_layout.addWidget(self.pdf_status)
         
         self.pdf_progress_bar = QProgressBar()
@@ -155,6 +174,7 @@ class ProcessorsTab(QWidget):
         # Similar to PDF tab but for text files
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        icon_manager = IconManager()
         
         # Configuration group
         config_group = QGroupBox("Text Processor Configuration")
@@ -206,10 +226,17 @@ class ProcessorsTab(QWidget):
         
         # Controls and progress similar to PDF tab
         controls_group = QGroupBox("Controls")
+        controls_group.setObjectName("card")
         controls_layout = QHBoxLayout(controls_group)
         
         self.text_start_btn = QPushButton("Start Processing")
+        start_icon = icon_manager.get_icon_path('Start/play operation control', by='Function')
+        if start_icon:
+            self.text_start_btn.setIcon(QIcon(start_icon))
         self.text_stop_btn = QPushButton("Stop")
+        stop_icon = icon_manager.get_icon_path('Stop operation control', by='Function')
+        if stop_icon:
+            self.text_stop_btn.setIcon(QIcon(stop_icon))
         self.text_stop_btn.setEnabled(False)
         
         controls_layout.addWidget(self.text_start_btn)
@@ -218,9 +245,11 @@ class ProcessorsTab(QWidget):
         layout.addWidget(controls_group)
         
         progress_group = QGroupBox("Progress")
+        progress_group.setObjectName("card")
         progress_layout = QVBoxLayout(progress_group)
         
         self.text_status = QLabel("Ready")
+        self.text_status.setObjectName("status-info")
         progress_layout.addWidget(self.text_status)
         
         self.text_progress_bar = QProgressBar()
@@ -234,6 +263,7 @@ class ProcessorsTab(QWidget):
     def create_advanced_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        icon_manager = IconManager()
         
         # Advanced processing options
         advanced_group = QGroupBox("Advanced Processing Options")
@@ -284,6 +314,7 @@ class ProcessorsTab(QWidget):
         progress_layout = QVBoxLayout(progress_group)
         
         self.advanced_status = QLabel("Ready")
+        self.advanced_status.setObjectName("status-info")
         progress_layout.addWidget(self.advanced_status)
         
         self.advanced_progress_bar = QProgressBar()
@@ -297,6 +328,7 @@ class ProcessorsTab(QWidget):
     def create_batch_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
+        icon_manager = IconManager()
         
         # Batch processing options
         batch_config_group = QGroupBox("Batch Configuration")
@@ -347,12 +379,17 @@ class ProcessorsTab(QWidget):
         
         # Controls
         controls_group = QGroupBox("Batch Controls")
+        controls_group.setObjectName("card")
         controls_layout = QHBoxLayout(controls_group)
         
         self.batch_start_btn = QPushButton("Start Batch Processing")
-        self.batch_start_btn.clicked.connect(self.start_batch_processing)
+        start_icon = icon_manager.get_icon_path('Start/play operation control', by='Function')
+        if start_icon:
+            self.batch_start_btn.setIcon(QIcon(start_icon))
         self.batch_stop_btn = QPushButton("Stop")
-        self.batch_stop_btn.clicked.connect(self.stop_batch_processing)
+        stop_icon = icon_manager.get_icon_path('Stop operation control', by='Function')
+        if stop_icon:
+            self.batch_stop_btn.setIcon(QIcon(stop_icon))
         self.batch_stop_btn.setEnabled(False)
         
         controls_layout.addWidget(self.batch_start_btn)
@@ -362,9 +399,11 @@ class ProcessorsTab(QWidget):
         
         # Progress
         progress_group = QGroupBox("Batch Progress")
+        progress_group.setObjectName("card")
         progress_layout = QVBoxLayout(progress_group)
         
         self.batch_status = QLabel("Ready")
+        self.batch_status.setObjectName("status-info")
         progress_layout.addWidget(self.batch_status)
         
         self.batch_progress_bar = QProgressBar()
@@ -666,7 +705,11 @@ class ProcessorsTab(QWidget):
                         shutil.copy2(file_path, target_dir)
                     except Exception as e:
                         self.notification_manager.add_notification(f"copy_{file_path}", "Copy Error", str(e), "error", auto_hide=True)
+                        if self.sound_enabled:
+                            Notifier.notify("Copy Error", str(e), level="error")
                 self.notification_manager.add_notification("batch_copy", "Batch Copy", f"Copied {len(selected_files)} files.", "success", auto_hide=True)
+                if self.sound_enabled:
+                    Notifier.notify("Batch Copy", f"Copied {len(selected_files)} files.", level="success")
             elif operation_type == "move":
                 target_dir = QFileDialog.getExistingDirectory(self, "Select Target Directory")
                 if not target_dir:
@@ -690,6 +733,8 @@ class ProcessorsTab(QWidget):
             self.refresh_file_view()
         except Exception as e:
             QMessageBox.critical(self, f"Batch {operation_type.capitalize()} Error", str(e))
+            if self.sound_enabled:
+                Notifier.notify(f"Batch {operation_type.capitalize()} Error", str(e), level="error")
 
     def get_selected_files(self):
         """Return the list of selected files from the active tab's file list."""

@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
                              QTextEdit, QPushButton, QDialogButtonBox, QCheckBox)
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont, QIcon
+from app.helpers.icon_manager import IconManager
 
 class ErrorDialog(QDialog):
     """Dialog for displaying error messages with details."""
@@ -23,7 +24,12 @@ class ErrorDialog(QDialog):
         """Set up the UI components."""
         self.setWindowTitle(f"Error: {self.title_text}")
         self.setMinimumWidth(500)
-        self.setWindowIcon(QIcon("app/resources/icons/error.png"))
+        icon_manager = IconManager()
+        icon_path = icon_manager.get_icon_path('Warning and alert notifications', by='Function')
+        if icon_path:
+            self.setWindowIcon(QIcon(icon_path))
+        else:
+            self.setWindowIcon(QIcon())
         
         main_layout = QVBoxLayout(self)
         
@@ -31,12 +37,14 @@ class ErrorDialog(QDialog):
         header_layout = QHBoxLayout()
         
         icon_label = QLabel()
-        icon_label.setPixmap(QIcon("app/resources/icons/error.png").pixmap(48, 48))
+        if icon_path:
+            icon_label.setPixmap(QIcon(icon_path).pixmap(48, 48))
         header_layout.addWidget(icon_label)
         
         message_label = QLabel(self.message_text)
         message_label.setWordWrap(True)
         message_label.setFont(QFont("Arial", 11))
+        message_label.setObjectName("status-info")
         header_layout.addWidget(message_label, 1)
         
         main_layout.addLayout(header_layout)
