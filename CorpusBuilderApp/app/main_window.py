@@ -19,6 +19,7 @@ from ui.tabs.balancer_tab import BalancerTab
 from ui.tabs.analytics_tab import AnalyticsTab
 from ui.tabs.configuration_tab import ConfigurationTab
 from ui.tabs.logs_tab import LogsTab
+from ui.tabs.maintenance_tab import MaintenanceTab
 
 class CryptoCorpusMainWindow(QMainWindow):
     """Main application window"""
@@ -99,6 +100,10 @@ class CryptoCorpusMainWindow(QMainWindow):
             # Logs tab
             self.logs_tab = LogsTab(self.config)
             self.tab_widget.addTab(self.logs_tab, "📝 Logs")
+            
+            # Add Maintenance tab
+            self.maintenance_tab = MaintenanceTab(self)
+            self.tab_widget.addTab(self.maintenance_tab, "🛠️ Maintenance")
             
             self.logger.info("All tabs initialized successfully")
             

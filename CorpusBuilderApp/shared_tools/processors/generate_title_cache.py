@@ -1,35 +1,57 @@
 import os
+import csv
 import re
-import sys
-from pathlib import Path
-from datetime import datetime
-import glob
-import json
+import unicodedata
+import argparse
+from typing import List, Set
 
-def normalize_title(title):
-    return re.sub(r'[^\w\s]', '', title.lower()).strip()
-
-def main(corpus_dir, output_dir):
-    meta_files = glob.glob(os.path.join(corpus_dir, '**', '*.meta'), recursive=True)
-    titles = set()
-    for meta_path in meta_files:
+def generate_title_cache(corpus_dir: str, output_dir: str) -> None:
+    """
+    Generate a cache of document titles from the corpus metadata.
+    This function scans the corpus directory for metadata files, normalizes titles,
+    and writes a cache file of unique titles to the output directory.
+    """
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Get all metadata files
+    metadata_files = []
+    for root, _, files in os.walk(corpus_dir):
+        for file in files:
+            if file.endswith('_metadata.csv'):
+                metadata_files.append(os.path.join(root, file))
+    
+    if not metadata_files:
+        print("No metadata files found.")
+        return
+    
+    # Process each metadata file
+    all_titles: Set[str] = set()
+    for metadata_file in metadata_files:
         try:
-            with open(meta_path, 'r', encoding='utf-8') as f:
-                meta = json.load(f)
-            title = meta.get('title')
-            if title:
-                titles.add(normalize_title(title))
+            with open(metadata_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if 'title' in row and row['title']:
+                        # Normalize title
+                        title = row['title'].strip()
+                        title = unicodedata.normalize('NFKC', title)
+                        title = re.sub(r'\s+', ' ', title)
+                        all_titles.add(title)
         except Exception as e:
-            print(f"[WARN] Could not process {meta_path}: {e}")
-    date_str = datetime.now().strftime('%Y%m%d')
-    output_file = Path(output_dir) / f'existing_titles_{date_str}.txt'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for t in sorted(titles):
-            f.write(t + '\n')
-    print(f"Extracted {len(titles)} normalized titles to {output_file}")
+            print(f"Error processing {metadata_file}: {e}")
+    
+    # Write cache file
+    cache_file = os.path.join(output_dir, 'title_cache.txt')
+    with open(cache_file, 'w', encoding='utf-8') as f:
+        for title in sorted(all_titles):
+            f.write(f"{title}\n")
+    
+    print(f"Title cache generated: {cache_file}")
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("Usage: python generate_title_cache.py <corpus_dir> <output_dir>")
-        sys.exit(1)
-    main(sys.argv[1], sys.argv[2]) 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate a cache of document titles from corpus metadata.")
+    parser.add_argument("corpus_dir", help="Directory containing the corpus metadata files")
+    parser.add_argument("output_dir", help="Directory to write the title cache file")
+    args = parser.parse_args()
+    generate_title_cache(args.corpus_dir, args.output_dir) 

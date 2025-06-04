@@ -5,6 +5,8 @@ Provides comprehensive deduplication capabilities for non-PDF documents
 
 import os
 import hashlib
+import subprocess
+import sys
 from typing import Dict, List, Optional, Any, Set, Tuple
 from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
@@ -443,6 +445,15 @@ class DeduplicateNonPDFOutputsWrapper(BaseWrapper, BatchProcessorMixin, Progress
         
         if input_path == "No directory selected":
             self.show_error("Configuration Error", "Please select a directory to process")
+            return
+            
+        # Automatically generate title cache before deduplication
+        corpus_dir = input_path
+        output_dir = corpus_dir  # Or set to a specific cache/output directory if needed
+        try:
+            subprocess.run([sys.executable, 'shared_tools/processors/generate_title_cache.py', corpus_dir, output_dir], check=True)
+        except Exception as e:
+            self.handle_error('Title Cache Generation Error', str(e))
             return
             
         # Prepare options

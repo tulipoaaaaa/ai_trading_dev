@@ -4,6 +4,8 @@ from PyQt6.QtCore import pyqtSignal, QThread
 from shared_tools.processors.deduplicator import Deduplicator
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+import subprocess
+import sys
 
 class DeduplicatorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Deduplicator processor."""
@@ -79,6 +81,18 @@ class DeduplicatorWrapper(BaseWrapper, ProcessorWrapperMixin):
         self.status_updated.emit(
             f"Deduplication completed: {len(results.get('duplicate_sets', []))} duplicate sets found"
         )
+        
+    @pyqtSlot()
+    def start_deduplication(self):
+        # Automatically generate title cache before deduplication
+        corpus_dir = self.input_directory_edit.text() if hasattr(self, 'input_directory_edit') else self.options.get('input_directory', '.')
+        output_dir = corpus_dir  # Or set to a specific cache/output directory if needed
+        try:
+            subprocess.run([sys.executable, 'shared_tools/processors/generate_title_cache.py', corpus_dir, output_dir], check=True)
+        except Exception as e:
+            self.handle_error('Title Cache Generation Error', str(e))
+        # Proceed with deduplication as usual
+        # ... existing deduplication logic ...
         
 class DeduplicatorWorkerThread(QThread):
     """Worker thread for deduplication processing."""
