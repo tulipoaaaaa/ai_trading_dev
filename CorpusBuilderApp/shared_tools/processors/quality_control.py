@@ -7,10 +7,10 @@ import json
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
-from CryptoFinanceCorpusBuilder.shared_tools.processors.machine_translation_detector import MachineTranslationDetector
-from CryptoFinanceCorpusBuilder.shared_tools.processors.language_confidence_detector import LanguageConfidenceDetector
-from CryptoFinanceCorpusBuilder.shared_tools.processors.corruption_detector import CorruptionDetector
-from CryptoFinanceCorpusBuilder.shared_tools.project_config import ProjectConfig
+from .machine_translation_detector import MachineTranslationDetector
+from .language_confidence_detector import LanguageConfidenceDetector
+from .corruption_detector import CorruptionDetector
+from shared_tools.project_config import ProjectConfig
 
 class QualityControl:
     """Quality control for corpus content"""

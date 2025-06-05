@@ -2,11 +2,11 @@
 Main window for CryptoFinance Corpus Builder
 """
 
-from PyQt6.QtWidgets import (QMainWindow, QTabWidget, QVBoxLayout, QWidget, 
+from PySide6.QtWidgets import (QMainWindow, QTabWidget, QVBoxLayout, QWidget, 
                              QStatusBar, QMenuBar, QToolBar, QProgressBar, 
-                             QLabel, QSplitter, QMessageBox, QHBoxLayout)
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QThread, QSize
-from PyQt6.QtGui import QAction, QIcon, QPixmap
+                             QLabel, QSplitter, QMessageBox, QHBoxLayout, QPushButton, QMenu, QDialog, QLineEdit, QComboBox, QTableWidget, QTableWidgetItem, QHeaderView)
+from PySide6.QtCore import Qt, QTimer, Signal as pyqtSignal, QThread, QSize
+from PySide6.QtGui import QAction, QIcon, QPixmap
 import logging
 from pathlib import Path
 
@@ -26,8 +26,22 @@ class CryptoCorpusMainWindow(QMainWindow):
     
     def __init__(self, config):
         super().__init__()
+        print(f"DEBUG: MainWindow received config type: {type(config)}")
+        print(f"DEBUG: MainWindow received config value: {config}")
+        print(f"DEBUG: Config has 'get' method: {hasattr(config, 'get')}")
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
+        
+        # Initialize tab attributes to None
+        self.dashboard_tab = None
+        self.collectors_tab = None
+        self.processors_tab = None
+        self.corpus_manager_tab = None
+        self.balancer_tab = None
+        self.analytics_tab = None
+        self.configuration_tab = None
+        self.logs_tab = None
+        self.maintenance_tab = None
         
         # Initialize UI
         self.init_ui()
@@ -69,44 +83,54 @@ class CryptoCorpusMainWindow(QMainWindow):
     def init_tabs(self):
         """Initialize all application tabs"""
         try:
+            print(f"DEBUG: About to initialize tabs with config type: {type(self.config)}")
+            print(f"DEBUG: About to initialize tabs with config value: {self.config}")
             # Dashboard tab
+            print("DEBUG: Initializing DashboardTab...")
             self.dashboard_tab = DashboardTab(self.config)
+            print("DEBUG: DashboardTab initialized successfully")
             self.tab_widget.addTab(self.dashboard_tab, "📊 Dashboard")
-            
             # Collectors tab
+            print("DEBUG: Initializing CollectorsTab...")
             self.collectors_tab = CollectorsTab(self.config)
+            print("DEBUG: CollectorsTab initialized successfully")
             self.tab_widget.addTab(self.collectors_tab, "🔍 Collectors")
-            
             # Processors tab
+            print("DEBUG: Initializing ProcessorsTab...")
             self.processors_tab = ProcessorsTab(self.config)
+            print("DEBUG: ProcessorsTab initialized successfully")
             self.tab_widget.addTab(self.processors_tab, "⚙️ Processors")
-            
             # Corpus Manager tab
+            print("DEBUG: Initializing CorpusManagerTab...")
             self.corpus_manager_tab = CorpusManagerTab(self.config)
+            print("DEBUG: CorpusManagerTab initialized successfully")
             self.tab_widget.addTab(self.corpus_manager_tab, "📁 Corpus Manager")
-            
             # Balancer tab
+            print("DEBUG: Initializing BalancerTab...")
             self.balancer_tab = BalancerTab(self.config)
+            print("DEBUG: BalancerTab initialized successfully")
             self.tab_widget.addTab(self.balancer_tab, "⚖️ Balancer")
-            
             # Analytics tab
+            print("DEBUG: Initializing AnalyticsTab...")
             self.analytics_tab = AnalyticsTab(self.config)
+            print("DEBUG: AnalyticsTab initialized successfully")
             self.tab_widget.addTab(self.analytics_tab, "📈 Analytics")
-            
             # Configuration tab
+            print("DEBUG: Initializing ConfigurationTab...")
             self.configuration_tab = ConfigurationTab(self.config)
+            print("DEBUG: ConfigurationTab initialized successfully")
             self.tab_widget.addTab(self.configuration_tab, "⚙️ Configuration")
-            
             # Logs tab
+            print("DEBUG: Initializing LogsTab...")
             self.logs_tab = LogsTab(self.config)
+            print("DEBUG: LogsTab initialized successfully")
             self.tab_widget.addTab(self.logs_tab, "📝 Logs")
-            
             # Add Maintenance tab
-            self.maintenance_tab = MaintenanceTab(self)
+            print("DEBUG: Initializing MaintenanceTab...")
+            self.maintenance_tab = MaintenanceTab(parent=self)
+            print("DEBUG: MaintenanceTab initialized successfully")
             self.tab_widget.addTab(self.maintenance_tab, "🛠️ Maintenance")
-            
             self.logger.info("All tabs initialized successfully")
-            
         except Exception as e:
             self.logger.error(f"Failed to initialize tabs: {e}")
             self.show_error("Initialization Error", f"Failed to initialize application tabs: {e}")
@@ -191,11 +215,11 @@ class CryptoCorpusMainWindow(QMainWindow):
         self.tab_widget.currentChanged.connect(self.on_tab_changed)
         
         # Connect tab signals to status updates
-        if hasattr(self.collectors_tab, 'collection_started'):
+        if getattr(self, "collectors_tab", None) and hasattr(self.collectors_tab, 'collection_started'):
             self.collectors_tab.collection_started.connect(self.on_collection_started)
             self.collectors_tab.collection_finished.connect(self.on_collection_finished)
         
-        if hasattr(self.processors_tab, 'processing_started'):
+        if getattr(self, "processors_tab", None) and hasattr(self.processors_tab, 'processing_started'):
             self.processors_tab.processing_started.connect(self.on_processing_started)
             self.processors_tab.processing_finished.connect(self.on_processing_finished)
     
@@ -246,14 +270,14 @@ class CryptoCorpusMainWindow(QMainWindow):
         """Quick start collection from toolbar"""
         self.tab_widget.setCurrentIndex(1)  # Switch to collectors tab
         # Trigger quick collection if available
-        if hasattr(self.collectors_tab, 'quick_start'):
+        if getattr(self, "collectors_tab", None) and hasattr(self.collectors_tab, 'quick_start'):
             self.collectors_tab.quick_start()
     
     def quick_start_processing(self):
         """Quick start processing from toolbar"""
         self.tab_widget.setCurrentIndex(2)  # Switch to processors tab
         # Trigger quick processing if available
-        if hasattr(self.processors_tab, 'quick_start'):
+        if getattr(self, "processors_tab", None) and hasattr(self.processors_tab, 'quick_start'):
             self.processors_tab.quick_start()
     
     def export_corpus(self):
@@ -299,9 +323,9 @@ class CryptoCorpusMainWindow(QMainWindow):
         """Handle window close event"""
         # Stop any running operations
         try:
-            if hasattr(self.collectors_tab, 'stop_all'):
+            if getattr(self, "collectors_tab", None) and hasattr(self.collectors_tab, 'stop_all'):
                 self.collectors_tab.stop_all()
-            if hasattr(self.processors_tab, 'stop_all'):
+            if getattr(self, "processors_tab", None) and hasattr(self.processors_tab, 'stop_all'):
                 self.processors_tab.stop_all()
         except Exception as e:
             self.logger.error(f"Error stopping operations: {e}")
@@ -309,4 +333,3 @@ class CryptoCorpusMainWindow(QMainWindow):
         # Accept the close event
         event.accept()
         self.logger.info("Main window closed")
-```

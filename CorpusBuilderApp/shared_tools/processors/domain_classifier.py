@@ -5,10 +5,10 @@ import json
 from pathlib import Path
 import numpy as np
 from collections import Counter
-from CryptoFinanceCorpusBuilder.config.domain_config import DOMAINS
-from CryptoFinanceCorpusBuilder.shared_tools.utils.domain_utils import get_valid_domains, get_domain_for_file
+from ..config.domain_config import DOMAINS
+from ..utils.domain_utils import get_valid_domains, get_domain_for_file
 from typing import Optional, Dict, Any, Union
-from CryptoFinanceCorpusBuilder.shared_tools.project_config import ProjectConfig
+from shared_tools.project_config import ProjectConfig
 
 class DomainClassifier:
     """Classify documents into crypto-finance domains"""

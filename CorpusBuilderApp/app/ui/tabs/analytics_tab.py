@@ -1,8 +1,9 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
                              QLabel, QPushButton, QComboBox, QDateEdit,
                              QTabWidget, QSpinBox, QCheckBox, QSlider)
-from PyQt6.QtCore import Qt, QDate, pyqtSlot
-from PyQt6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
+from PySide6.QtCore import Qt, QDate, Slot as pyqtSlot
+from PySide6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
+from PySide6.QtGui import QPainter
 
 import random
 import datetime
@@ -119,7 +120,7 @@ class AnalyticsTab(QWidget):
         
         # Create a chart view
         chart_view = QChartView(chart)
-        chart_view.setRenderHint(1)  # Use antialiasing
+        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         return chart_view
     
@@ -131,7 +132,7 @@ class AnalyticsTab(QWidget):
         
         # Create a chart view
         chart_view = QChartView(chart)
-        chart_view.setRenderHint(1)  # Use antialiasing
+        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         return chart_view
     
@@ -143,7 +144,7 @@ class AnalyticsTab(QWidget):
         
         # Create a chart view
         chart_view = QChartView(chart)
-        chart_view.setRenderHint(1)  # Use antialiasing
+        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         return chart_view
     
@@ -155,15 +156,15 @@ class AnalyticsTab(QWidget):
         
         # Create a chart view
         chart_view = QChartView(chart)
-        chart_view.setRenderHint(1)  # Use antialiasing
+        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
         
         return chart_view
     
     def update_charts(self):
         """Update all analytics charts with current data"""
         # Get filter values
-        from_date = self.date_from.date().toPyDate()
-        to_date = self.date_to.date().toPyDate()
+        from_date = self.date_from.date().toPython()
+        to_date = self.date_to.date().toPython()
         domain = self.domain_filter.currentText()
         min_quality = self.quality_filter.value()
         

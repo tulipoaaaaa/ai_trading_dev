@@ -1,10 +1,10 @@
 # File: app/ui/widgets/domain_distribution.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QComboBox, QCheckBox)
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
-from PyQt6.QtGui import QColor, QPainter
+from PySide6.QtCore import Qt, Signal as pyqtSignal
+from PySide6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
+from PySide6.QtGui import QColor, QPainter
 
 class DomainDistribution(QWidget):
     """Widget for displaying corpus domain distribution."""
@@ -12,8 +12,9 @@ class DomainDistribution(QWidget):
     refresh_requested = pyqtSignal()
     balance_requested = pyqtSignal()
     
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super().__init__(parent)
+        self.config = config
         self.setup_ui()
         
     def setup_ui(self):
@@ -86,14 +87,14 @@ class DomainDistribution(QWidget):
         }
         
         self.target_distribution = {
-            "Crypto Derivatives": 20,
-            "High Frequency Trading": 15,
-            "Risk Management": 15,
-            "Market Microstructure": 15,
-            "DeFi": 12,
-            "Portfolio Construction": 10,
-            "Valuation Models": 8,
-            "Regulation & Compliance": 5
+            "Crypto Derivatives": {"allocation": 0.20},
+            "High Frequency Trading": {"allocation": 0.15},
+            "Risk Management": {"allocation": 0.15},
+            "Market Microstructure": {"allocation": 0.15},
+            "DeFi": {"allocation": 0.12},
+            "Portfolio Construction": {"allocation": 0.10},
+            "Valuation Models": {"allocation": 0.08},
+            "Regulation & Compliance": {"allocation": 0.05},
         }
         
         # Initial chart
@@ -134,13 +135,25 @@ class DomainDistribution(QWidget):
         self.chart.setTitle("Current Corpus Domain Distribution")
         
         # Add slices
-        for domain, value in self.current_distribution.items():
-            slice = series.append(f"{domain} ({value}%)", value)
+        for domain, data in self.current_distribution.items():
+            # Handle both integer values and dictionary values
+            if isinstance(data, dict):
+                value = data.get("current", 0) * 100  # Convert to percentage
+            else:
+                # data is just an integer percentage
+                value = data
+                
+            slice = series.append(f"{domain} ({value:.1f}%)", value)
             slice.setLabelVisible(True)
             
             # Color based on comparison with target
+            target_data = self.target_distribution.get(domain, {})
+            if isinstance(target_data, dict):
+                target = target_data.get("allocation", 0) * 100
+            else:
+                target = target_data if target_data else 0
+                
             if self.show_target.isChecked():
-                target = self.target_distribution.get(domain, 0)
                 if abs(value - target) <= 2:
                     # On target (±2%)
                     slice.setColor(QColor("green"))
@@ -167,11 +180,22 @@ class DomainDistribution(QWidget):
         
         # Add data
         for domain in self.domains:
-            current_value = self.current_distribution.get(domain, 0)
+            current_data = self.current_distribution.get(domain, {})
+            # Handle both integer values and dictionary values
+            if isinstance(current_data, dict):
+                current_value = current_data.get("current", 0) * 100
+            else:
+                # current_data is just an integer percentage
+                current_value = current_data if current_data else 0
+                
             current_set.append(current_value)
             
             if self.show_target.isChecked():
-                target_value = self.target_distribution.get(domain, 0)
+                target_data = self.target_distribution.get(domain, {})
+                if isinstance(target_data, dict):
+                    target_value = target_data.get("allocation", 0) * 100
+                else:
+                    target_value = target_data if target_data else 0
                 target_set.append(target_value)
         
         # Create and configure bar series
@@ -189,7 +213,7 @@ class DomainDistribution(QWidget):
         series.attachAxis(axis_x)
         
         axis_y = QValueAxis()
-        axis_y.setRange(0, 30)  # Adjust range as needed
+        axis_y.setRange(0, 100)  # Adjust range as needed for percentage
         axis_y.setTitleText("Percentage (%)")
         self.chart.addAxis(axis_y, Qt.AlignmentFlag.AlignLeft)
         series.attachAxis(axis_y)

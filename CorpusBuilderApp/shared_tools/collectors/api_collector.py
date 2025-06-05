@@ -1,18 +1,19 @@
 # sources/api_collector.py
-from CryptoFinanceCorpusBuilder.shared_tools.collectors.base_collector import BaseCollector
+from ..collectors.base_collector import BaseCollector
+from ..project_config import ProjectConfig
 import json
 import requests
 import time
-from typing import Optional, Dict, Union, Any
+from typing import Optional, Dict, Union, Any, Tuple
 from pathlib import Path
 
 class ApiCollector(BaseCollector):
     """Base class for API-based collectors"""
     
     def __init__(self, 
-                 config: Union[str, 'ProjectConfig'],
+                 config: Union[str, ProjectConfig],
                  api_base_url: Optional[str] = None,
-                 delay_range: tuple = (5, 10)):
+                 delay_range: Tuple[int, int] = (5, 10)):
         """Initialize the API collector.
         
         Args:
@@ -24,8 +25,8 @@ class ApiCollector(BaseCollector):
         self.api_base_url = api_base_url
         self.delay_range = delay_range
         self.api_key = None  # Ensure attribute exists
-        self.last_request_time = {}
-        self.rate_limits = {}  # Format: {'domain': {'requests': 10, 'period': 60}}
+        self.last_request_time: Dict[str, float] = {}
+        self.rate_limits: Dict[str, Dict[str, int]] = {}  # Format: {'domain': {'requests': 10, 'period': 60}}
     
     def api_request(self, 
                    endpoint: str,
@@ -139,7 +140,7 @@ if __name__ == "__main__":
             exit(1)
             
     print(f"[DEBUG] CLI args: {args}")
-    print(f"[DEBUG] Using API key: {api_key}")
+    print(f"[DEBUG] Using API key: [REDACTED]")
     print(f"[DEBUG] Using base URL: {api_base_url}")
     print(f"[DEBUG] Endpoint: {args.endpoint}")
     print(f"[DEBUG] Params: {params}")

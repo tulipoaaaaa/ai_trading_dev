@@ -10,10 +10,14 @@ import json
 import datetime
 from .base_collector import BaseCollector
 from CryptoFinanceCorpusBuilder.shared_tools.utils.domain_utils import get_domain_for_file
+from shared_tools.utils.extractor_utils import safe_filename
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Environment Variable Required:
+#   AA_ACCOUNT_COOKIE - Your Anna's Archive account cookie (set in .env or environment)
 
 # Try to import enhanced client first, then fall back to CookieAuthClient
 try:
@@ -54,10 +58,6 @@ def load_existing_titles(existing_titles_path):
             for line in f:
                 existing_titles.add(line.strip())
     return existing_titles
-
-def safe_filename(s):
-    import re
-    return re.sub(r'[^a-zA-Z0-9_\-\.]+', '_', s)[:128]
 
 class AnnasMainLibraryCollector(BaseCollector):
     def __init__(self, config, account_cookie=None):
@@ -158,7 +158,7 @@ class AnnasMainLibraryCollector(BaseCollector):
                 if not filepath.exists():
                     logger.error(f"Downloaded file not found at {filepath}")
                     continue
-                output_filename = f"Unknown_{result.get('year', 'Unknown')}_{safe_filename(result['title'])}_{result['md5']}.pdf"
+                output_filename = f"Unknown_{result.get('year', 'Unknown')}_{safe_filename(result['title'], 128)}_{result['md5']}.pdf"
                 domain = get_domain_for_file(str(filepath), text=result['title'], debug=True)
                 logger.info(f"Classified '{result['title']}' into domain: {domain}")
                 if domain != 'unknown':

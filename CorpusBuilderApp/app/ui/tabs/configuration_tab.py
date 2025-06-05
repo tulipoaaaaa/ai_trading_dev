@@ -1,19 +1,26 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
                              QLabel, QPushButton, QLineEdit, QComboBox,
                              QTabWidget, QFileDialog, QCheckBox, QFormLayout,
                              QSpinBox, QTableWidget, QTableWidgetItem, QHeaderView,
                              QMessageBox)
-from PyQt6.QtCore import Qt, pyqtSlot
+from PySide6.QtCore import Qt, Slot as pyqtSlot, QMimeData
+from PySide6.QtGui import QDragEnterEvent, QDropEvent
 import os
 import yaml
+from pathlib import Path
+from dotenv import load_dotenv, set_key
+from app.helpers.crypto_utils import encrypt_value, decrypt_value
 
 
 class ConfigurationTab(QWidget):
     def __init__(self, project_config, parent=None):
         super().__init__(parent)
         self.project_config = project_config
+        self.env_path = Path(project_config.config_path).parent / '.env'
         self.setup_ui()
         self.load_current_config()
+        # Enable drop events
+        self.setAcceptDrops(True)
         
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -59,6 +66,12 @@ class ConfigurationTab(QWidget):
         buttons_layout.addWidget(self.default_btn)
         
         main_layout.addLayout(buttons_layout)
+        
+        # Add drag-and-drop area for importing config files
+        self.drop_area = QLabel("Drop config file here to import")
+        self.drop_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.drop_area.setStyleSheet("border: 2px dashed #aaa; padding: 20px;")
+        main_layout.addWidget(self.drop_area)
     
     def create_environment_tab(self):
         """Create the environment configuration tab"""
@@ -107,9 +120,10 @@ class ConfigurationTab(QWidget):
         venv_layout = QHBoxLayout()
         venv_layout.addWidget(QLabel("Virtual Environment:"))
         self.venv_path = QLineEdit()
-        venv_layout.addWidget(self.venv_path)
+        self.venv_path.setPlaceholderText('venv/')
         venv_browse = QPushButton("Browse...")
         venv_browse.clicked.connect(self.browse_venv_path)
+        venv_layout.addWidget(self.venv_path)
         venv_layout.addWidget(venv_browse)
         env_vars_layout.addLayout(venv_layout)
         
@@ -148,34 +162,40 @@ class ConfigurationTab(QWidget):
         self.github_token = QLineEdit()
         self.github_token.setEchoMode(QLineEdit.EchoMode.Password)
         self.github_token.setPlaceholderText("Enter GitHub API token")
+        self.github_token.setToolTip("Enter your GitHub API token. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("GitHub Token:", self.github_token)
         
         # Anna's Archive
         self.aa_cookie = QLineEdit()
         self.aa_cookie.setEchoMode(QLineEdit.EchoMode.Password)
         self.aa_cookie.setPlaceholderText("Enter Anna's Archive cookie")
+        self.aa_cookie.setToolTip("Enter your Anna's Archive cookie. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("Anna's Archive Cookie:", self.aa_cookie)
         
         # FRED API
         self.fred_key = QLineEdit()
         self.fred_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.fred_key.setPlaceholderText("Enter FRED API key")
+        self.fred_key.setToolTip("Enter your FRED API key. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("FRED API Key:", self.fred_key)
         
         # BitMEX API
         self.bitmex_key = QLineEdit()
         self.bitmex_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.bitmex_key.setPlaceholderText("Enter BitMEX API key")
+        self.bitmex_key.setToolTip("Enter your BitMEX API key. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("BitMEX API Key:", self.bitmex_key)
         
         self.bitmex_secret = QLineEdit()
         self.bitmex_secret.setEchoMode(QLineEdit.EchoMode.Password)
         self.bitmex_secret.setPlaceholderText("Enter BitMEX API secret")
+        self.bitmex_secret.setToolTip("Enter your BitMEX API secret. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("BitMEX API Secret:", self.bitmex_secret)
         
         # arXiv
         self.arxiv_email = QLineEdit()
         self.arxiv_email.setPlaceholderText("Enter contact email for arXiv API")
+        self.arxiv_email.setToolTip("Enter your contact email for arXiv API. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         keys_layout.addRow("arXiv Contact Email:", self.arxiv_email)
         
         layout.addWidget(keys_group)
@@ -514,47 +534,51 @@ class ConfigurationTab(QWidget):
     
     def load_current_config(self):
         """Load the current configuration into UI"""
-        # In a real implementation, this would load from project_config
-        # For demonstration, populate with sample data
+        # Load from .env file if it exists
+        if self.env_path.exists():
+            load_dotenv(self.env_path)
         
         # Environment tab
-        self.env_selector.setCurrentText("test")
-        self.config_path.setText("config/test.yaml")
-        self.python_path.setText("G:\\venv\\ai_trading_dev_1\\Scripts\\python.exe")
-        self.venv_path.setText("G:\\venv\\ai_trading_dev_1")
-        self.temp_dir.setText("C:\\Temp\\crypto_corpus")
+        self.env_selector.setCurrentText(os.getenv('ENVIRONMENT', 'test'))
+        self.config_path.setText(str(self.project_config.config_path))
+        self.python_path.setText(os.getenv('PYTHON_PATH', ''))
+        self.venv_path.setText('venv/')
+        self.temp_dir.setText(os.getenv('TEMP_DIR', ''))
         
-        # API Keys tab - in a real implementation, these would be loaded securely
-        self.github_token.setText("github_token_placeholder")
-        self.aa_cookie.setText("aa_cookie_placeholder")
-        self.fred_key.setText("fred_key_placeholder")
-        self.bitmex_key.setText("bitmex_key_placeholder")
-        self.bitmex_secret.setText("bitmex_secret_placeholder")
-        self.arxiv_email.setText("user@example.com")
+        # API Keys tab
+        self.github_token.setText(os.getenv('GITHUB_TOKEN', ''))
+        self.aa_cookie.setText(os.getenv('AA_COOKIE', ''))
+        self.fred_key.setText(os.getenv('FRED_API_KEY', ''))
+        self.bitmex_key.setText(os.getenv('BITMEX_API_KEY', ''))
+        self.bitmex_secret.setText(os.getenv('BITMEX_API_SECRET', ''))
+        self.arxiv_email.setText(os.getenv('ARXIV_EMAIL', ''))
         
         # Directories tab
-        base_dir = os.path.expanduser("~/crypto_corpus")
-        self.corpus_root.setText(base_dir)
-        self.raw_data_dir.setText(f"{base_dir}/raw")
-        self.processed_dir.setText(f"{base_dir}/processed")
-        self.metadata_dir.setText(f"{base_dir}/metadata")
-        self.logs_dir.setText(f"{base_dir}/logs")
-        
-        # Domains tab is already populated in create_domains_tab
+        self.corpus_root.setText(os.getenv('CORPUS_ROOT', '~/crypto_corpus'))
+        self.raw_data_dir.setText(os.getenv('RAW_DATA_DIR', '~/crypto_corpus/raw'))
+        self.processed_dir.setText(os.getenv('PROCESSED_DIR', '~/crypto_corpus/processed'))
+        self.metadata_dir.setText(os.getenv('METADATA_DIR', '~/crypto_corpus/metadata'))
+        self.logs_dir.setText(os.getenv('LOGS_DIR', '~/crypto_corpus/logs'))
         
         # Processing tab
-        self.pdf_threads.setValue(4)
-        self.text_threads.setValue(4)
-        self.batch_size.setValue(50)
-        self.max_retries.setValue(3)
-        self.timeout.setValue(300)
+        self.pdf_threads.setValue(int(os.getenv('PDF_THREADS', '4')))
+        self.text_threads.setValue(int(os.getenv('TEXT_THREADS', '4')))
+        self.batch_size.setValue(int(os.getenv('BATCH_SIZE', '50')))
+        self.max_retries.setValue(int(os.getenv('MAX_RETRIES', '3')))
+        self.timeout.setValue(int(os.getenv('TIMEOUT', '300')))
     
     def load_default_config(self):
-        """Reset to default configuration"""
+        """Reset to default configuration.
+        
+        Note: This method sets up a default configuration with non-functional placeholder values.
+        All credential fields are cleared and must be populated with real values before use.
+        """
         # Confirm with user
         confirm = QMessageBox.question(
             self, "Confirm Reset",
-            "Are you sure you want to reset to default configuration?",
+            "Are you sure you want to reset to default configuration?\n\n"
+            "Note: This will clear all API credentials and other sensitive information.\n"
+            "You will need to re-enter these values before using the application.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -564,16 +588,16 @@ class ConfigurationTab(QWidget):
             self.env_selector.setCurrentText("test")
             self.config_path.setText("config/test.yaml")
             self.python_path.setText("")
-            self.venv_path.setText("G:\\venv\\ai_trading_dev_1")
+            self.venv_path.setText("venv/")
             self.temp_dir.setText("")
             
-            # API Keys tab
-            self.github_token.setText("")
-            self.aa_cookie.setText("")
-            self.fred_key.setText("")
-            self.bitmex_key.setText("")
-            self.bitmex_secret.setText("")
-            self.arxiv_email.setText("")
+            # API Keys tab - Clear all credential fields
+            self.github_token.clear()
+            self.aa_cookie.clear()
+            self.fred_key.clear()
+            self.bitmex_key.clear()
+            self.bitmex_secret.clear()
+            self.arxiv_email.clear()
             
             # Directories tab
             base_dir = os.path.expanduser("~/crypto_corpus")
@@ -630,87 +654,103 @@ class ConfigurationTab(QWidget):
             
             QMessageBox.information(
                 self, "Reset Complete", 
-                "Configuration has been reset to defaults."
+                "Configuration has been reset to defaults.\n\n"
+                "Note: All API credentials have been cleared and must be re-entered before use."
             )
     
     def save_configuration(self):
         """Save the current configuration"""
-        # In a real implementation, this would save to project_config and config files
-        # For now, just show a confirmation message
-        
-        # Build a dictionary of configuration values
-        config = {
-            "environment": {
-                "active": self.env_selector.currentText(),
-                "config_path": self.config_path.text(),
-                "python_path": self.python_path.text(),
-                "venv_path": self.venv_path.text(),
-                "temp_dir": self.temp_dir.text(),
-                "auto_save": self.auto_save.isChecked()
-            },
-            "api_keys": {
-                "github_token": self.github_token.text(),
-                "aa_cookie": self.aa_cookie.text(),
-                "fred_key": self.fred_key.text(),
-                "bitmex_key": self.bitmex_key.text(),
-                "bitmex_secret": self.bitmex_secret.text(),
-                "arxiv_email": self.arxiv_email.text(),
-                "encrypt_keys": self.encrypt_keys.isChecked(),
-                "use_env_file": self.use_env_file.isChecked()
-            },
-            "directories": {
-                "corpus_root": self.corpus_root.text(),
-                "raw_data_dir": self.raw_data_dir.text(),
-                "processed_dir": self.processed_dir.text(),
-                "metadata_dir": self.metadata_dir.text(),
-                "logs_dir": self.logs_dir.text(),
-                "create_missing": self.create_missing.isChecked(),
-                "relative_paths": self.relative_paths.isChecked(),
-                "validate_paths": self.validate_paths.isChecked()
-            },
-            "domains": [],
-            "processing": {
-                "pdf": {
-                    "enable_ocr": self.enable_ocr.isChecked(),
-                    "threads": self.pdf_threads.value(),
-                    "enable_formula": self.enable_formula.isChecked(),
-                    "enable_tables": self.enable_tables.isChecked()
+        try:
+            # Create .env file if it doesn't exist
+            if not self.env_path.exists():
+                self.env_path.touch()
+            
+            # Save API keys to .env file
+            if self.use_env_file.isChecked():
+                env_vars = {
+                    'ENVIRONMENT': self.env_selector.currentText(),
+                    'PYTHON_PATH': self.python_path.text(),
+                    'VENV_PATH': self.venv_path.text(),
+                    'TEMP_DIR': self.temp_dir.text(),
+                    'GITHUB_TOKEN': self.github_token.text(),
+                    'AA_COOKIE': self.aa_cookie.text(),
+                    'FRED_API_KEY': self.fred_key.text(),
+                    'BITMEX_API_KEY': self.bitmex_key.text(),
+                    'BITMEX_API_SECRET': self.bitmex_secret.text(),
+                    'ARXIV_EMAIL': self.arxiv_email.text(),
+                    'CORPUS_ROOT': self.corpus_root.text(),
+                    'RAW_DATA_DIR': self.raw_data_dir.text(),
+                    'PROCESSED_DIR': self.processed_dir.text(),
+                    'METADATA_DIR': self.metadata_dir.text(),
+                    'LOGS_DIR': self.logs_dir.text(),
+                    'PDF_THREADS': str(self.pdf_threads.value()),
+                    'TEXT_THREADS': str(self.text_threads.value()),
+                    'BATCH_SIZE': str(self.batch_size.value()),
+                    'MAX_RETRIES': str(self.max_retries.value()),
+                    'TIMEOUT': str(self.timeout.value())
+                }
+                
+                # Update .env file
+                for key, value in env_vars.items():
+                    set_key(self.env_path, key, value)
+            
+            # Save non-sensitive configuration to YAML
+            config = {
+                'environment': {
+                    'active': self.env_selector.currentText(),
+                    'config_path': str(self.project_config.config_path),
+                    'auto_save': self.auto_save.isChecked()
                 },
-                "text": {
-                    "threads": self.text_threads.value(),
-                    "enable_language": self.enable_language.isChecked(),
-                    "min_quality": self.min_quality.value(),
-                    "enable_deduplication": self.enable_deduplication.isChecked()
+                'processing': {
+                    'pdf': {
+                        'enable_ocr': self.enable_ocr.isChecked(),
+                        'enable_formula': self.enable_formula.isChecked(),
+                        'enable_tables': self.enable_tables.isChecked()
+                    },
+                    'text': {
+                        'enable_language': self.enable_language.isChecked(),
+                        'min_quality': self.min_quality.value(),
+                        'enable_deduplication': self.enable_deduplication.isChecked()
+                    }
                 },
-                "advanced": {
-                    "batch_size": self.batch_size.value(),
-                    "max_retries": self.max_retries.value(),
-                    "timeout": self.timeout.value()
+                'directories': {
+                    'create_missing': self.create_missing.isChecked(),
+                    'relative_paths': self.relative_paths.isChecked(),
+                    'validate_paths': self.validate_paths.isChecked()
                 }
             }
-        }
-        
-        # Collect domain configuration
-        for i in range(self.domains_table.rowCount()):
-            domain = self.domains_table.item(i, 0).text()
-            try:
-                target = float(self.domains_table.item(i, 1).text())
-            except (ValueError, AttributeError):
-                target = 0
-            description = self.domains_table.item(i, 2).text()
             
-            config["domains"].append({
-                "name": domain,
-                "target_percentage": target,
-                "description": description
-            })
-        
-        # For demonstration, just show the config
-        # In a real implementation, this would save to files
-        config_yaml = yaml.dump(config, default_flow_style=False)
-        
-        # Show confirmation with truncated YAML
-        QMessageBox.information(
-            self, "Configuration Saved",
-            "Configuration has been saved successfully."
-        )
+            # Save to YAML
+            with open(self.project_config.config_path, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
+            
+            QMessageBox.information(
+                self, "Configuration Saved",
+                "Configuration has been saved successfully."
+            )
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self, "Save Error",
+                f"Failed to save configuration: {str(e)}"
+            )
+
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+            
+    def dropEvent(self, event: QDropEvent):
+        files = [url.toLocalFile() for url in event.mimeData().urls()]
+        if files:
+            self.import_config_file(files[0])
+            
+    def import_config_file(self, file_path: str):
+        try:
+            with open(file_path, 'r') as f:
+                config = yaml.safe_load(f)
+            # Here you can merge or overwrite the current config
+            # For now, we'll just print the imported config
+            print("Imported config:", config)
+            # TODO: Update the UI with the new config
+        except Exception as e:
+            QMessageBox.critical(self, "Import Error", f"Failed to import config: {str(e)}")

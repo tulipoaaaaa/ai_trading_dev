@@ -335,4 +335,6 @@ if __name__ == "__main__":
     results = collector.collect(max_pages=args.bitmex_max_pages, keywords=keywords)
     print(f"\nCollected {len(results)} BitMEX research posts. Output dir: {args.output_dir}")
     if results:
-        print(f"First post: {results[0].get('title','N/A')}") 
+        print(f"First post: {results[0].get('title','N/A')}")
+
+BitMEXCollector = UpdatedBitMEXCollector 

@@ -1,11 +1,11 @@
 # File: app/ui/widgets/activity_log.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
-                             QLabel, QHBoxLayout, QPushButton, QComboBox, QMenu,
-                             QAction)
-from PyQt6.QtCore import Qt, pyqtSignal, QDateTime
-from PyQt6.QtGui import QIcon, QColor, QFont
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QListWidget, QListWidgetItem,
+                             QLabel, QHBoxLayout, QPushButton, QComboBox, QMenu, QFileDialog, QApplication, QMessageBox)
+from PySide6.QtGui import QAction, QIcon, QColor, QFont, QClipboard
+from PySide6.QtCore import Qt, Signal as pyqtSignal, QDateTime
 from app.helpers.icon_manager import IconManager
+import csv
 
 import datetime
 
@@ -49,8 +49,9 @@ class ActivityLog(QWidget):
     
     item_selected = pyqtSignal(ActivityLogItem)
     
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super().__init__(parent)
+        self.config = config
         self.setObjectName("card")
         self.setup_ui()
         
@@ -122,9 +123,6 @@ class ActivityLog(QWidget):
     
     def export_log(self):
         """Export the log entries to a file."""
-        from PyQt6.QtWidgets import QFileDialog
-        import csv
-        
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Export Log", "", "CSV Files (*.csv);;Text Files (*.txt)"
         )
@@ -182,15 +180,10 @@ class ActivityLog(QWidget):
     
     def copy_item_text(self, item):
         """Copy the item text to clipboard."""
-        from PyQt6.QtGui import QClipboard
-        from PyQt6.QtWidgets import QApplication
-        
         QApplication.clipboard().setText(item.text())
     
     def view_item_details(self, item):
         """View the details of an item."""
-        from PyQt6.QtWidgets import QMessageBox
-        
         if isinstance(item, ActivityLogItem) and item.details:
             QMessageBox.information(
                 self, 
@@ -203,3 +196,25 @@ class ActivityLog(QWidget):
         row = self.log_list.row(item)
         if row >= 0:
             self.log_list.takeItem(row)
+            
+    def update_activity_log(self, activity_data):
+        """Update the activity log with new data."""
+        # Clear existing entries
+        self.log_list.clear()
+        
+        # Add new entries
+        for entry in activity_data:
+            if isinstance(entry, dict):
+                activity_type = entry.get('status', 'Info')
+                message = entry.get('action', 'Unknown action')
+                details = entry.get('details', '')
+                
+                # Map status to activity type
+                if activity_type == 'running':
+                    activity_type = 'Info'
+                elif activity_type == 'success':
+                    activity_type = 'Success'
+                elif activity_type == 'error':
+                    activity_type = 'Error'
+                
+                self.add_activity(activity_type, message, details)

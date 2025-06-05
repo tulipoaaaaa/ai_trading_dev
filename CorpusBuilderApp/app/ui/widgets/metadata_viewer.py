@@ -1,10 +1,11 @@
 # File: app/ui/widgets/metadata_viewer.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+import os
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QPushButton, QTableView, QHeaderView, QMessageBox,
                              QDialog, QFormLayout, QLineEdit, QDialogButtonBox)
-from PyQt6.QtCore import Qt, pyqtSignal, QAbstractTableModel, QModelIndex
-from PyQt6.QtGui import QFont
+from PySide6.QtCore import Qt, Signal as pyqtSignal, QAbstractTableModel, QModelIndex
+from PySide6.QtGui import QFont
 
 class MetadataTableModel(QAbstractTableModel):
     """Table model for displaying and editing metadata."""

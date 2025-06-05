@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/domain_classifier_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from shared_tools.processors.domain_classifier import DomainClassifier
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 class DomainClassifierWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Domain Classifier processor."""

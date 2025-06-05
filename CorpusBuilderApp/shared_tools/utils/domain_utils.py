@@ -15,12 +15,12 @@ from typing import Dict, List, Optional, Union, Any
 
 # Try to load domains from config, else fallback
 try:
-    from CryptoFinanceCorpusBuilder.config.domain_config import DOMAINS as _CONFIG_DOMAINS
+    from shared_tools.config.domain_config import DOMAINS as _CONFIG_DOMAINS
 except ImportError:
     _CONFIG_DOMAINS: Optional[Dict[str, Dict[str, Any]]] = None
 
 try:
-    from CryptoFinanceCorpusBuilder.shared_tools.project_config import ProjectConfig
+    from shared_tools.project_config import ProjectConfig
 except ImportError:
     ProjectConfig = None
 
@@ -39,10 +39,10 @@ DOMAIN_KEYWORDS = {
 class DomainConfig:
     """Configuration wrapper for domain settings with fallback mechanisms."""
     
-    def __init__(self, config_path: Optional[Union[str, ProjectConfig]] = None):
+    def __init__(self, config_path: Optional[Union[str, Any]] = None):
         self.config_path = config_path
         self.project_config = None
-        if isinstance(config_path, ProjectConfig):
+        if ProjectConfig is not None and isinstance(config_path, ProjectConfig):
             self.project_config = config_path
             self.config_path = None
         self.domains = self._load_domains()

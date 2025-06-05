@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from PyPDF2 import PdfReader
 import sys
+import logging
+from typing import Callable, Optional
 
 class CorpusMonitor:
     def __init__(self, corpus_dir, output_dir, interval=300):
@@ -405,6 +407,56 @@ class CorpusMonitor:
             self.generate_charts()
         
         print("Final report generated")
+
+class MonitorProgress:
+    """Monitor and report progress of long-running tasks."""
+    def __init__(self, total: int = 100, description: str = "", progress_callback: Optional[Callable[[int, str], None]] = None):
+        self.total = total
+        self.current = 0
+        self.description = description
+        self.progress_callback = progress_callback
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.setLevel(logging.INFO)
+        self.finished = False
+
+    def start(self, description: Optional[str] = None, total: Optional[int] = None):
+        if description is not None:
+            self.description = description
+        if total is not None:
+            self.total = total
+        self.current = 0
+        self.finished = False
+        self.logger.info(f"Progress started: {self.description} (total: {self.total})")
+        self._notify()
+
+    def update(self, increment: int = 1, message: Optional[str] = None):
+        self.current += increment
+        if self.current > self.total:
+            self.current = self.total
+        if message:
+            self.description = message
+        self.logger.info(f"Progress updated: {self.current}/{self.total} - {self.description}")
+        self._notify()
+
+    def finish(self, message: Optional[str] = None):
+        self.current = self.total
+        self.finished = True
+        if message:
+            self.description = message
+        self.logger.info(f"Progress finished: {self.current}/{self.total} - {self.description}")
+        self._notify()
+
+    def get_progress(self) -> float:
+        if self.total == 0:
+            return 1.0
+        return self.current / self.total
+
+    def is_finished(self) -> bool:
+        return self.finished
+
+    def _notify(self):
+        if self.progress_callback:
+            self.progress_callback(self.current, self.description)
 
 def main():
     """Main function to parse arguments and start monitoring."""

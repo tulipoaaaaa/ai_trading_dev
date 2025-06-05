@@ -6,9 +6,9 @@ Provides comprehensive batch processing capabilities for non-PDF documents
 import os
 import time
 from typing import Dict, List, Optional, Any
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex, QTimer
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, QSpinBox, QGroupBox, QGridLayout
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, BatchProcessorMixin, ProgressMixin
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QMutex, QTimer
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, QSpinBox, QGroupBox, QGridLayout
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, ProcessorWrapperMixin
 from shared_tools.processors.batch_nonpdf_extractor_enhanced import BatchNonPDFExtractorEnhanced
 
 
@@ -106,7 +106,7 @@ class BatchNonPDFExtractorWorker(QThread):
         return files
 
 
-class BatchNonPDFExtractorWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
+class BatchNonPDFExtractorEnhancedWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Batch Non-PDF Extractor Enhanced"""
     
     def __init__(self, parent=None):

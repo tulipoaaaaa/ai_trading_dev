@@ -1,9 +1,9 @@
 # File: app/ui/widgets/corpus_statistics.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                              QProgressBar, QFrame, QSizePolicy)
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer
-from PyQt6.QtGui import QFont, QColor, QPalette
+from PySide6.QtCore import Qt, Signal as pyqtSignal, QTimer
+from PySide6.QtGui import QFont, QColor, QPalette
 from app.helpers.icon_manager import IconManager
 
 class CorpusStatistics(QWidget):
@@ -11,8 +11,9 @@ class CorpusStatistics(QWidget):
     
     refresh_requested = pyqtSignal()
     
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super().__init__(parent)
+        self.config = config
         self.setObjectName("card")
         self.setup_ui()
         self.timer = QTimer(self)
@@ -40,7 +41,7 @@ class CorpusStatistics(QWidget):
         stats_layout = QHBoxLayout()
         
         # Total documents
-        self.total_docs_widget = self._create_stat_widget(
+        self.total_docs_widget, self.total_docs_value_label = self._create_stat_widget(
             "Total Documents", 
             "0", 
             "documents in corpus"
@@ -48,7 +49,7 @@ class CorpusStatistics(QWidget):
         stats_layout.addWidget(self.total_docs_widget)
         
         # Total size
-        self.total_size_widget = self._create_stat_widget(
+        self.total_size_widget, self.total_size_value_label = self._create_stat_widget(
             "Total Size", 
             "0 MB", 
             "of data"
@@ -56,7 +57,7 @@ class CorpusStatistics(QWidget):
         stats_layout.addWidget(self.total_size_widget)
         
         # Domains
-        self.domains_widget = self._create_stat_widget(
+        self.domains_widget, self.domains_value_label = self._create_stat_widget(
             "Domains", 
             "0/8", 
             "domains filled"
@@ -130,7 +131,7 @@ class CorpusStatistics(QWidget):
         main_layout.addStretch()
     
     def _create_stat_widget(self, title, value, subtitle):
-        """Create a statistic widget with title, value, and subtitle."""
+        """Create a statistic widget with title, value, and subtitle. Returns (widget, value_label)."""
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(10, 5, 10, 5)
@@ -151,23 +152,23 @@ class CorpusStatistics(QWidget):
         subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtitle_label)
         
-        return widget
+        return widget, value_label
         
     def update_statistics(self, stats_data):
         """Update the statistics with the provided data."""
         # Update total documents
         total_docs = stats_data.get('total_documents', 0)
-        self.total_docs_widget.findChild(QLabel, None, Qt.FindChildOption.FindChildrenRecursively)[1].setText(str(total_docs))
+        self.total_docs_value_label.setText(str(total_docs))
         
         # Update total size
         total_size = stats_data.get('total_size', 0)
         size_str = self._format_size(total_size)
-        self.total_size_widget.findChild(QLabel, None, Qt.FindChildOption.FindChildrenRecursively)[1].setText(size_str)
+        self.total_size_value_label.setText(size_str)
         
         # Update domains
         filled_domains = stats_data.get('filled_domains', 0)
         total_domains = stats_data.get('total_domains', 8)
-        self.domains_widget.findChild(QLabel, None, Qt.FindChildOption.FindChildrenRecursively)[1].setText(f"{filled_domains}/{total_domains}")
+        self.domains_value_label.setText(f"{filled_domains}/{total_domains}")
         
         # Update storage usage
         storage_used = stats_data.get('storage_used', 0)

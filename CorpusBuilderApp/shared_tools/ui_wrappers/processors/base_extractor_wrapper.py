@@ -5,8 +5,8 @@ Provides configuration interface for base extraction functionality
 
 import os
 from typing import Dict, List, Optional, Any
-from PyQt6.QtCore import QObject, pyqtSignal, pyqtSlot
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from PySide6.QtCore import QObject, Signal as pyqtSignal, Slot as pyqtSlot
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QLabel, QTextEdit, QFileDialog, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox,
                            QLineEdit, QTabWidget, QSlider)
@@ -213,7 +213,7 @@ class BaseExtractorWrapper(BaseWrapper):
         quality_layout = QGridLayout(quality_group)
         
         self.min_quality_label = QLabel("Minimum Quality Score:")
-        self.min_quality_slider = QSlider(Qt.Orientation.Horizontal)
+        self.min_quality_slider = QSlider()
         self.min_quality_slider.setRange(0, 100)
         self.min_quality_slider.setValue(70)
         self.min_quality_value_label = QLabel("70%")
@@ -222,7 +222,7 @@ class BaseExtractorWrapper(BaseWrapper):
         )
         
         self.confidence_threshold_label = QLabel("Confidence Threshold:")
-        self.confidence_threshold_slider = QSlider(Qt.Orientation.Horizontal)
+        self.confidence_threshold_slider = QSlider()
         self.confidence_threshold_slider.setRange(0, 100)
         self.confidence_threshold_slider.setValue(80)
         self.confidence_value_label = QLabel("80%")
@@ -457,7 +457,7 @@ class BaseExtractorWrapper(BaseWrapper):
     @pyqtSlot()
     def reset_configuration(self):
         """Reset to default configuration"""
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         
         reply = QMessageBox.question(
             self,

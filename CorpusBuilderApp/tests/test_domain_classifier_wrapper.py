@@ -17,12 +17,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtCore import QObject, Signal as pyqtSignal
+from PySide6.QtWidgets import QApplication
 
 from shared_tools.ui_wrappers.processors.domain_classifier_wrapper import (
     DomainClassifierWrapper,
-    DomainClassifierWorker
+    DomainClassifierWorkerThread
 )
 from shared_tools.project_config import ProjectConfig
 
@@ -42,14 +42,14 @@ class TestDomainClassifierWrapper:
     def mock_config(self):
         """Create mock configuration"""
         config = Mock(spec=ProjectConfig)
-        config.get_all_settings.return_value = {
+        config.get_all_settings = Mock(return_value={
             'classification_threshold': 0.8,
             'supported_domains': [
                 'crypto_derivatives',
                 'high_frequency_trading',
                 'risk_management'
             ]
-        }
+        })
         return config
         
     @pytest.fixture
@@ -150,7 +150,7 @@ class TestDomainClassifierWrapper:
         result = wrapper.start_classification(['test.pdf'])
         assert result == False
         
-    @patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorker')
+    @patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorkerThread')
     def test_start_classification_success(self, mock_worker_class, wrapper):
         """Test successful classification start"""
         mock_worker = Mock()
@@ -168,7 +168,7 @@ class TestDomainClassifierWrapper:
         """Test classification start with exception"""
         wrapper.classifier.classify_document.side_effect = Exception("Test error")
         
-        with patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorker') as mock_worker:
+        with patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorkerThread') as mock_worker:
             mock_worker.side_effect = Exception("Worker creation failed")
             
             result = wrapper.start_classification(['test.pdf'])
@@ -194,12 +194,12 @@ class TestDomainClassifierWorker:
         """Create worker instance"""
         config = {'classification_threshold': 0.8}
         files = ['test1.pdf', 'test2.pdf']
-        return DomainClassifierWorker(mock_classifier, files, config)
+        return DomainClassifierWorkerThread(mock_classifier, files, config)
         
     def test_worker_initialization(self, worker, mock_classifier):
         """Test worker initialization"""
-        assert worker.classifier == mock_classifier
-        assert len(worker.files_to_process) == 2
+        assert worker.processor == mock_classifier
+        assert len(worker.documents) == 2
         assert worker._is_running == True
         
     def test_worker_stop(self, worker):
@@ -326,7 +326,7 @@ class TestDomainClassifierIntegration:
             assert not wrapper.is_running()
             
             # Test starting classification
-            with patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorker'):
+            with patch('shared_tools.ui_wrappers.processors.domain_classifier_wrapper.DomainClassifierWorkerThread'):
                 result = wrapper.start_classification(['test.pdf'])
                 assert result == True
                 assert wrapper.is_running()

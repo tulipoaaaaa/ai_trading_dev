@@ -1,3 +1,5 @@
+# Environment Variable Required:
+#   AA_ACCOUNT_COOKIE - Your Anna's Archive account cookie (set in .env or environment)
 import os
 import time
 import json

@@ -1,9 +1,9 @@
 # File: app/ui/dialogs/api_key_dialog.py
 
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                              QLineEdit, QPushButton, QFormLayout, QDialogButtonBox,
                              QCheckBox, QComboBox, QTabWidget, QWidget)
-from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from PySide6.QtCore import Qt, Signal as pyqtSignal, Slot as pyqtSlot
 
 class APIKeyDialog(QDialog):
     """Dialog for managing API keys and credentials."""
@@ -35,6 +35,7 @@ class APIKeyDialog(QDialog):
         self.github_key = QLineEdit()
         self.github_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.github_key.setPlaceholderText("Enter GitHub API token")
+        self.github_key.setToolTip("Enter your GitHub API token. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         data_sources_layout.addRow("GitHub Token:", self.github_key)
         
         # ISDA
@@ -51,6 +52,7 @@ class APIKeyDialog(QDialog):
         self.annas_cookie = QLineEdit()
         self.annas_cookie.setEchoMode(QLineEdit.EchoMode.Password)
         self.annas_cookie.setPlaceholderText("Enter Anna's Archive cookie")
+        self.annas_cookie.setToolTip("Enter your Anna's Archive cookie. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         data_sources_layout.addRow("Anna's Archive Cookie:", self.annas_cookie)
         
         # Financial APIs tab
@@ -62,17 +64,20 @@ class APIKeyDialog(QDialog):
         self.fred_key = QLineEdit()
         self.fred_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.fred_key.setPlaceholderText("Enter FRED API key")
+        self.fred_key.setToolTip("Enter your FRED API key. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         financial_layout.addRow("FRED API Key:", self.fred_key)
         
         # BitMEX API
         self.bitmex_key = QLineEdit()
         self.bitmex_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.bitmex_key.setPlaceholderText("Enter BitMEX API key")
+        self.bitmex_key.setToolTip("Enter your BitMEX API key. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         financial_layout.addRow("BitMEX API Key:", self.bitmex_key)
         
         self.bitmex_secret = QLineEdit()
         self.bitmex_secret.setEchoMode(QLineEdit.EchoMode.Password)
         self.bitmex_secret.setPlaceholderText("Enter BitMEX API secret")
+        self.bitmex_secret.setToolTip("Enter your BitMEX API secret. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         financial_layout.addRow("BitMEX API Secret:", self.bitmex_secret)
         
         # Other APIs tab
@@ -83,6 +88,7 @@ class APIKeyDialog(QDialog):
         # arXiv
         self.arxiv_email = QLineEdit()
         self.arxiv_email.setPlaceholderText("Enter contact email for arXiv API")
+        self.arxiv_email.setToolTip("Enter your contact email for arXiv API. This will be stored securely in .env or encrypted config. Never stored in plaintext.")
         other_layout.addRow("arXiv Contact Email:", self.arxiv_email)
         
         main_layout.addWidget(self.tabs)
@@ -157,13 +163,21 @@ class APIKeyDialog(QDialog):
     
     def accept(self):
         """Handle dialog acceptance."""
+        if not self.encrypt_keys.isChecked() and not self.use_env_file.isChecked():
+            from PySide6.QtWidgets import QMessageBox
+            QMessageBox.warning(
+                self,
+                "Security Warning",
+                "At least one secure storage method must be enabled. Please enable 'Encrypt API keys in configuration' or 'Store in .env file'."
+            )
+            return
         api_keys = self.get_api_keys()
         self.keys_updated.emit(api_keys)
         super().accept()
     
     def test_connections(self):
         """Test connections to APIs."""
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         
         # In a real implementation, this would test the actual APIs
         # For now, just show a message

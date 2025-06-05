@@ -8,6 +8,20 @@ import logging
 from collections import Counter
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
+from shared_tools.project_config import ProjectConfig
+
+def detect_corruption(text: str, config: Optional[Dict] = None) -> Dict[str, Any]:
+    """Detect corruption in text using CorruptionDetector
+    
+    Args:
+        text (str): Text to analyze
+        config (dict, optional): Configuration for corruption detection
+        
+    Returns:
+        dict: Detection results
+    """
+    detector = CorruptionDetector(config=config)
+    return detector.detect(text)
 
 class CorruptionDetector:
     """Detect corrupted content"""
@@ -271,7 +285,6 @@ def main():
     
     if args.project_config:
         # Use project config
-        from CryptoFinanceCorpusBuilder.shared_tools.config.project_config import ProjectConfig
         project = ProjectConfig.load(args.project_config)
         results = run_with_project_config(project, args.verbose)
     else:

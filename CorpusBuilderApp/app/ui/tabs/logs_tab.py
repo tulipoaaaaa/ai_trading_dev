@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
                              QLabel, QPushButton, QTextEdit, QComboBox,
                              QLineEdit, QCheckBox, QFileDialog, QSplitter,
                              QTableWidget, QTableWidgetItem, QHeaderView)
-from PyQt6.QtCore import Qt, QTimer, pyqtSlot
-from PyQt6.QtGui import QColor, QTextCharFormat, QBrush
+from PySide6.QtCore import Qt, QTimer, Slot as pyqtSlot
+from PySide6.QtGui import QColor, QTextCharFormat, QBrush
 
 import os
 import re
@@ -148,11 +148,16 @@ class LogsTab(QWidget):
     def refresh_logs(self):
         """Refresh the current log view"""
         if not self.current_log:
+            print("DEBUG: No current log set, skipping refresh")
             return
             
-        # In a real implementation, this would read from the actual log file
-        # For demonstration, generate sample log entries
-        log_entries = self.generate_sample_logs(self.current_log["type"])
+        # Generate sample logs (ensure it returns a list, not None)
+        log_entries = self.generate_sample_logs(self.current_log.get("type", "app"))
+        
+        # Defensive check
+        if log_entries is None:
+            print("DEBUG: generate_sample_logs returned None, using empty list")
+            log_entries = []
         
         # Apply filters
         filtered_entries = self.filter_log_entries(log_entries)
@@ -327,4 +332,156 @@ class LogsTab(QWidget):
                 })
         
         elif log_type == "error":
-            components =
+            pass  # No sample error log entries defined
+
+    def apply_filters(self):
+        """Apply all current filters to the log entries."""
+        if not self.current_log:
+            return
+        # Get current filter values
+        level_filter = self.level_filter.currentText()
+        # component_filter is not present in your UI, so skip it
+        text_filter = self.filter_input.text()
+        # Generate new sample data (in real implementation, this would filter existing data)
+        log_entries = self.generate_sample_logs(self.current_log["type"])
+        # Apply filters
+        filtered_entries = self.filter_log_entries(log_entries)
+        self.filtered_entries = filtered_entries  # <-- Ensure this is set for export
+        # Update the table
+        self.populate_log_table(filtered_entries)
+
+    def filter_log_entries(self, entries):
+        """Apply filters to the log entries."""
+        # Defensive check for None entries
+        if entries is None:
+            print("DEBUG: filter_log_entries received None, returning empty list")
+            return []
+        
+        if not isinstance(entries, list):
+            print(f"DEBUG: filter_log_entries received {type(entries)}, converting to list")
+            entries = list(entries) if entries else []
+        
+        level_filter = self.level_filter.currentText()
+        text_filter = self.filter_input.text().lower()
+        
+        filtered = []
+        for entry in entries:
+            # Level filter
+            if level_filter != "All" and entry.get("level") != level_filter:
+                continue
+            # Text filter
+            if text_filter and text_filter not in entry.get("message", "").lower():
+                continue
+            filtered.append(entry)
+        
+        return filtered
+
+    def populate_log_table(self, entries):
+        """Populate the log table with entries."""
+        self.log_table.setRowCount(len(entries))
+        for i, entry in enumerate(entries):
+            # Time
+            time_item = QTableWidgetItem(entry.get("time", ""))
+            self.log_table.setItem(i, 0, time_item)
+            # Level
+            level_item = QTableWidgetItem(entry.get("level", ""))
+            if entry.get("level") == "ERROR":
+                level_item.setForeground(QColor("red"))
+            elif entry.get("level") == "WARNING":
+                level_item.setForeground(QColor("orange"))
+            self.log_table.setItem(i, 1, level_item)
+            # Component
+            component_item = QTableWidgetItem(entry.get("component", ""))
+            self.log_table.setItem(i, 2, component_item)
+            # Message
+            message_item = QTableWidgetItem(entry.get("message", ""))
+            self.log_table.setItem(i, 3, message_item)
+            # Details
+            details_item = QTableWidgetItem(entry.get("details", ""))
+            self.log_table.setItem(i, 4, details_item)
+
+    def on_log_entry_selected(self, index):
+        """Handle log entry selection in the table."""
+        if not index.isValid():
+            return
+        row = index.row()
+        if row >= self.log_table.rowCount():
+            return
+        # Get the log entry data from the selected row
+        time_item = self.log_table.item(row, 0)
+        level_item = self.log_table.item(row, 1)
+        component_item = self.log_table.item(row, 2)
+        message_item = self.log_table.item(row, 3)
+        details_item = self.log_table.item(row, 4)
+        if not all([time_item, level_item, component_item, message_item]):
+            return
+        # Create a detailed view of the selected entry
+        details_text = f"""Log Entry Details\n═══════════════════\n\nTime: {time_item.text()}\nLevel: {level_item.text()}\nComponent: {component_item.text()}\nMessage: {message_item.text()}\n\nDetails:\n{details_item.text() if details_item else 'No additional details'}\n\n═══════════════════"""
+        # Display in the detail view
+        self.log_detail.setPlainText(details_text)
+
+    def clear_filters(self):
+        """Clear all filters and show all log entries."""
+        # Reset filter controls
+        self.level_filter.setCurrentText("All")
+        # If you have a component_filter, reset it too
+        if hasattr(self, 'component_filter'):
+            self.component_filter.setCurrentText("All")
+        self.filter_input.clear()
+        # Clear the today only checkbox if you have one
+        if hasattr(self, 'today_only'):
+            self.today_only.setChecked(False)
+        # Refresh the display
+        self.apply_filters()
+
+    def toggle_auto_refresh(self, enabled):
+        """Toggle auto-refresh on/off"""
+        if enabled:
+            if self.update_timer:
+                self.update_timer.start(5000)  # Refresh every 5 seconds
+            print("DEBUG: Auto-refresh enabled")
+        else:
+            if self.update_timer:
+                self.update_timer.stop()
+            print("DEBUG: Auto-refresh disabled")
+
+    def clear_log_view(self):
+        """Clear the current log view"""
+        self.log_table.setRowCount(0)
+        self.log_detail.clear()
+
+    def export_logs(self):
+        """Export filtered log entries to a file"""
+        if not hasattr(self, 'filtered_entries') or not self.filtered_entries:
+            from PySide6.QtWidgets import QMessageBox
+            QMessageBox.information(self, "No Data", "No log entries to export.")
+            return
+
+        from PySide6.QtWidgets import QFileDialog
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Logs", "",
+            "Text Files (*.txt);;CSV Files (*.csv);;All Files (*)"
+        )
+
+        if file_path:
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    if file_path.endswith('.csv'):
+                        import csv
+                        writer = csv.writer(f)
+                        writer.writerow(["Time", "Level", "Component", "Message", "Details"])
+                        for entry in self.filtered_entries:
+                            writer.writerow([
+                                entry.get("time", ""),
+                                entry.get("level", ""),
+                                entry.get("component", ""),
+                                entry.get("message", ""),
+                                entry.get("details", "")
+                            ])
+                    else:
+                        for entry in self.filtered_entries:
+                            f.write(f"[{entry.get('time','')}] {entry.get('level','')} [{entry.get('component','')}] {entry.get('message','')}\nDetails: {entry.get('details','')}\n\n")
+                print(f"DEBUG: Exported {len(self.filtered_entries)} entries to {file_path}")
+            except Exception as e:
+                from PySide6.QtWidgets import QMessageBox
+                QMessageBox.critical(self, "Export Error", f"Could not export logs: {str(e)}")

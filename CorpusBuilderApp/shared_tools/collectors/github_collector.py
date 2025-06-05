@@ -1,12 +1,17 @@
 # sources/specific_collectors/github_collector.py
+# Environment Variable Required:
+#   GITHUB_TOKEN - Your GitHub API token (set in .env or environment)
 import os
 import json
 import time
 from pathlib import Path
 from urllib.parse import quote
 from typing import List, Optional, Union, Dict, Any
-from CryptoFinanceCorpusBuilder.shared_tools.collectors.api_collector import ApiCollector
+from .api_collector import ApiCollector
 import re
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from shared_tools.project_config import ProjectConfig
 
 def ascii_safe(s):
     """Make string safe for console output on any platform."""
@@ -33,7 +38,7 @@ class GitHubCollector(ApiCollector):
             existing_titles: Path to file containing existing titles for deduplication
         """
         super().__init__(config, api_base_url='https://api.github.com', delay_range=delay_range)
-        self.api_key = api_key  # Store for future use if needed
+        self.api_key: Optional[str] = api_key  # Store for future use if needed
         self.rate_limits = {'api.github.com': {'requests': 5, 'period': 60}}  # Conservative rate limiting
         
         # Set up GitHub-specific directory based on environment
@@ -49,7 +54,12 @@ class GitHubCollector(ApiCollector):
         self.logger.info(f"Cache size: {len(self.titles_cache)}")
         self.logger.info(f"First 5 cache entries: {[ascii_safe(x) for x in list(self.titles_cache)[:5]]}")
         
-        log_dir = Path(config.log_dir)
+        # Ensure config is a ProjectConfig before using .log_dir
+        log_dir = None
+        if hasattr(config, 'log_dir'):
+            log_dir = Path(config.log_dir)
+        else:
+            log_dir = Path.cwd() / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
         with open(log_dir / 'dedup_debug.log', 'a', encoding='utf-8') as dbg:
             dbg.write(f"Collector: github, Cache entries: {list(self.titles_cache)[:5]}\n\n")
@@ -175,10 +185,8 @@ class GitHubCollector(ApiCollector):
         """
         endpoint = f"search/repositories?q=topic:{quote(topic)}&sort=stars&order=desc&per_page={max_repos}"
         response = self.api_request(endpoint)
-        
-        if not response or 'items' not in response:
+        if not response or not isinstance(response, dict) or 'items' not in response:
             return []
-            
         return response['items']
     
     def _search_by_term(self, term: str, max_repos: int = 10) -> List[Dict[str, Any]]:
@@ -193,10 +201,8 @@ class GitHubCollector(ApiCollector):
         """
         endpoint = f"search/repositories?q={quote(term)}&sort=stars&order=desc&per_page={max_repos}"
         response = self.api_request(endpoint)
-        
-        if not response or 'items' not in response:
+        if not response or not isinstance(response, dict) or 'items' not in response:
             return []
-            
         return response['items']
     
     def _clone_repo(self, clone_url: str, target_dir: Path) -> Optional[Path]:
@@ -314,7 +320,7 @@ class GitHubCollector(ApiCollector):
             endpoint = f"repos/{owner}/{repo_name}"
             repo_data = self.api_request(endpoint)
             
-            if not repo_data:
+            if not repo_data or not isinstance(repo_data, dict):
                 self.logger.error(f"Failed to get repository data for {owner}/{repo_name}")
                 continue
                 

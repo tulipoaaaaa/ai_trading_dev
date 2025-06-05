@@ -5,15 +5,18 @@ import json
 import datetime
 from pathlib import Path
 from bs4 import BeautifulSoup
-import requests
+import requests  # type: ignore
 from dotenv import load_dotenv
 import time
 from selenium.webdriver.common.by import By
-import undetected_chromedriver as uc
+import undetected_chromedriver as uc  # type: ignore
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 import shutil
-from CryptoFinanceCorpusBuilder.utils.extractor_utils import safe_filename
+from CryptoFinanceCorpusBuilder.utils.extractor_utils import safe_filename  # type: ignore
+
+# Replace load_dotenv("/workspace/notebooks/.env") with project root .env
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
 
 class CookieAuthClient:
     """Client for Anna's Archive that uses cookie-based authentication"""
@@ -25,17 +28,16 @@ class CookieAuthClient:
             self.download_dir = Path(download_dir)
         else:
             self.download_dir = Path("/workspace/data/corpus_1/temp")
-            print("WARNING: Using default (legacy) download directory. Please pass a harmonized output directory for proper domain-based organization.")
+            self.logger.warning("Using default download directory. Please pass a harmonized output directory for proper domain-based organization.")
         self.download_dir.mkdir(parents=True, exist_ok=True)
         
         # Use provided cookie or load from environment
         self.account_cookie = account_cookie
         if not self.account_cookie:
-            load_dotenv("/workspace/notebooks/.env")
             self.account_cookie = os.getenv("AA_ACCOUNT_COOKIE")
             
         if not self.account_cookie:
-            pass  # Minimal: removed debug print
+            raise ValueError("Authentication required: No account cookie provided or found in environment")
         
         # Initialize session with browser-like headers
         self.session = requests.Session()
@@ -56,6 +58,8 @@ class CookieAuthClient:
         
         # Verify authentication
         self.is_authenticated = self._verify_authentication()
+        if not self.is_authenticated:
+            raise ValueError("Authentication failed: Invalid or expired cookie")
     
     def _verify_authentication(self):
         """Check if the authentication cookie is valid"""
@@ -63,13 +67,13 @@ class CookieAuthClient:
             account_url = "https://annas-archive.org/account"
             response = self.session.get(account_url)
             if "Downloaded files" in response.text:
-                print("Authenticated with Anna's Archive.")
+                self.logger.info("Successfully authenticated with Anna's Archive")
                 return True
             else:
-                print("Authentication failed: invalid or expired cookie.")
+                self.logger.error("Authentication failed: Invalid or expired cookie")
                 return False
-        except Exception:
-            print("Authentication check error.")
+        except Exception as e:
+            self.logger.error(f"Authentication check failed: {str(e)}")
             return False
     
     def search(self, query, content_type="book", language="en", ext="pdf"):
@@ -449,7 +453,7 @@ class CookieAuthClient:
             
             # Try to extract some text to verify it's not corrupted
             try:
-                from PyPDF2 import PdfReader
+                from PyPDF2 import PdfReader  # type: ignore
                 reader = PdfReader(filepath)
                 
                 if len(reader.pages) == 0:

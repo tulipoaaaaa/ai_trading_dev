@@ -1,4 +1,71 @@
-# --- theme_dark.qss ---
+/* === CRITICAL BASE STYLES === */
+QMainWindow {
+    background-color: #1F2121;
+    color: #F5F5F5;
+}
+
+QTabWidget {
+    background-color: #1F2121;
+    border: none;
+}
+
+QTabWidget::pane {
+    background-color: #262828;
+    border: 1px solid #232525;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+QTabWidget::tab-bar {
+    alignment: left;
+}
+
+/* Ensure ALL widgets inherit dark background */
+QDialog, QFrame, QScrollArea {
+    background-color: #1F2121;
+    color: #F5F5F5;
+}
+
+/* Tree/List widgets */
+QTreeView, QListView, QListWidget, QTreeWidget {
+    background-color: #232525;
+    color: #F5F5F5;
+    border: 1px solid #232525;
+    border-radius: 8px;
+    selection-background-color: #32B8C6;
+    selection-color: #1F2121;
+}
+
+/* Table widgets */
+QTableView, QTableWidget {
+    background-color: #232525;
+    color: #F5F5F5;
+    gridline-color: #2A2C2C;
+    border: 1px solid #232525;
+    border-radius: 8px;
+}
+
+QHeaderView::section {
+    background-color: #262828;
+    color: #32B8C6;
+    border: none;
+    padding: 8px;
+    font-weight: 500;
+}
+
+/* Progress bars */
+QProgressBar {
+    background-color: #232525;
+    color: #F5F5F5;
+    border: 1px solid #232525;
+    border-radius: 8px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #32B8C6;
+    border-radius: 6px;
+
 
 /* Fonts & Base */
 QWidget {

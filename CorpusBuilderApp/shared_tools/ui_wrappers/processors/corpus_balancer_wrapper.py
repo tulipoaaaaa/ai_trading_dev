@@ -1,6 +1,6 @@
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from ..base_wrapper import BaseWrapper, ProcessorWrapperMixin
-from shared_tools.prev_working.Prev_working_processors.corpus_balancer import CorpusBalancer
+from shared_tools.processors.corpus_balancer import CorpusAnalyzer as CorpusBalancer
 from typing import Dict, Any, List
 
 class CorpusBalancerWorker(QThread):
@@ -138,4 +138,22 @@ class CorpusBalancerWrapper(BaseWrapper, ProcessorWrapperMixin):
         """Get statistics for each domain"""
         balancer = self._create_target_object()
         return balancer.get_domain_stats()
-```
+
+    def collect_for_missing_domains(self):
+        """Analyze corpus and trigger collection for missing/underrepresented domains."""
+        balancer = self._create_target_object()
+        analysis = balancer.analyze_corpus()
+        recommendations = analysis.get('recommendations', [])
+        missing_domains = []
+        for rec in recommendations:
+            if rec.get('action') == 'collect_data' and 'missing domains' in rec.get('description', ''):
+                # Extract domains from description string
+                desc = rec['description']
+                if ':' in desc:
+                    domains_str = desc.split(':', 1)[1]
+                    missing_domains = [d.strip() for d in domains_str.split(',')]
+        if missing_domains:
+            print("[CorpusBalancerWrapper] Would trigger collectors for: {}".format(missing_domains))
+            # TODO: Actually trigger collectors here
+        else:
+            print("[CorpusBalancerWrapper] No missing domains found for collection.")

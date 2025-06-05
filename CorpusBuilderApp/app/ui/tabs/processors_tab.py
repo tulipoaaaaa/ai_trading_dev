@@ -1,8 +1,8 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, 
                              QLabel, QProgressBar, QPushButton, QCheckBox, 
                              QSpinBox, QListWidget, QGroupBox, QFileDialog, QMessageBox)
-from PyQt6.QtCore import Qt, pyqtSlot
-from PyQt6.QtGui import QIcon
+from PySide6.QtCore import Qt, Slot as pyqtSlot
+from PySide6.QtGui import QIcon
 import os
 import shutil
 
@@ -23,7 +23,8 @@ from shared_tools.ui_wrappers.processors.language_confidence_detector_wrapper im
 from shared_tools.ui_wrappers.processors.financial_symbol_processor_wrapper import FinancialSymbolProcessorWrapper
 from shared_tools.ui_wrappers.processors.chart_image_extractor_wrapper import ChartImageExtractorWrapper
 from shared_tools.ui_wrappers.processors.formula_extractor_wrapper import FormulaExtractorWrapper
-from CorpusBuilderApp.app.ui.tabs.corpus_manager_tab import NotificationManager
+from shared_tools.ui_wrappers.processors.corpus_balancer_wrapper import CorpusBalancerWrapper
+from .corpus_manager_tab import NotificationManager
 from app.helpers.icon_manager import IconManager
 from app.helpers.notifier import Notifier
 
@@ -419,40 +420,101 @@ class ProcessorsTab(QWidget):
         return tab
 
     def init_processors(self):
-        # Initialize all processor wrappers
-        self.processor_wrappers['pdf'] = PDFExtractorWrapper(self.project_config)
-        self.processor_wrappers['text'] = TextExtractorWrapper(self.project_config)
-        self.processor_wrappers['balancer'] = CorpusBalancerWrapper(self.project_config)
-        self.processor_wrappers['quality'] = QualityControlWrapper(self.project_config)
-        self.processor_wrappers['deduplicator'] = DeduplicatorWrapper(self.project_config)
-        self.processor_wrappers['domain'] = DomainClassifierWrapper(self.project_config)
-        self.processor_wrappers['formula'] = FormulaExtractorWrapper(self.project_config)
-        self.processor_wrappers['chart'] = ChartImageExtractorWrapper(self.project_config)
-        self.processor_wrappers['language'] = LanguageConfidenceDetectorWrapper(self.project_config)
-        self.processor_wrappers['mt_detector'] = MachineTranslationDetectorWrapper(self.project_config)
-        self.processor_wrappers['financial'] = FinancialSymbolProcessorWrapper(self.project_config)
+        """Initialize all processor wrappers with correct parameter types"""
+        try:
+            print("DEBUG: Starting processor wrapper initialization...")
+            print(f"DEBUG: project_config type: {type(self.project_config)}")
+            
+            # Get both config object and config path
+            config_object = self.project_config
+            config_path = getattr(self.project_config, 'config_path', str(self.project_config))
+            print(f"DEBUG: Using config_path: {config_path}")
+            
+            # Wrappers that expect config_path (string)
+            path_wrappers = [
+                ('pdf', PDFExtractorWrapper),
+                ('text', TextExtractorWrapper),
+                ('balancer', CorpusBalancerWrapper),
+                ('deduplicator', DeduplicatorWrapper),
+                ('domain', DomainClassifierWrapper),
+                ('formula', FormulaExtractorWrapper),
+                ('chart', ChartImageExtractorWrapper)
+            ]
+            
+            # Wrappers that expect config object
+            object_wrappers = [
+                ('quality', QualityControlWrapper),
+                ('language', LanguageConfidenceDetectorWrapper),
+                ('mt_detector', MachineTranslationDetectorWrapper),
+                ('financial', FinancialSymbolProcessorWrapper)
+            ]
+            
+            # Initialize path-based wrappers
+            for name, wrapper_class in path_wrappers:
+                try:
+                    print(f"DEBUG: Initializing {wrapper_class.__name__} with config_path...")
+                    self.processor_wrappers[name] = wrapper_class(config_path)
+                    print(f"DEBUG: {wrapper_class.__name__} initialized successfully")
+                except Exception as e:
+                    print(f"ERROR: Failed to initialize {wrapper_class.__name__}: {e}")
+                    self.processor_wrappers[name] = None
+            
+            # Initialize object-based wrappers
+            for name, wrapper_class in object_wrappers:
+                try:
+                    print(f"DEBUG: Initializing {wrapper_class.__name__} with config_object...")
+                    self.processor_wrappers[name] = wrapper_class(config_object)
+                    print(f"DEBUG: {wrapper_class.__name__} initialized successfully")
+                except Exception as e:
+                    print(f"ERROR: Failed to initialize {wrapper_class.__name__}: {e}")
+                    self.processor_wrappers[name] = None
+            
+            print("DEBUG: Processor wrapper initialization completed")
+            
+        except Exception as e:
+            print(f"ERROR: Failed to initialize processor wrappers: {e}")
+            # Fallback: create empty wrappers dict
+            self.processor_wrappers = {name: None for name in [
+                'pdf', 'text', 'balancer', 'quality', 'deduplicator', 
+                'domain', 'formula', 'chart', 'language', 'mt_detector', 'financial'
+            ]}
+            print("DEBUG: Using empty processor wrappers as fallback")
 
     def connect_signals(self):
-        # Connect PDF processor signals
-        pdf_wrapper = self.processor_wrappers['pdf']
-        pdf_wrapper.progress_updated.connect(self.pdf_progress_bar.setValue)
-        pdf_wrapper.status_updated.connect(self.pdf_status.setText)
-        pdf_wrapper.batch_completed.connect(self.on_pdf_batch_completed)
-        
-        self.pdf_start_btn.clicked.connect(self.start_pdf_processing)
-        self.pdf_stop_btn.clicked.connect(self.stop_pdf_processing)
-        
-        # Connect Text processor signals
-        text_wrapper = self.processor_wrappers['text']
-        text_wrapper.progress_updated.connect(self.text_progress_bar.setValue)
-        text_wrapper.status_updated.connect(self.text_status.setText)
-        text_wrapper.batch_completed.connect(self.on_text_batch_completed)
-        
-        self.text_start_btn.clicked.connect(self.start_text_processing)
-        self.text_stop_btn.clicked.connect(self.stop_text_processing)
-        
-        # Connect other processor signals similarly
-        # ...
+        """Connect signals with defensive checks"""
+        print("DEBUG: Setting up processor signal connections...")
+        # Connect PDF processor signals if they exist
+        pdf_wrapper = self.processor_wrappers.get('pdf')
+        if pdf_wrapper:
+            if hasattr(pdf_wrapper, 'progress_updated'):
+                pdf_wrapper.progress_updated.connect(self.pdf_progress_bar.setValue)
+            if hasattr(pdf_wrapper, 'status_updated'):
+                pdf_wrapper.status_updated.connect(self.pdf_status.setText)
+            if hasattr(pdf_wrapper, 'batch_completed'):
+                pdf_wrapper.batch_completed.connect(self.on_pdf_batch_completed)
+            else:
+                print("DEBUG: PDFExtractorWrapper has no 'batch_completed' signal")
+        # Connect Text processor signals if they exist
+        text_wrapper = self.processor_wrappers.get('text')
+        if text_wrapper:
+            if hasattr(text_wrapper, 'progress_updated'):
+                text_wrapper.progress_updated.connect(self.text_progress_bar.setValue)
+            if hasattr(text_wrapper, 'status_updated'):
+                text_wrapper.status_updated.connect(self.text_status.setText)
+            if hasattr(text_wrapper, 'batch_completed'):
+                text_wrapper.batch_completed.connect(self.on_text_batch_completed)
+            else:
+                print("DEBUG: TextExtractorWrapper has no 'batch_completed' signal")
+        # Connect button signals
+        if hasattr(self, 'pdf_start_btn'):
+            self.pdf_start_btn.clicked.connect(self.start_pdf_processing)
+        if hasattr(self, 'pdf_stop_btn'):
+            self.pdf_stop_btn.clicked.connect(self.stop_pdf_processing)
+        if hasattr(self, 'text_start_btn'):
+            self.text_start_btn.clicked.connect(self.start_text_processing)
+        if hasattr(self, 'text_stop_btn'):
+            self.text_stop_btn.clicked.connect(self.stop_text_processing)
+        print("DEBUG: Processor signal connections completed")
 
     def add_pdf_files(self):
         files, _ = QFileDialog.getOpenFileNames(
@@ -485,27 +547,30 @@ class ProcessorsTab(QWidget):
             self.input_dir_path.setText(directory)
 
     def start_pdf_processing(self):
-        pdf_wrapper = self.processor_wrappers['pdf']
-        
+        """Start PDF processing with safety checks"""
+        if not hasattr(self, 'pdf_file_list'):
+            print("DEBUG: PDF UI not fully initialized")
+            return
+        pdf_wrapper = self.processor_wrappers.get('pdf')
+        if not pdf_wrapper:
+            print("DEBUG: PDF wrapper not available")
+            return
+        print("DEBUG: PDF processing start requested")
         # Get files from list
         files_to_process = []
         for i in range(self.pdf_file_list.count()):
             files_to_process.append(self.pdf_file_list.item(i).text())
-        
         if not files_to_process:
             self.pdf_status.setText("Error: No files to process")
             return
-        
         # Configure processor
         pdf_wrapper.set_ocr_enabled(self.ocr_enabled.isChecked())
         pdf_wrapper.set_table_extraction(self.table_extraction.isChecked())
         pdf_wrapper.set_formula_extraction(self.formula_extraction.isChecked())
         pdf_wrapper.set_worker_threads(self.pdf_threads.value())
-        
         # Update UI
         self.pdf_start_btn.setEnabled(False)
         self.pdf_stop_btn.setEnabled(True)
-        
         # Start processing
         pdf_wrapper.start_batch_processing(files_to_process)
 
@@ -515,26 +580,29 @@ class ProcessorsTab(QWidget):
         self.pdf_stop_btn.setEnabled(False)
 
     def start_text_processing(self):
-        text_wrapper = self.processor_wrappers['text']
-        
+        """Start Text processing with safety checks"""
+        if not hasattr(self, 'text_file_list'):
+            print("DEBUG: Text UI not fully initialized")
+            return
+        text_wrapper = self.processor_wrappers.get('text')
+        if not text_wrapper:
+            print("DEBUG: Text wrapper not available")
+            return
+        print("DEBUG: Text processing start requested")
         # Get files from list
         files_to_process = []
         for i in range(self.text_file_list.count()):
             files_to_process.append(self.text_file_list.item(i).text())
-        
         if not files_to_process:
             self.text_status.setText("Error: No files to process")
             return
-        
         # Configure processor
         text_wrapper.set_language_detection(self.language_detection.isChecked())
         text_wrapper.set_quality_threshold(self.quality_threshold.value())
         text_wrapper.set_worker_threads(self.text_threads.value())
-        
         # Update UI
         self.text_start_btn.setEnabled(False)
         self.text_stop_btn.setEnabled(True)
-        
         # Start processing
         text_wrapper.start_batch_processing(files_to_process)
 

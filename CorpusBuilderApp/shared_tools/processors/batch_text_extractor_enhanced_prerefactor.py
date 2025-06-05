@@ -132,16 +132,16 @@ from langdetect import detect, LangDetectException  # type: ignore
 import yaml
 from tqdm import tqdm
 
-from CryptoFinanceCorpusBuilder.shared_tools.processors.formula_extractor import FormulaExtractor
-from CryptoFinanceCorpusBuilder.shared_tools.processors.chart_image_extractor import ChartImageExtractor
-from CryptoFinanceCorpusBuilder.shared_tools.processors.finacial_symbol_processor import FinancialSymbolProcessor, AcademicPaperProcessor, MemoryOptimizer
-from CryptoFinanceCorpusBuilder.shared_tools.utils.domain_utils import get_domain_for_file
-from CryptoFinanceCorpusBuilder.shared_tools.utils.pdf_safe_open import safe_open_pdf
-from CryptoFinanceCorpusBuilder.shared_tools.utils.metadata_normalizer import main as normalize_directory
-from CryptoFinanceCorpusBuilder.shared_tools.processors.corruption_detector import detect_corruption
-from CryptoFinanceCorpusBuilder.shared_tools.processors.language_confidence_detector import detect_language_confidence
-from CryptoFinanceCorpusBuilder.shared_tools.processors.machine_translation_detector import detect_machine_translation
-from CryptoFinanceCorpusBuilder.shared_tools.project_config import ProjectConfig
+from .formula_extractor import FormulaExtractor
+from .chart_image_extractor import ChartImageExtractor
+from .finacial_symbol_processor import FinancialSymbolProcessor, AcademicPaperProcessor, MemoryOptimizer
+from ..utils.domain_utils import get_domain_for_file
+from ..utils.pdf_safe_open import safe_open_pdf
+from ..utils.metadata_normalizer import main as normalize_directory
+from .corruption_detector import detect_corruption
+from .language_confidence_detector import detect_language_confidence
+from .machine_translation_detector import detect_machine_translation
+from shared_tools.project_config import ProjectConfig
 
 # --- Config ---
 MIN_TOKEN_THRESHOLD = 50
@@ -192,8 +192,8 @@ pypdf_logger = logging.getLogger('pypdf')
 pypdf_logger.setLevel(logging.ERROR)
 
 # --- Helpers ---
-def safe_filename(s):
-    return re.sub(r'[^a-zA-Z0-9_\-\.]+', '_', s)[:128]
+def safe_filename(s, max_length=128):
+    return re.sub(r'[^a-zA-Z0-9_\-\.]+', '_', s)[:max_length]
 
 def count_tokens(text):
     return len(text.split())
@@ -210,7 +210,7 @@ def quality_flag(text):
 def write_outputs(base_dir, rel_path, text, meta, quality, tables=None, formulas=None):
     out_dir = Path(base_dir) / ('low_quality' if quality == 'low_quality' else '_extracted')
     out_dir.mkdir(parents=True, exist_ok=True)
-    base = safe_filename(rel_path.name)
+    base = safe_filename(rel_path.name, 128)
     txt_path = out_dir / f"{base}.txt"
     json_path = out_dir / f"{base}.json"
     with open(txt_path, 'w', encoding='utf-8') as f:
@@ -747,6 +747,145 @@ def run_with_paths(
         CHUNK_TOKEN_THRESHOLD = processor_config.get('chunk_token_threshold', CHUNK_TOKEN_THRESHOLD)
     
     # Rest of the existing function...
+
+class BatchTextExtractorEnhancedPrerefactor:
+    """Enhanced batch processor for PDF files with pre-refactoring features"""
+    
+    def __init__(self, config: Optional[Dict] = None, project_config: Optional[Union[str, ProjectConfig]] = None):
+        """Initialize the batch text extractor
+        
+        Args:
+            config: Optional configuration dictionary
+            project_config: Optional project configuration
+        """
+        self.config = config or {}
+        self.project_config = project_config
+        self.logger = logging.getLogger(self.__class__.__name__)
+        
+        # Initialize Ghostscript environment
+        setup_ghostscript_environment()
+        
+        # Set default configuration
+        self._set_default_config()
+        
+        # Update with provided config
+        if config:
+            self.config.update(config)
+    
+    def _set_default_config(self):
+        """Set default configuration values"""
+        self.config.update({
+            'chunking_mode': 'page',
+            'chunk_overlap': 1,
+            'min_token_threshold': MIN_TOKEN_THRESHOLD,
+            'low_quality_token_threshold': LOW_QUALITY_TOKEN_THRESHOLD,
+            'chunk_token_threshold': CHUNK_TOKEN_THRESHOLD,
+            'timeout': DEFAULT_TIMEOUT,
+            'max_retries': MAX_RETRIES,
+            'batch_size': BATCH_SIZE,
+            'verbose': False,
+            'auto_normalize': True
+        })
+    
+    def process_directory(self, input_dir: str, output_dir: str) -> Dict[str, Any]:
+        """Process all PDF files in a directory
+        
+        Args:
+            input_dir: Input directory containing PDFs
+            output_dir: Output directory for extracted text
+            
+        Returns:
+            dict: Processing results
+        """
+        try:
+            # Create args namespace with configuration
+            args = types.SimpleNamespace(
+                output_dir=output_dir,
+                verbose=self.config.get('verbose', False),
+                auto_normalize=self.config.get('auto_normalize', True),
+                chunking_mode=self.config.get('chunking_mode', 'page'),
+                chunk_overlap=self.config.get('chunk_overlap', 1),
+                timeout=self.config.get('timeout', DEFAULT_TIMEOUT),
+                disable_tables=False,
+                mixed_lang_ratio=0.30,
+                corruption_thresholds=None,
+                mt_config=None
+            )
+            
+            # Run processing
+            results = run_with_paths(
+                input_dir=input_dir,
+                output_dir=output_dir,
+                chunking_mode=args.chunking_mode,
+                chunk_overlap=args.chunk_overlap,
+                verbose=args.verbose,
+                auto_normalize=args.auto_normalize,
+                processor_config=self.config
+            )
+            
+            return results
+            
+        except Exception as e:
+            self.logger.error(f"Error processing directory: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e),
+                'files_processed': 0,
+                'successful': 0,
+                'failed': 0,
+                'low_quality': 0
+            }
+    
+    def process_file(self, file_path: str, output_dir: str) -> Dict[str, Any]:
+        """Process a single PDF file
+        
+        Args:
+            file_path: Path to input PDF file
+            output_dir: Output directory for extracted text
+            
+        Returns:
+            dict: Processing results
+        """
+        try:
+            # Create args namespace with configuration
+            args = types.SimpleNamespace(
+                output_dir=output_dir,
+                verbose=self.config.get('verbose', False),
+                auto_normalize=self.config.get('auto_normalize', True),
+                chunking_mode=self.config.get('chunking_mode', 'page'),
+                chunk_overlap=self.config.get('chunk_overlap', 1),
+                timeout=self.config.get('timeout', DEFAULT_TIMEOUT),
+                disable_tables=False,
+                mixed_lang_ratio=0.30,
+                corruption_thresholds=None,
+                mt_config=None
+            )
+            
+            # Process the file
+            result = process_pdf_file_enhanced(file_path, args)
+            
+            if result:
+                return {
+                    'success': True,
+                    'file_path': file_path,
+                    'output_path': str(Path(output_dir) / '_extracted' / f"{Path(file_path).stem}.txt"),
+                    'metadata': result.metadata,
+                    'quality_metrics': result.quality_metrics
+                }
+            else:
+                return {
+                    'success': False,
+                    'file_path': file_path,
+                    'error': 'Failed to process file'
+                }
+                
+        except Exception as e:
+            self.logger.error(f"Error processing file {file_path}: {str(e)}")
+            return {
+                'success': False,
+                'file_path': file_path,
+                'error': str(e)
+            }
 
 def main():
     """Main entry point when script is run directly"""

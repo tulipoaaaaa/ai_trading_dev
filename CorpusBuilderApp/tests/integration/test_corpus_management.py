@@ -5,7 +5,7 @@ import os
 import tempfile
 import json
 from unittest.mock import MagicMock
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 from app.ui.tabs.corpus_manager_tab import CorpusManagerTab
 from shared_tools.ui_wrappers.processors.quality_control_wrapper import QualityControlWrapper

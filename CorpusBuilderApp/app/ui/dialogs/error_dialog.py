@@ -1,9 +1,9 @@
 # File: app/ui/dialogs/error_dialog.py
 
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                              QTextEdit, QPushButton, QDialogButtonBox, QCheckBox)
-from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QFont, QIcon
+from PySide6.QtCore import Qt, Signal as pyqtSignal
+from PySide6.QtGui import QFont, QIcon
 from app.helpers.icon_manager import IconManager
 
 class ErrorDialog(QDialog):

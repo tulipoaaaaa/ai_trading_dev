@@ -5,14 +5,16 @@ Provides comprehensive batch text extraction with advanced preprocessing
 
 import os
 import json
-from typing import Dict, List, Optional, Any, Tuple
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex, QTimer
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from typing import Dict, List, Optional, Any, Tuple, Union
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QMutex, QTimer, Qt
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox, QDoubleSpinBox,
-                           QTabWidget, QListWidget, QSplitter)
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, BatchProcessorMixin, ProgressMixin
+                           QTabWidget, QListWidget, QSplitter, QFormLayout)
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.processors.batch_text_extractor_enhanced_prerefactor import BatchTextExtractorEnhancedPrerefactor
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
+from ...project_config import ProjectConfig
 
 
 class BatchTextExtractorWorker(QThread):
@@ -154,7 +156,163 @@ class BatchTextExtractorWorker(QThread):
         return files
 
 
-class BatchTextExtractorWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
+class BatchTextExtractorEnhancedPrerefactorWrapper(ProcessorWrapperMixin):
+    """Wrapper for BatchTextExtractorEnhancedPrerefactor with UI controls"""
+    
+    def __init__(self, parent: Optional[QWidget] = None, project_config: Optional[Union[str, ProjectConfig]] = None):
+        """Initialize the wrapper
+        
+        Args:
+            parent: Parent widget
+            project_config: Optional project configuration
+        """
+        super().__init__(parent, project_config)
+        self.processor = BatchTextExtractorEnhancedPrerefactor(project_config=project_config)
+        self._init_ui()
+    
+    def _init_ui(self):
+        """Initialize the UI controls"""
+        # Create main layout
+        main_layout = QVBoxLayout()
+        form_layout = QFormLayout()
+        
+        # Chunking mode
+        self.chunking_mode = QComboBox()
+        self.chunking_mode.addItems(['page', 'token'])
+        self.chunking_mode.setCurrentText(self.processor.config.get('chunking_mode', 'page'))
+        form_layout.addRow("Chunking Mode:", self.chunking_mode)
+        
+        # Chunk overlap
+        self.chunk_overlap = QSpinBox()
+        self.chunk_overlap.setRange(0, 10)
+        self.chunk_overlap.setValue(self.processor.config.get('chunk_overlap', 1))
+        form_layout.addRow("Chunk Overlap:", self.chunk_overlap)
+        
+        # Min token threshold
+        self.min_token_threshold = QSpinBox()
+        self.min_token_threshold.setRange(10, 1000)
+        self.min_token_threshold.setValue(self.processor.config.get('min_token_threshold', 50))
+        form_layout.addRow("Min Token Threshold:", self.min_token_threshold)
+        
+        # Low quality token threshold
+        self.low_quality_token_threshold = QSpinBox()
+        self.low_quality_token_threshold.setRange(100, 2000)
+        self.low_quality_token_threshold.setValue(self.processor.config.get('low_quality_token_threshold', 200))
+        form_layout.addRow("Low Quality Token Threshold:", self.low_quality_token_threshold)
+        
+        # Timeout
+        self.timeout = QSpinBox()
+        self.timeout.setRange(30, 600)
+        self.timeout.setValue(self.processor.config.get('timeout', 300))
+        form_layout.addRow("Timeout (seconds):", self.timeout)
+        
+        # Max retries
+        self.max_retries = QSpinBox()
+        self.max_retries.setRange(1, 5)
+        self.max_retries.setValue(self.processor.config.get('max_retries', 2))
+        form_layout.addRow("Max Retries:", self.max_retries)
+        
+        # Batch size
+        self.batch_size = QSpinBox()
+        self.batch_size.setRange(1, 50)
+        self.batch_size.setValue(self.processor.config.get('batch_size', 20))
+        form_layout.addRow("Batch Size:", self.batch_size)
+        
+        # Verbose mode
+        self.verbose = QCheckBox()
+        self.verbose.setChecked(self.processor.config.get('verbose', False))
+        form_layout.addRow("Verbose Mode:", self.verbose)
+        
+        # Auto normalize
+        self.auto_normalize = QCheckBox()
+        self.auto_normalize.setChecked(self.processor.config.get('auto_normalize', True))
+        form_layout.addRow("Auto Normalize:", self.auto_normalize)
+        
+        # Add form layout to main layout
+        main_layout.addLayout(form_layout)
+        
+        # Add stretch to push everything to the top
+        main_layout.addStretch()
+        
+        # Set the main layout
+        self.setLayout(main_layout)
+    
+    def get_config(self) -> Dict[str, Any]:
+        """Get the current configuration from UI controls
+        
+        Returns:
+            dict: Current configuration
+        """
+        return {
+            'chunking_mode': self.chunking_mode.currentText(),
+            'chunk_overlap': self.chunk_overlap.value(),
+            'min_token_threshold': self.min_token_threshold.value(),
+            'low_quality_token_threshold': self.low_quality_token_threshold.value(),
+            'timeout': self.timeout.value(),
+            'max_retries': self.max_retries.value(),
+            'batch_size': self.batch_size.value(),
+            'verbose': self.verbose.isChecked(),
+            'auto_normalize': self.auto_normalize.isChecked()
+        }
+    
+    def set_config(self, config: Dict[str, Any]):
+        """Set the configuration and update UI controls
+        
+        Args:
+            config: Configuration to set
+        """
+        if 'chunking_mode' in config:
+            self.chunking_mode.setCurrentText(config['chunking_mode'])
+        if 'chunk_overlap' in config:
+            self.chunk_overlap.setValue(config['chunk_overlap'])
+        if 'min_token_threshold' in config:
+            self.min_token_threshold.setValue(config['min_token_threshold'])
+        if 'low_quality_token_threshold' in config:
+            self.low_quality_token_threshold.setValue(config['low_quality_token_threshold'])
+        if 'timeout' in config:
+            self.timeout.setValue(config['timeout'])
+        if 'max_retries' in config:
+            self.max_retries.setValue(config['max_retries'])
+        if 'batch_size' in config:
+            self.batch_size.setValue(config['batch_size'])
+        if 'verbose' in config:
+            self.verbose.setChecked(config['verbose'])
+        if 'auto_normalize' in config:
+            self.auto_normalize.setChecked(config['auto_normalize'])
+        
+        # Update processor config
+        self.processor.config.update(config)
+    
+    def process_directory(self, input_dir: str, output_dir: str) -> Dict[str, Any]:
+        """Process a directory of files
+        
+        Args:
+            input_dir: Input directory path
+            output_dir: Output directory path
+            
+        Returns:
+            dict: Processing results
+        """
+        # Update processor config with current UI values
+        self.processor.config.update(self.get_config())
+        return self.processor.process_directory(input_dir, output_dir)
+    
+    def process_file(self, file_path: str, output_dir: str) -> Dict[str, Any]:
+        """Process a single file
+        
+        Args:
+            file_path: Input file path
+            output_dir: Output directory path
+            
+        Returns:
+            dict: Processing results
+        """
+        # Update processor config with current UI values
+        self.processor.config.update(self.get_config())
+        return self.processor.process_file(file_path, output_dir)
+
+
+class BatchTextExtractorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Batch Text Extractor Enhanced Pre-refactor"""
     
     def __init__(self, parent=None):

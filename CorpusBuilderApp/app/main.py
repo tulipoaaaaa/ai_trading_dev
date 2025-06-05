@@ -6,11 +6,12 @@ import sys
 import os
 import logging
 from pathlib import Path
-from PyQt6.QtWidgets import QApplication, QMessageBox
-from PyQt6.QtCore import QDir, QStandardPaths
-from PyQt6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtCore import QDir, QStandardPaths, QTimer
+from PySide6.QtGui import QIcon, QPalette, QColor
 import traceback
 import json
+from dotenv import load_dotenv
 
 # Add shared_tools to path for imports
 current_dir = Path(__file__).parent.parent
@@ -20,7 +21,8 @@ from main_window import CryptoCorpusMainWindow
 from shared_tools.project_config import ProjectConfig
 from app.helpers.theme_manager import ThemeManager
 
-THEME_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'theme_config.json')
+# Update theme config path to use the correct location
+THEME_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'resources', 'styles', 'theme_config.json')
 
 def load_user_theme():
     if os.path.exists(THEME_CONFIG_PATH):
@@ -49,49 +51,103 @@ def load_user_sound_setting():
             return True
     return True
 
+def set_dark_theme(app):
+    dark_palette = QPalette()
+    dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.WindowText, QColor(245, 245, 245))
+    dark_palette.setColor(QPalette.Base, QColor(35, 35, 35))
+    dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.ToolTipBase, QColor(245, 245, 245))
+    dark_palette.setColor(QPalette.ToolTipText, QColor(245, 245, 245))
+    dark_palette.setColor(QPalette.Text, QColor(245, 245, 245))
+    dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.ButtonText, QColor(245, 245, 245))
+    dark_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
+    dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    dark_palette.setColor(QPalette.HighlightedText, QColor(35, 35, 35))
+    app.setPalette(dark_palette)
+    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+
 class CryptoCorpusApp(QApplication):
     """Main application class"""
     
     def __init__(self, argv):
         super().__init__(argv)
-        
-        # Set application properties
         self.setApplicationName("CryptoFinance Corpus Builder")
-        self.setApplicationVersion("3.0")
-        self.setOrganizationName("CryptoFinance Research")
-        self.setOrganizationDomain("cryptofinance.org")
+        self.setApplicationVersion("3.0.0")
         
-        # Setup logging
+        # Set up logging
         self.setup_logging()
         
-        # Setup exception handling
-        sys.excepthook = self.handle_exception
+        # Load environment variables
+        self.load_environment()
         
-        # Create main window
-        try:
-            self.main_window = None
-            self.init_config()
-            self.create_main_window()
-        except Exception as e:
-            self.show_error("Initialization Error", f"Failed to initialize application: {e}")
-            sys.exit(1)
+        # Initialize configuration
+        self.init_config()
+        
+        # Create main window with config
+        self.logger.debug(f"Config object type: {type(self.config)}")
+        self.logger.debug(f"Config has 'get' method: {hasattr(self.config, 'get')}")
+        self.main_window = CryptoCorpusMainWindow(self.config)
+        
+        # APPLY THEME AFTER WINDOW CREATION
+        user_theme = load_user_theme()
+        print(f"DEBUG: Applying theme after window creation: {user_theme}")
+        ThemeManager.apply_theme(user_theme)
+        
+        # TEST: Apply a simple style to see if styling works at all
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #2b2b2b;
+            }
+            QTabWidget {
+                background-color: #3c3c3c;
+            }
+        """)
+        print("DEBUG: Applied test stylesheet")
+        
+        # Show the window
+        self.main_window.show()
     
     def setup_logging(self):
-        """Setup application logging"""
-        log_dir = Path.home() / ".cryptofinance" / "logs"
+        """Set up application logging"""
+        log_dir = Path.home() / '.cryptofinance' / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
+        
+        log_file = log_dir / 'app.log'
         
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
             handlers=[
-                logging.FileHandler(log_dir / "app.log"),
-                logging.StreamHandler(sys.stdout)
+                logging.FileHandler(log_file),
+                logging.StreamHandler()
             ]
         )
         
-        self.logger = logging.getLogger("CryptoCorpusApp")
-        self.logger.info("Application starting...")
+        self.logger = logging.getLogger('CryptoCorpusApp')
+    
+    def load_environment(self):
+        """Load environment variables from .env file"""
+        # Look for .env file in common locations
+        env_locations = [
+            Path.cwd() / '.env',
+            Path.cwd() / 'shared_tools' / '.env',
+            Path.home() / '.cryptofinance' / '.env'
+        ]
+        
+        env_path = None
+        for location in env_locations:
+            if location.exists():
+                env_path = location
+                break
+        
+        if env_path:
+            load_dotenv(env_path)
+            self.logger.info(f"Loaded environment from: {env_path}")
+        else:
+            self.logger.warning("No .env file found in common locations")
     
     def init_config(self):
         """Initialize project configuration"""
@@ -113,7 +169,7 @@ class CryptoCorpusApp(QApplication):
                 # Create default config if none found
                 config_path = self.create_default_config()
             
-            self.config = ProjectConfig(str(config_path), environment='test')
+            self.config = ProjectConfig(str(config_path), environment=os.getenv('ENVIRONMENT', 'test'))
             self.logger.info(f"Loaded configuration from: {config_path}")
             
         except Exception as e:
@@ -149,16 +205,6 @@ class CryptoCorpusApp(QApplication):
         
         return config_path
     
-    def create_main_window(self):
-        """Create and show the main window"""
-        self.main_window = CryptoCorpusMainWindow(self.config)
-        self.main_window.show()
-        
-        # Center window on screen
-        self.main_window.center_on_screen()
-        
-        self.logger.info("Main window created and shown")
-    
     def handle_exception(self, exc_type, exc_value, exc_traceback):
         """Handle uncaught exceptions"""
         if issubclass(exc_type, KeyboardInterrupt):
@@ -181,25 +227,35 @@ class CryptoCorpusApp(QApplication):
 
 def main():
     """Main entry point"""
-    # Enable high DPI scaling
-    QApplication.setHighDpiScaleFactorRoundingPolicy(
-        QApplication.HighDpiScaleFactorRoundingPolicy.PassThrough
-    )
-    
+    # Enable high DPI scaling if available
+    if hasattr(QApplication, "setHighDpiScaleFactorRoundingPolicy") and hasattr(getattr(QApplication, "HighDpiScaleFactorRoundingPolicy", None), "PassThrough"):
+        QApplication.setHighDpiScaleFactorRoundingPolicy(
+            QApplication.HighDpiScaleFactorRoundingPolicy.PassThrough
+        )
     app = CryptoCorpusApp(sys.argv)
 
-    # Load and apply theme from config
+    # Create main window with config
+    app.main_window = CryptoCorpusMainWindow(app.config)
+    
+    # Load and apply theme AFTER window creation
     user_theme = load_user_theme()
+    print(f"DEBUG: Applying theme after window creation: {user_theme}")
     ThemeManager.apply_theme(user_theme)
+    
+    # Force theme re-application after a short delay
+    QTimer.singleShot(100, lambda: ThemeManager.apply_theme(user_theme))
+
+    # Show the window
+    app.main_window.show()
 
     # Connect settings dialog to save theme changes
     def on_settings_updated(settings):
         theme = settings.get('theme', None)
         if theme:
             save_user_theme(theme.lower())
+            ThemeManager.apply_theme(theme.lower())
     if hasattr(app, 'main_window') and hasattr(app.main_window, 'settings_dialog'):
         app.main_window.settings_dialog.settings_updated.connect(on_settings_updated)
-    # If settings dialog is created dynamically, ensure this connection is made after creation.
 
     sound_enabled = load_user_sound_setting()
 

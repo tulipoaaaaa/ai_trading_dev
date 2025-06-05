@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 from datetime import datetime
-from CryptoFinanceCorpusBuilder.shared_tools.processors.deduplicator import Deduplicator
+from .deduplicator import Deduplicator
 import argparse
 
 def get_token_count(json_path):
@@ -105,6 +105,85 @@ def main():
         json.dump(report, f, ensure_ascii=False, indent=2)
     print(f"Deduplication complete. Groups: {len(duplicate_groups)}, Duplicates: {total_duplicates}, Token loss: {total_token_loss}")
     print(f"Report saved to {args.report}")
+
+class DeduplicateNonPDFOutputs:
+    """Class for deduplicating non-PDF extracted outputs and updating metadata programmatically."""
+    def __init__(self, corpus_dir, strategy='keep_first', minhash=False, similarity_threshold=0.8, report_path=None):
+        self.corpus_dir = corpus_dir
+        self.strategy = strategy
+        self.minhash = minhash
+        self.similarity_threshold = similarity_threshold
+        self.report_path = report_path
+
+    def run(self):
+        dedup = Deduplicator(
+            corpus_dir=self.corpus_dir,
+            similarity_threshold=self.similarity_threshold,
+            use_minhash=self.minhash
+        )
+        duplicates = dedup.find_duplicates()
+        deduplication_date = datetime.utcnow().isoformat()
+        total_token_loss = 0
+        total_duplicates = 0
+        duplicate_groups = []
+        group_id_counter = 1
+        for group in duplicates:
+            files = group.get('files', [])
+            if len(files) <= 1:
+                continue
+            group_id = f"dg-{group_id_counter:03d}"
+            group_id_counter += 1
+            # Find all .json metadata files for group members
+            file_jsons = []
+            for file_path in files:
+                p = Path(file_path)
+                for subdir in ['_extracted', 'low_quality']:
+                    meta_path = p.parent.parent / subdir / (p.stem + '.json')
+                    if meta_path.exists():
+                        file_jsons.append((file_path, meta_path))
+                        break
+            if not file_jsons:
+                continue
+            # Determine kept file
+            if self.strategy == 'keep_first':
+                kept_file, kept_json = file_jsons[0]
+            elif self.strategy == 'keep_largest':
+                kept_file, kept_json = max(file_jsons, key=lambda x: get_token_count(x[1]))
+            else:
+                kept_file, kept_json = file_jsons[0]
+            # Calculate token loss for this group
+            kept_tokens = get_token_count(kept_json)
+            group_token_loss = 0
+            duplicates_list = []
+            for file_path, json_path in file_jsons:
+                is_kept = (file_path == kept_file)
+                file_tokens = get_token_count(json_path)
+                loss = 0 if is_kept else file_tokens
+                if not is_kept:
+                    group_token_loss += loss
+                    duplicates_list.append(file_path)
+                update_metadata(json_path, group_id, deduplication_date, kept_file, is_kept, group.get('type'), loss)
+            total_token_loss += group_token_loss
+            total_duplicates += len(duplicates_list)
+            duplicate_groups.append({
+                "group_id": group_id,
+                "type": group.get('type'),
+                "kept_file": kept_file,
+                "duplicates": duplicates_list,
+                "token_loss": group_token_loss
+            })
+        report = {
+            "deduplication_date": deduplication_date,
+            "strategy": self.strategy,
+            "total_groups": len(duplicate_groups),
+            "total_duplicates": total_duplicates,
+            "token_loss": total_token_loss,
+            "duplicate_groups": duplicate_groups
+        }
+        if self.report_path:
+            with open(self.report_path, 'w', encoding='utf-8') as f:
+                json.dump(report, f, ensure_ascii=False, indent=2)
+        return report
 
 if __name__ == '__main__':
     main() 

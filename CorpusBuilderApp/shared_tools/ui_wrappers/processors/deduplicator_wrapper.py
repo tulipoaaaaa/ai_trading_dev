@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/deduplicator_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread, Slot as pyqtSlot
 from shared_tools.processors.deduplicator import Deduplicator
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 import subprocess
 import sys
 

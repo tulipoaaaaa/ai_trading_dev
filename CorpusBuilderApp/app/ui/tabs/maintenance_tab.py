@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox
-from PyQt6.QtCore import QThread, pyqtSignal
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox
+from PySide6.QtCore import QThread, Signal as pyqtSignal
 import subprocess
 
 class DependencyUpgradeWorker(QThread):

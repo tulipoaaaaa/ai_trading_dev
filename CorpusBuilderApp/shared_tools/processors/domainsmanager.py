@@ -4,9 +4,10 @@ import json
 from pathlib import Path
 import logging
 from CryptoFinanceCorpusBuilder.config.domain_config import DOMAINS
+from typing import Dict, List, Optional, Any
 
-class DomainManager:
-    """Manager for crypto-finance corpus domains"""
+class DomainsManager:
+    """Manager for crypto-finance corpus domains, including classification, import/export, and category management."""
     
     def __init__(self, domains_config=None, base_dir="/workspace/data/corpus_1"):
         """Initialize with domain configuration"""
@@ -37,6 +38,8 @@ class DomainManager:
         
         # Set up logging
         self._setup_logging()
+        
+        self.categories: Dict[str, List[str]] = {}
     
     def _setup_logging(self):
         """Set up logging for the domain manager"""
@@ -232,3 +235,109 @@ class DomainManager:
             print(f"    Metadata: {domain_stats['meta_files']} files")
             print(f"    Extracted: {domain_stats['extracted_files']} text files")
             print(f"    Size: {domain_stats['size_mb']:.2f} MB")
+
+    def classify_domain(self, domain: str, confidence_threshold: float = 0.7, use_ml_classification: bool = True, check_whois: bool = False) -> Dict[str, Any]:
+        """Classify a domain and return its category and confidence."""
+        # Dummy implementation: classify by keyword
+        domain_lower = domain.lower()
+        if 'crypto' in domain_lower:
+            category = 'crypto_derivatives'
+            confidence = 0.9
+        elif 'trade' in domain_lower:
+            category = 'high_frequency_trading'
+            confidence = 0.8
+        else:
+            category = 'other'
+            confidence = 0.5
+        result = {
+            'category': category,
+            'confidence': confidence,
+            'details': f"Classified by keyword for domain: {domain}"
+        }
+        self.logger.info(f"Classified domain {domain}: {result}")
+        return result
+
+    def import_domains_from_file(self, file_path: str, format: str = 'auto', update_existing: bool = False) -> int:
+        """Import domains from a file (JSON or CSV). Returns number of domains imported."""
+        import json, csv, os
+        count = 0
+        if not os.path.exists(file_path):
+            self.logger.error(f"File not found: {file_path}")
+            return 0
+        if file_path.endswith('.json') or format == 'json':
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for domain, meta in data.items():
+                    if update_existing or domain not in self.domains:
+                        self.domains[domain] = meta
+                        count += 1
+        elif file_path.endswith('.csv') or format == 'csv':
+            with open(file_path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    domain = row.get('domain')
+                    if domain and (update_existing or domain not in self.domains):
+                        self.domains[domain] = row
+                        count += 1
+        else:
+            self.logger.error(f"Unsupported file format: {file_path}")
+        self.logger.info(f"Imported {count} domains from {file_path}")
+        return count
+
+    def export_domains_to_file(self, file_path: str, categories: Optional[List[str]] = None, format: str = 'json', include_metadata: bool = True) -> int:
+        """Export domains to a file (JSON or CSV). Returns number of domains exported."""
+        import json, csv
+        export_domains = self.domains
+        if categories:
+            export_domains = {d: meta for d, meta in self.domains.items() if meta.get('category') in categories}
+        count = len(export_domains)
+        if format == 'json':
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(export_domains, f, ensure_ascii=False, indent=2)
+        elif format == 'csv':
+            if export_domains:
+                keys = set()
+                for meta in export_domains.values():
+                    keys.update(meta.keys())
+                keys = list(keys)
+                with open(file_path, 'w', encoding='utf-8', newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=['domain'] + keys)
+                    writer.writeheader()
+                    for domain, meta in export_domains.items():
+                        row = {'domain': domain}
+                        row.update(meta)
+                        writer.writerow(row)
+        else:
+            self.logger.error(f"Unsupported export format: {format}")
+            return 0
+        self.logger.info(f"Exported {count} domains to {file_path}")
+        return count
+
+    def add_category(self, category: str):
+        if category not in self.categories:
+            self.categories[category] = []
+            self.logger.info(f"Added category: {category}")
+
+    def add_domain(self, domain: str, category: str):
+        self.domains[domain] = {'category': category}
+        if category not in self.categories:
+            self.categories[category] = []
+        self.categories[category].append(domain)
+        self.logger.info(f"Added domain {domain} to category {category}")
+
+    def remove_domain(self, domain: str):
+        if domain in self.domains:
+            category = self.domains[domain].get('category')
+            if category and category in self.categories and domain in self.categories[category]:
+                self.categories[category].remove(domain)
+            del self.domains[domain]
+            self.logger.info(f"Removed domain: {domain}")
+
+    def get_domains_by_category(self, category: str) -> List[str]:
+        return self.categories.get(category, [])
+
+    def get_all_categories(self) -> List[str]:
+        return list(self.categories.keys())
+
+    def get_all_domains(self) -> List[str]:
+        return list(self.domains.keys())

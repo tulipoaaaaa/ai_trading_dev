@@ -1,11 +1,11 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QSplitter, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QSplitter, 
                              QTreeView, QGroupBox, QTextEdit, QPushButton, 
                              QLabel, QLineEdit, QFileDialog, QComboBox,
                              QTableView, QHeaderView, QMenu, QMessageBox,
                              QDialog, QFormLayout, QCheckBox, QDialogButtonBox,
-                             QProgressBar, QInputDialog)
-from PyQt6.QtCore import Qt, QDir, QFileSystemModel, QSortFilterProxyModel, QModelIndex, pyqtSlot, QPoint, QThread, pyqtSignal, QMimeData, QTimer, QMutex
-from PyQt6.QtGui import QAction, QStandardItemModel, QStandardItem, QDragEnterEvent, QDropEvent, QIcon
+                             QProgressBar, QInputDialog, QFileSystemModel)
+from PySide6.QtGui import QAction, QStandardItemModel, QStandardItem, QDragEnterEvent, QDropEvent, QIcon
+from PySide6.QtCore import Qt, QDir, QSortFilterProxyModel, QModelIndex, Slot as pyqtSlot, QPoint, QThread, Signal as pyqtSignal, QMimeData, QTimer, QMutex
 import os
 import json
 import shutil
@@ -366,9 +366,9 @@ class BatchOperationWorker(QThread):
 class CorpusManagerTab(QWidget):
     def __init__(self, project_config, parent=None):
         super().__init__(parent)
+        self.notification_manager = NotificationManager(self)  # Initialize first
         self.project_config = project_config
         self.setup_ui()
-        self.notification_manager = NotificationManager(self)
         self.selected_files = []
         self.batch_metadata_editor = None
         self.sound_enabled = True  # Will be set from user settings
@@ -592,8 +592,14 @@ class CorpusManagerTab(QWidget):
         
         # Try to set default directory to the corpus root
         try:
-            corpus_root = self.project_config.get_corpus_root()
-            if os.path.isdir(corpus_root):
+            # Fix: Check if the method exists and use appropriate fallback
+            if hasattr(self.project_config, 'get_corpus_root'):
+                corpus_root = self.project_config.get_corpus_root()
+            elif hasattr(self.project_config, 'corpus_root'):
+                corpus_root = self.project_config.corpus_root
+            else:
+                corpus_root = None
+            if corpus_root and os.path.isdir(corpus_root):
                 self.set_root_directory(corpus_root)
             else:
                 # Fallback to documents folder
@@ -853,8 +859,8 @@ class CorpusManagerTab(QWidget):
     def open_file(self, file_path):
         """Open file with default application"""
         # Use QDesktopServices to open file with system default program
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtCore import QUrl
         
         QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
     

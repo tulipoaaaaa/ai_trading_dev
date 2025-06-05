@@ -23,8 +23,9 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 
 # Import existing utilities from your codebase
-from CryptoFinanceCorpusBuilder.shared_tools.utils.domain_utils import get_valid_domains, get_domain_for_file
-from CryptoFinanceCorpusBuilder.shared_tools.utils.extractor_utils import safe_filename
+from ..utils.domain_utils import get_valid_domains, get_domain_for_file
+from ..utils.extractor_utils import safe_filename
+from shared_tools.project_config import ProjectConfig
 
 class CorpusAnalyzer:
     """Analyzes corpus composition and identifies imbalances."""
@@ -892,7 +893,7 @@ def main():
     
     if args.project_config:
         # Use project config
-        from CryptoFinanceCorpusBuilder.shared_tools.config.project_config import ProjectConfig
+        from shared_tools.project_config import ProjectConfig
         project = ProjectConfig.load(args.project_config)
         results = run_with_project_config(project, args.verbose)
     else:

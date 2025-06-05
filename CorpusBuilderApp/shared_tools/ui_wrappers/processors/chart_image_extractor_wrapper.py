@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/chart_image_extractor_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from shared_tools.processors.chart_image_extractor import ChartImageExtractor
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 class ChartImageExtractorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Chart Image Extractor processor."""

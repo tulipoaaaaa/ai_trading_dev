@@ -1,11 +1,11 @@
 # File: app/ui/widgets/log_viewer.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, 
                              QPushButton, QLineEdit, QComboBox, QLabel, QCheckBox,
                              QSplitter, QListWidget, QListWidgetItem, QFileDialog,
                              QMessageBox, QGroupBox)
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QThread, pyqtSlot
-from PyQt6.QtGui import QTextCharFormat, QColor, QFont, QTextCursor
+from PySide6.QtCore import Qt, Signal as pyqtSignal, QTimer, QThread, Slot as pyqtSlot
+from PySide6.QtGui import QTextCharFormat, QColor, QFont, QTextCursor
 import re
 import os
 from datetime import datetime

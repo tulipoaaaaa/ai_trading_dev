@@ -7,16 +7,17 @@ import os
 import time
 import json
 from typing import Dict, List, Optional, Any, Callable
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QTimer, QMutex
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QTimer, QMutex
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QProgressBar, QLabel, QTextEdit, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox,
                            QTableWidget, QTableWidgetItem, QHeaderView,
                            QTabWidget, QSplitter, QSlider, QListWidget)
-from PyQt6.QtGui import QColor, QBrush, QPalette
-from PyQt6.QtCore import Qt
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, ProgressMixin
+from PySide6.QtGui import QColor, QBrush, QPalette
+from PySide6.QtCore import Qt
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.processors.monitor_progress import MonitorProgress
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 
 class ProgressMonitoringWorker(QThread):
@@ -136,7 +137,7 @@ class ProgressMonitoringWorker(QThread):
         self._is_running = False
 
 
-class MonitorProgressWrapper(BaseWrapper, ProgressMixin):
+class MonitorProgressWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Progress Monitoring"""
     
     def __init__(self, parent=None):
@@ -665,7 +666,7 @@ class MonitorProgressWrapper(BaseWrapper, ProgressMixin):
         if current_row >= 0:
             task_id = self.tasks_table.item(current_row, 0).text()
             
-            from PyQt6.QtWidgets import QMessageBox
+            from PySide6.QtWidgets import QMessageBox
             reply = QMessageBox.question(
                 self,
                 "Cancel Task",
@@ -686,7 +687,7 @@ class MonitorProgressWrapper(BaseWrapper, ProgressMixin):
     @pyqtSlot()
     def clear_history(self):
         """Clear task history"""
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         
         reply = QMessageBox.question(
             self,
@@ -701,7 +702,7 @@ class MonitorProgressWrapper(BaseWrapper, ProgressMixin):
     @pyqtSlot()
     def export_history(self):
         """Export task history to file"""
-        from PyQt6.QtWidgets import QFileDialog
+        from PySide6.QtWidgets import QFileDialog
         
         filename, _ = QFileDialog.getSaveFileName(
             self,
@@ -740,4 +741,5 @@ class MonitorProgressWrapper(BaseWrapper, ProgressMixin):
                 
     def _export_history_json(self, filename: str):
         """Export history to JSON format"""
-        history```
+        # TODO: Implement JSON export logic
+        pass

@@ -6,8 +6,8 @@ import json
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from CryptoFinanceCorpusBuilder.models.quality_config import QualityConfig
-from CryptoFinanceCorpusBuilder.shared_tools.utils.extractor_utils import (
+from ..models.quality_config import QualityConfig
+from ..utils.extractor_utils import (
     safe_filename,
     count_tokens,
     extract_metadata,
@@ -19,10 +19,10 @@ from CryptoFinanceCorpusBuilder.shared_tools.utils.extractor_utils import (
     normalize_text,
     calculate_similarity
 )
-from CryptoFinanceCorpusBuilder.shared_tools.processors.quality_control import QualityControlService
-from CryptoFinanceCorpusBuilder.shared_tools.processors.domain_classifier import DomainClassifier
-from CryptoFinanceCorpusBuilder.shared_tools.processors.language_confidence_detector import detect_language_confidence
-from CryptoFinanceCorpusBuilder.shared_tools.processors.corruption_detector import detect_corruption
+from .quality_control import QualityControl
+from .domain_classifier import DomainClassifier
+from .language_confidence_detector import detect_language_confidence
+from .corruption_detector import CorruptionDetector
 
 class ExtractionError(Exception):
     """Custom exception for extraction errors."""
@@ -61,7 +61,7 @@ class BaseExtractor(ABC):
             self.quality_config = QualityConfig()
         
         # Initialize services
-        self.quality_service = QualityControlService(quality_config=self.quality_config)
+        self.quality_service = QualityControl(quality_config=self.quality_config)
         self.domain_classifier = DomainClassifier(domain_config=domain_config)
         
         # Create output directories
@@ -133,7 +133,8 @@ class BaseExtractor(ABC):
             metadata.update(lang_info)
             
             # Detect corruption
-            corruption_info = detect_corruption(text)
+            detector = CorruptionDetector()
+            corruption_info = detector.detect(text)
             metadata.update(corruption_info)
             
             # Classify domain
@@ -147,11 +148,11 @@ class BaseExtractor(ABC):
                 output_dir = self.extracted_dir
             
             # Save extracted text
-            text_file = output_dir / f"{safe_filename(file_path.stem)}.txt"
+            text_file = output_dir / f"{safe_filename(file_path.stem, 128)}.txt"
             text_file.write_text(text, encoding='utf-8')
             
             # Save metadata
-            metadata_file = output_dir / f"{safe_filename(file_path.stem)}.json"
+            metadata_file = output_dir / f"{safe_filename(file_path.stem, 128)}.json"
             save_metadata(metadata, metadata_file)
             
             return metadata

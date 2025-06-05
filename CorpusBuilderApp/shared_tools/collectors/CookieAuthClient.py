@@ -26,7 +26,7 @@ class CookieAuthClient:
         # Use provided cookie or load from environment
         self.account_cookie = account_cookie
         if not self.account_cookie:
-            load_dotenv("/workspace/notebooks/.env")
+            load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
             self.account_cookie = os.getenv("AA_ACCOUNT_COOKIE")
             
         if not self.account_cookie:

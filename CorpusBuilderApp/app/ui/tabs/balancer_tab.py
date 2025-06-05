@@ -6,13 +6,13 @@ Provides comprehensive corpus balancing with automatic re-analysis capabilities
 import os
 import time
 from typing import Dict, List, Optional, Any
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
                            QLabel, QPushButton, QProgressBar, QSpinBox,
                            QTableWidget, QTableWidgetItem, QHeaderView,
                            QComboBox, QCheckBox, QMessageBox, QSlider,
                            QSystemTrayIcon, QMenu, QStatusBar)
-from PyQt6.QtCore import Qt, pyqtSlot, QTimer, pyqtSignal, QObject
-from PyQt6.QtGui import QColor, QBrush, QPalette, QIcon, QAction
+from PySide6.QtCore import Qt, Slot as pyqtSlot, QTimer, Signal as pyqtSignal, QObject
+from PySide6.QtGui import QColor, QBrush, QPalette, QIcon, QAction
 from shared_tools.ui_wrappers.processors.corpus_balancer_wrapper import CorpusBalancerWrapper
 from app.helpers.icon_manager import IconManager
 from app.helpers.notifier import Notifier
@@ -214,6 +214,12 @@ class BalancerTab(QWidget):
         self.analyze_btn.clicked.connect(self.analyze_corpus_balance)
         primary_controls.addWidget(self.analyze_btn)
         
+        # Add to Control Panel (primary_controls)
+        self.collect_missing_btn = QPushButton("Collect for Missing Domains")
+        self.collect_missing_btn.setToolTip("Trigger collectors for missing/underrepresented domains based on corpus analysis.")
+        self.collect_missing_btn.clicked.connect(self.collect_for_missing_domains)
+        primary_controls.addWidget(self.collect_missing_btn)
+        
         controls_layout.addLayout(primary_controls)
         
         # Secondary controls
@@ -341,7 +347,6 @@ class BalancerTab(QWidget):
         for i in range(self.domain_table.rowCount()):
             target_text = self.domain_table.item(i, 1).text().strip('%')
             current_text = self.domain_table.item(i, 2).text().strip('%')
-            
             try:
                 target = float(target_text)
                 current = float(current_text)
@@ -349,10 +354,13 @@ class BalancerTab(QWidget):
                 total_deviation += deviation
             except (ValueError, AttributeError):
                 continue
-                
         # Convert deviation to balance score (lower deviation = higher score)
         max_possible_deviation = 100
-        balance_score = max(0, 100 - (total_deviation / len(domains) * 100 / max_possible_deviation))
+        num_domains = self.domain_table.rowCount()
+        if num_domains > 0:
+            balance_score = max(0, 100 - (total_deviation / num_domains * 100 / max_possible_deviation))
+        else:
+            balance_score = 0
         return balance_score
         
     def refresh_corpus_stats(self):
@@ -488,7 +496,7 @@ class BalancerTab(QWidget):
     @pyqtSlot()
     def export_balance_report(self):
         """Export detailed balance report"""
-        from PyQt6.QtWidgets import QFileDialog
+        from PySide6.QtWidgets import QFileDialog
         
         filename, _ = QFileDialog.getSaveFileName(
             self, "Export Balance Report", 
@@ -628,3 +636,10 @@ class BalancerTab(QWidget):
         """Show notification if enabled"""
         if self.enable_notifications.isChecked():
             self.notification_manager.show_notification(title, message, notification_type)
+
+    def collect_for_missing_domains(self):
+        """Trigger collection for missing/underrepresented domains via the wrapper."""
+        # Call the wrapper method
+        self.balancer.collect_for_missing_domains()
+        # For now, show a message box as a placeholder
+        QMessageBox.information(self, "Collect for Missing Domains", "Triggered collection for missing/underrepresented domains. Check logs for details.")

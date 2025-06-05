@@ -25,19 +25,19 @@ import hashlib
 from io import StringIO
 import types
 
-from CryptoFinanceCorpusBuilder.shared_tools.processors.base_extractor import BaseExtractor, ExtractionError
-from CryptoFinanceCorpusBuilder.shared_tools.processors.formula_extractor import FormulaExtractor
-from CryptoFinanceCorpusBuilder.shared_tools.processors.finacial_symbol_processor import FinancialSymbolProcessor, AcademicPaperProcessor, MemoryOptimizer
-from CryptoFinanceCorpusBuilder.shared_tools.processors.chart_image_extractor import ChartImageExtractor
-from CryptoFinanceCorpusBuilder.shared_tools.processors.domain_classifier import DomainClassifier
-from CryptoFinanceCorpusBuilder.shared_tools.processors.quality_control import QualityControlService
-from CryptoFinanceCorpusBuilder.shared_tools.processors.language_confidence_detector import detect_language_confidence
-from CryptoFinanceCorpusBuilder.shared_tools.processors.corruption_detector import detect_corruption
-from CryptoFinanceCorpusBuilder.shared_tools.processors.machine_translation_detector import detect_machine_translation
-from CryptoFinanceCorpusBuilder.shared_tools.utils.extractor_utils import extract_metadata, calculate_hash, safe_filename
-from CryptoFinanceCorpusBuilder.shared_tools.utils.domain_utils import get_domain_for_file, DOMAIN_KEYWORDS
-from CryptoFinanceCorpusBuilder.shared_tools.utils.metadata_normalizer import main as normalize_directory
-from CryptoFinanceCorpusBuilder.shared_tools.project_config import ProjectConfig
+from .base_extractor import BaseExtractor, ExtractionError
+from .formula_extractor import FormulaExtractor
+from .finacial_symbol_processor import FinancialSymbolProcessor, AcademicPaperProcessor, MemoryOptimizer
+from .chart_image_extractor import ChartImageExtractor
+from .domain_classifier import DomainClassifier
+from .quality_control import QualityControl
+from .language_confidence_detector import detect_language_confidence
+from .corruption_detector import detect_corruption
+from .machine_translation_detector import detect_machine_translation
+from ..utils.extractor_utils import extract_metadata, calculate_hash, safe_filename
+from ..utils.domain_utils import get_domain_for_file, DOMAIN_KEYWORDS
+from ..utils.metadata_normalizer import main as normalize_directory
+from shared_tools.project_config import ProjectConfig
 
 # Configure logging
 log_dir = Path("G:/ai_trading_dev/CryptoFinanceCorpusBuilder/logs")
@@ -824,9 +824,8 @@ def write_outputs(base_dir, rel_path, text, meta, quality, tables=None, formulas
     base_dir = Path(base_dir).resolve()  # Ensure absolute path
     out_dir = base_dir / '_extracted'  # Create _extracted subdirectory
     out_dir.mkdir(parents=True, exist_ok=True)
-    
     # Use stem to remove original extension before adding new ones
-    base = safe_filename(rel_path.stem)
+    base = safe_filename(rel_path.stem, 128)
     txt_path = out_dir / f"{base}.txt"
     json_path = out_dir / f"{base}.json"
 
@@ -1000,6 +999,68 @@ def main():
     if args.verbose:
         print("\nDetailed Results:")
         print(json.dumps(results, indent=2))
+
+class BatchNonPDFExtractorEnhanced:
+    """Enhanced batch processor for non-PDF files"""
+    
+    def __init__(self):
+        self.config = {
+            'preserve_formatting': True,
+            'extract_metadata': True,
+            'handle_tables': True,
+            'max_file_size': 100,
+            'batch_size': 10
+        }
+    
+    def configure(self, **kwargs):
+        """Configure the extractor with processing options"""
+        for key, value in kwargs.items():
+            if key in self.config:
+                self.config[key] = value
+    
+    def extract_file(self, file_path: str, output_path: str) -> bool:
+        """Extract text from a single file
+        
+        Args:
+            file_path: Path to input file
+            output_path: Path to output directory
+            
+        Returns:
+            bool: True if extraction was successful
+        """
+        try:
+            # Create args namespace with configuration
+            args = types.SimpleNamespace(
+                output_dir=output_path,
+                verbose=True,
+                auto_normalize=True,
+                lang_conf_threshold=0.70,
+                mixed_lang_ratio=0.30,
+                corruption_thresholds=None,
+                mt_config=None,
+                relevance_threshold=30
+            )
+            
+            # Process the file
+            result = process_nonpdf_file_enhanced(file_path, args)
+            
+            if result:
+                # Write outputs
+                write_outputs(
+                    output_path,
+                    Path(file_path),
+                    result.text,
+                    result.metadata,
+                    result.quality_metrics.get('quality_flag', 'ok'),
+                    tables=result.tables,
+                    formulas=result.formulas
+                )
+                return True
+            return False
+            
+        except Exception as e:
+            logger.error(f"Error extracting file {file_path}: {str(e)}")
+            return False
 
 if __name__ == "__main__":
     main() 

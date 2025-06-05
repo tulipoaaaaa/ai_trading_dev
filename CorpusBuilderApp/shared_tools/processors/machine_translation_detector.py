@@ -4,6 +4,7 @@ import logging
 from collections import Counter
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Union
+from shared_tools.project_config import ProjectConfig
 
 # --- Load language/domain-specific config ---
 def load_mt_config(config_path=None):
@@ -551,7 +552,6 @@ def main():
     
     if args.project_config:
         # Use project config
-        from CryptoFinanceCorpusBuilder.shared_tools.config.project_config import ProjectConfig
         project = ProjectConfig.load(args.project_config)
         results = run_with_project_config(project, args.verbose)
     else:

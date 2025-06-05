@@ -6,14 +6,15 @@ Provides domain classification and management capabilities
 import os
 import json
 from typing import Dict, List, Optional, Any, Set
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QMutex
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox, QListWidget,
                            QSplitter, QTabWidget, QTableWidget, QTableWidgetItem,
                            QHeaderView, QLineEdit, QTreeWidget, QTreeWidgetItem)
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, BatchProcessorMixin, ProgressMixin
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.processors.domainsmanager import DomainsManager
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 
 class DomainsManagerWorker(QThread):
@@ -156,7 +157,7 @@ class DomainsManagerWorker(QThread):
         self._mutex.unlock()
 
 
-class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
+class DomainsManagerWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Domains Manager"""
     
     def __init__(self, parent=None):
@@ -726,7 +727,7 @@ class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
     @pyqtSlot()
     def add_category(self):
         """Add a new domain category"""
-        from PyQt6.QtWidgets import QInputDialog
+        from PySide6.QtWidgets import QInputDialog
         
         category, ok = QInputDialog.getText(
             self, 
@@ -746,7 +747,7 @@ class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
         if current and current.parent() is None:
             category = current.text(0)
             
-            from PyQt6.QtWidgets import QMessageBox
+            from PySide6.QtWidgets import QMessageBox
             reply = QMessageBox.question(
                 self,
                 "Remove Category",
@@ -768,7 +769,7 @@ class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
             self.show_error("Selection Error", "Please select a category first")
             return
             
-        from PyQt6.QtWidgets import QInputDialog
+        from PySide6.QtWidgets import QInputDialog
         
         domain, ok = QInputDialog.getText(
             self, 
@@ -792,7 +793,7 @@ class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
             
         domain = current_domain.text()
         
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         reply = QMessageBox.question(
             self,
             "Remove Domain",
@@ -996,7 +997,7 @@ class DomainsManagerWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
     @pyqtSlot()
     def clear_classification_cache(self):
         """Clear classification cache"""
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         
         reply = QMessageBox.question(
             self,

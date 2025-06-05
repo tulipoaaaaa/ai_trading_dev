@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/financial_symbol_processor_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from shared_tools.processors.finacial_symbol_processor import FinancialSymbolProcessor
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 class FinancialSymbolProcessorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Financial Symbol Processor."""

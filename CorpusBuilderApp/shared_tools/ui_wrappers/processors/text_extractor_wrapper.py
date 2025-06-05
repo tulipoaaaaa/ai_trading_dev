@@ -1,6 +1,11 @@
-from PyQt6.QtCore import pyqtSignal, QThread
+"""
+Text Extractor Wrapper for UI Integration
+Provides text extraction capabilities with UI controls
+"""
+
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from ..base_wrapper import BaseWrapper, ProcessorWrapperMixin
-from shared_tools.prev_working.Prev_working_processors.text_extractor import TextExtractor
+from shared_tools.processors.text_extractor import TextExtractor
 from typing import List, Dict, Any
 from pathlib import Path
 
@@ -117,4 +122,3 @@ class TextExtractorWrapper(BaseWrapper, ProcessorWrapperMixin):
         if self.extractor:
             return {"formats_processed": self.extractor.format_counts}
         return {"formats_processed": {}}
-```

@@ -2,8 +2,8 @@
 
 import pytest
 from unittest.mock import MagicMock, patch
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
 
 from app.ui.tabs.collectors_tab import CollectorsTab
 from shared_tools.ui_wrappers.collectors.isda_wrapper import ISDAWrapper
@@ -25,9 +25,9 @@ class TestCollectorsTab:
     @pytest.fixture
     def collectors_tab(self, qtbot, mock_project_config, app):
         """Create a CollectorsTab instance with mocked collectors."""
-        with patch('app.ui.tabs.collectors_tab.ISDAWrapper') as mock_isda, \
-             patch('app.ui.tabs.collectors_tab.GitHubWrapper') as mock_github, \
-             patch('app.ui.tabs.collectors_tab.AnnaArchiveWrapper') as mock_anna:
+        with patch('shared_tools.ui_wrappers.collectors.annas_archive_wrapper.AnnasArchiveWrapper') as mock_anna, \
+             patch('app.ui.tabs.collectors_tab.ISDAWrapper') as mock_isda, \
+             patch('app.ui.tabs.collectors_tab.GitHubWrapper') as mock_github:
             
             # Configure mocks
             mock_isda.return_value = MagicMock()

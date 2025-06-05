@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from shared_tools.ui_wrappers.processors.monitor_progress_wrapper import MonitorProgressWrapper
 
 class MonitoringTab(QWidget):

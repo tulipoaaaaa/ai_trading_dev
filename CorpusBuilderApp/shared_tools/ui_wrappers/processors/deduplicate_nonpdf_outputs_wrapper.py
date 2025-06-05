@@ -8,14 +8,15 @@ import hashlib
 import subprocess
 import sys
 from typing import Dict, List, Optional, Any, Set, Tuple
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QMutex
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox, QListWidget,
                            QSplitter, QTabWidget, QTableWidget, QTableWidgetItem,
                            QHeaderView, QSlider)
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, BatchProcessorMixin, ProgressMixin
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.processors.deduplicate_nonpdf_outputs import DeduplicateNonPDFOutputs
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 
 class DeduplicationWorker(QThread):
@@ -217,7 +218,7 @@ class DeduplicationWorker(QThread):
         self._mutex.unlock()
 
 
-class DeduplicateNonPDFOutputsWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
+class DeduplicateNonPDFOutputsWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Non-PDF Deduplication"""
     
     def __init__(self, parent=None):
@@ -587,7 +588,7 @@ class DeduplicateNonPDFOutputsWrapper(BaseWrapper, BatchProcessorMixin, Progress
             return
             
         # Confirm removal
-        from PyQt6.QtWidgets import QMessageBox
+        from PySide6.QtWidgets import QMessageBox
         reply = QMessageBox.question(
             self,
             "Confirm Removal",

@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/quality_control_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QObject, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QObject, QThread
 from shared_tools.processors.quality_control import QualityControl
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 class QualityControlWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Quality Control processor."""
@@ -12,6 +12,7 @@ class QualityControlWrapper(BaseWrapper, ProcessorWrapperMixin):
     
     def __init__(self, project_config):
         super().__init__(project_config)
+        self.project_config = project_config  # Ensure attribute exists for tests
         self.processor = QualityControl(project_config)
         self._is_running = False
         self.worker_thread = None
@@ -79,6 +80,13 @@ class QualityControlWrapper(BaseWrapper, ProcessorWrapperMixin):
         self.status_updated.emit(
             f"Quality control completed: {len(results.get('processed_files', []))} files processed"
         )
+        
+    def _on_progress_updated(self, progress):
+        """Handle progress updates from worker thread."""
+        self.progress_updated.emit(progress)
+        
+    def _on_status_updated(self, *args, **kwargs):
+        pass
         
 class QCWorkerThread(QThread):
     """Worker thread for quality control processing."""

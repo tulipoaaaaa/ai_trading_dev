@@ -1,3 +1,8 @@
+import os
+from PySide6.QtWidgets import QSystemTrayIcon
+from PySide6.QtMultimedia import QSoundEffect
+from PySide6.QtCore import QUrl
+
 class Notifier:
     success_sound_path = os.path.join("app", "resources", "audio", "success.wav")
     error_sound_path = os.path.join("app", "resources", "audio", "error.wav")

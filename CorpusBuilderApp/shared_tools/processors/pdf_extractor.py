@@ -9,9 +9,9 @@ from pdfminer.layout import LTTextContainer, LTChar, LTFigure
 import concurrent.futures
 import time
 
-from CryptoFinanceCorpusBuilder.shared_tools.processors.base_extractor import BaseExtractor, ExtractionError
-from CryptoFinanceCorpusBuilder.shared_tools.processors.mixins.table_mixin import TableMixin
-from CryptoFinanceCorpusBuilder.shared_tools.processors.mixins.formula_mixin import FormulaMixin
+from .base_extractor import BaseExtractor, ExtractionError
+from .mixins.table_mixin import TableMixin
+from .mixins.formula_mixin import FormulaMixin
 
 class PDFExtractor(BaseExtractor, TableMixin, FormulaMixin):
     """PDF text extractor with table and formula detection."""

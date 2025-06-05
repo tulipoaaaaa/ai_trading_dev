@@ -1,10 +1,10 @@
 # File: app/ui/widgets/file_browser.py
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTreeView, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTreeView, 
                              QPushButton, QLineEdit, QLabel, QComboBox, QMessageBox,
-                             QFileDialog, QMenu, QInputDialog)
-from PyQt6.QtCore import Qt, pyqtSignal, QDir, QFileSystemModel, QSortFilterProxyModel, QMimeData, QUrl
-from PyQt6.QtGui import QAction, QDragEnterEvent, QDropEvent, QIcon
+                             QFileDialog, QMenu, QInputDialog, QFileSystemModel)
+from PySide6.QtCore import Qt, Signal as pyqtSignal, QDir, QSortFilterProxyModel, QMimeData, QUrl
+from PySide6.QtGui import QAction, QDragEnterEvent, QDropEvent, QIcon
 import os
 import shutil
 from app.helpers.icon_manager import IconManager
@@ -304,13 +304,13 @@ class FileBrowser(QWidget):
                 
     def open_file(self, file_path):
         """Open file with default application."""
-        from PyQt6.QtGui import QDesktopServices
-        from PyQt6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtCore import QUrl
         QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
         
     def copy_path_to_clipboard(self, file_path):
         """Copy file path to clipboard."""
-        from PyQt6.QtWidgets import QApplication
+        from PySide6.QtWidgets import QApplication
         QApplication.clipboard().setText(file_path)
         self.status_label.setText("Path copied to clipboard")
         

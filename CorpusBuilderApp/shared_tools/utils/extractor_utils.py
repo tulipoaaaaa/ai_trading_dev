@@ -11,21 +11,17 @@ try:
 except ImportError:
     ProjectConfig = None
 
-def safe_filename(filename: str) -> str:
-    """Convert a string to a safe filename.
-    
-    Args:
-        filename: Original filename
-        
-    Returns:
-        Safe filename with special characters replaced
-    """
+def safe_filename(filename: str, max_length: int = 128) -> str:
+    """Convert a string to a safe filename, truncated to max_length chars."""
     # Remove invalid characters
     safe = "".join(c for c in filename if c.isalnum() or c in (' ', '-', '_', '.'))
     # Replace spaces with underscores
     safe = safe.replace(' ', '_')
     # Remove multiple underscores
     safe = re.sub(r'_+', '_', safe)
+    # Truncate to max_length
+    if len(safe) > max_length:
+        safe = safe[:max_length]
     return safe
 
 def count_tokens(text: str) -> int:

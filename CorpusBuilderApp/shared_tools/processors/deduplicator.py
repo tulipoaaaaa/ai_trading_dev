@@ -39,8 +39,8 @@ class Deduplicator:
             self.similarity_threshold = config.get('similarity_threshold', similarity_threshold)
             self.use_minhash = config.get('use_minhash', use_minhash)
         else:
-        self.similarity_threshold = similarity_threshold
-        self.use_minhash = use_minhash
+            self.similarity_threshold = similarity_threshold
+            self.use_minhash = use_minhash
         
         # Indexes for duplicate detection
         self.file_hashes = {}  # Maps file hash to file paths

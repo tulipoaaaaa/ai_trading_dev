@@ -1,9 +1,9 @@
-from PyQt6.QtCore import pyqtSignal
+from PySide6.QtCore import Signal as pyqtSignal
 from ..base_wrapper import BaseWrapper, CollectorWrapperMixin
-from shared_tools.collectors.enhanced_scidb_collector import EnhancedSciDBCollector
+from shared_tools.collectors.enhanced_scidb_collector import SciDBCollector
 
 class SciDBWrapper(BaseWrapper, CollectorWrapperMixin):
-    """UI wrapper for Enhanced SciDB Collector"""
+    """UI wrapper for SciDB Collector"""
     
     papers_found = pyqtSignal(int)  # Number of papers found
     
@@ -12,9 +12,9 @@ class SciDBWrapper(BaseWrapper, CollectorWrapperMixin):
         self.collector = None
         
     def _create_target_object(self):
-        """Create Enhanced SciDB collector instance"""
+        """Create SciDB collector instance"""
         if not self.collector:
-            self.collector = EnhancedSciDBCollector(self.config)
+            self.collector = SciDBCollector(self.config)
         return self.collector
         
     def _get_operation_type(self):

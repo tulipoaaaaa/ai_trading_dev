@@ -1,9 +1,9 @@
 # File: shared_tools/ui_wrappers/processors/machine_translation_detector_wrapper.py
 
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from shared_tools.processors.machine_translation_detector import MachineTranslationDetector
 from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
-from shared_tools.ui_wrappers.processor_wrapper_mixin import ProcessorWrapperMixin
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 class MachineTranslationDetectorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI wrapper for the Machine Translation Detector processor."""

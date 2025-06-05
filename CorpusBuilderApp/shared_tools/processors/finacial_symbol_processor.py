@@ -11,8 +11,8 @@ from typing import Dict, List, Set, Any, Optional, Tuple
 from pathlib import Path
 import logging
 from collections import defaultdict, Counter
-from CryptoFinanceCorpusBuilder.shared_tools.processors.formula_extractor import FormulaExtractor
-from CryptoFinanceCorpusBuilder.shared_tools.processors.chart_image_extractor import ChartImageExtractor
+from .formula_extractor import FormulaExtractor
+from .chart_image_extractor import ChartImageExtractor
 
 class FinancialSymbolProcessor:
     """Process and preserve financial symbols, tickers, and mathematical notation."""
@@ -559,7 +559,7 @@ class AcademicPaperProcessor:
             validation_results['passes_academic_standards'] = False
         
         # Check reference density
-        reference_patterns = ['references', 'bibliography', '\[\d+\]', '\(\d{4}\)']
+        reference_patterns = ['references', 'bibliography', r'\[\d+\]', r'\(\d{4}\)']
         reference_matches = sum(len(re.findall(pattern, text, re.IGNORECASE)) for pattern in reference_patterns)
         reference_density = reference_matches / token_count if token_count > 0 else 0
         

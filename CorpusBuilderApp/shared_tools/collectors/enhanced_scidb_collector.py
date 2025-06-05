@@ -3,6 +3,9 @@
 Collector for SciDB academic papers
 """
 
+# Environment Variable Required:
+#   AA_ACCOUNT_COOKIE - Your Anna's Archive account cookie (set in .env or environment)
+
 import os
 import re
 import json

@@ -1,4 +1,4 @@
-from PyQt6.QtCore import pyqtSignal
+from PySide6.QtCore import Signal as pyqtSignal
 from ..base_wrapper import BaseWrapper, CollectorWrapperMixin
 from shared_tools.collectors.arxiv_collector import ArxivCollector
 

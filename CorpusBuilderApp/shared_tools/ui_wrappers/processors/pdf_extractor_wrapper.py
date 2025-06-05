@@ -1,6 +1,6 @@
-from PyQt6.QtCore import pyqtSignal, QThread
+from PySide6.QtCore import Signal as pyqtSignal, QThread
 from ..base_wrapper import BaseWrapper, ProcessorWrapperMixin
-from shared_tools.prev_working.Prev_working_processors.pdf_extractor import PDFExtractor
+from shared_tools.processors.pdf_extractor import PDFExtractor
 from typing import List, Dict, Any
 from pathlib import Path
 
@@ -137,4 +137,3 @@ class PDFExtractorWrapper(BaseWrapper, ProcessorWrapperMixin):
             return {"files_processed": self.extractor.files_processed,
                     "ocr_used_count": self.extractor.ocr_used_count}
         return {"files_processed": 0, "ocr_used_count": 0}
-```

@@ -2,8 +2,8 @@
 
 import pytest
 import os
-from PyQt6.QtCore import QDir
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtCore import QDir
+from PySide6.QtWidgets import QApplication
 from app.ui.widgets.file_browser import FileBrowser
 
 class TestFileBrowser:

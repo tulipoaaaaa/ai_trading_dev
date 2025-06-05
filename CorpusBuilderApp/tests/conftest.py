@@ -3,10 +3,11 @@
 import pytest
 import sys
 import os
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import QDir
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QDir
 import tempfile
 import shutil
+from shared_tools.project_config import ProjectConfig
 
 # Add the app directory to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'app'))
@@ -31,8 +32,6 @@ def temp_dir():
 @pytest.fixture
 def mock_project_config(temp_dir):
     """Create a mock project configuration for testing."""
-    from shared_tools.config.project_config import ProjectConfig
-    
     config = ProjectConfig()
     config.config['directories']['corpus_root'] = temp_dir
     config.config['directories']['raw_data'] = os.path.join(temp_dir, 'raw')

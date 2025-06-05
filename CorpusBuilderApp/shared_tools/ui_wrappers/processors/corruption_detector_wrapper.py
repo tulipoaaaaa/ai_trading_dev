@@ -6,14 +6,15 @@ Provides comprehensive file corruption detection capabilities
 import os
 import json
 from typing import Dict, List, Optional, Any, Tuple
-from PyQt6.QtCore import QObject, QThread, pyqtSignal, pyqtSlot, QMutex
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
+from PySide6.QtCore import QObject, QThread, Signal as pyqtSignal, Slot as pyqtSlot, QMutex
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
                            QProgressBar, QLabel, QTextEdit, QFileDialog, QCheckBox, 
                            QSpinBox, QGroupBox, QGridLayout, QComboBox, QListWidget,
                            QSplitter, QTabWidget, QTableWidget, QTableWidgetItem,
                            QHeaderView)
-from shared_tools.ui_wrappers.base_wrapper import BaseWrapper, BatchProcessorMixin, ProgressMixin
+from shared_tools.ui_wrappers.base_wrapper import BaseWrapper
 from shared_tools.processors.corruption_detector import CorruptionDetector
+from shared_tools.processors.mixins.processor_wrapper_mixin import ProcessorWrapperMixin
 
 
 class CorruptionDetectorWorker(QThread):
@@ -134,7 +135,7 @@ class CorruptionDetectorWorker(QThread):
         return files
 
 
-class CorruptionDetectorWrapper(BaseWrapper, BatchProcessorMixin, ProgressMixin):
+class CorruptionDetectorWrapper(BaseWrapper, ProcessorWrapperMixin):
     """UI Wrapper for Corruption Detector"""
     
     def __init__(self, parent=None):

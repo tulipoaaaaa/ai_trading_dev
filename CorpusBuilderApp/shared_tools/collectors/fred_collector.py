@@ -1,4 +1,6 @@
 # sources/specific_collectors/fred_collector.py
+# Environment Variable Required:
+#   FRED_API_KEY - Your FRED API key (set in .env or environment)
 import os
 import json
 import time

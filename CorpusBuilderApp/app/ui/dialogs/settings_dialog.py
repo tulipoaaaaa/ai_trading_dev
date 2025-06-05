@@ -1,10 +1,10 @@
 # File: app/ui/dialogs/settings_dialog.py
 
-from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
+from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                              QLineEdit, QPushButton, QFormLayout, QDialogButtonBox,
                              QCheckBox, QComboBox, QTabWidget, QWidget, QSpinBox,
                              QFileDialog, QGroupBox)
-from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot
+from PySide6.QtCore import Qt, Signal as pyqtSignal, Slot as pyqtSlot
 from app.helpers.theme_manager import ThemeManager
 import json
 import os
@@ -52,6 +52,7 @@ class SettingsDialog(QDialog):
         env_layout.addRow("Python Executable:", python_layout)
         
         self.venv_path = QLineEdit()
+        self.venv_path.setPlaceholderText('venv/')
         venv_browse = QPushButton("Browse...")
         venv_browse.clicked.connect(self.browse_venv_path)
         venv_layout = QHBoxLayout()
@@ -238,7 +239,7 @@ class SettingsDialog(QDialog):
         # General tab
         self.env_selector.setCurrentText(self.current_settings.get('environment', 'test'))
         self.python_path.setText(self.current_settings.get('python_path', ''))
-        self.venv_path.setText(self.current_settings.get('venv_path', 'G:\\venv\\ai_trading_dev_1'))
+        self.venv_path.setText('venv/')
         self.theme_selector.setCurrentText(self.current_settings.get('theme', 'System'))
         self.show_tooltips.setChecked(self.current_settings.get('show_tooltips', True))
         self.auto_refresh.setChecked(self.current_settings.get('auto_refresh', True))
@@ -307,7 +308,7 @@ class SettingsDialog(QDialog):
         # General
         self.env_selector.setCurrentText('test')
         self.python_path.setText('')
-        self.venv_path.setText('G:\\venv\\ai_trading_dev_1')
+        self.venv_path.setText('venv/')
         self.theme_selector.setCurrentText('System')
         self.show_tooltips.setChecked(True)
         self.auto_refresh.setChecked(True)

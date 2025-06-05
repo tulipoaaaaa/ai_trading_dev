@@ -2,12 +2,12 @@
 Dashboard Tab for CryptoFinance Corpus Builder
 """
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, 
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, 
                             QLabel, QProgressBar, QFrame, QSplitter, QPushButton,
                             QScrollArea, QTableWidget, QTableWidgetItem, QHeaderView)
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, pyqtSlot, QSize, QThread
-from PyQt6.QtGui import QColor, QIcon
-from PyQt6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
+from PySide6.QtCore import Qt, QTimer, Signal as pyqtSignal, Slot as pyqtSlot, QSize, QThread
+from PySide6.QtGui import QColor, QIcon
+from PySide6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 
 import logging
 from pathlib import Path
@@ -18,19 +18,21 @@ import json
 import threading
 
 # Import UI components
-from ..widgets.deprecated.corpus_statistics import CorpusStatisticsWidget
-from ..widgets.activity_log import ActivityLogWidget
-from ..widgets.domain_distribution import DomainDistributionWidget
-from ..widgets.storage_usage import StorageUsageWidget
+from app.ui.widgets.corpus_statistics import CorpusStatistics
+from app.ui.widgets.activity_log import ActivityLog
+from app.ui.widgets.domain_distribution import DomainDistribution
+# from ..widgets.storage_usage import StorageUsageWidget
 
 class DashboardTab(QWidget):
     """Dashboard Tab with overview of corpus and activities"""
     
     update_needed = pyqtSignal()
     
-    def __init__(self, config):
-        super().__init__()
-        self.config = config
+    def __init__(self, project_config, parent=None):
+        print(f"DEBUG: DashboardTab received config type: {type(project_config)}")
+        print(f"DEBUG: DashboardTab received config value: {project_config}")
+        super().__init__(parent)
+        self.config = project_config
         self.logger = logging.getLogger(self.__class__.__name__)
         
         # UI setup
@@ -57,21 +59,23 @@ class DashboardTab(QWidget):
         # Create top widgets layout
         top_layout = QHBoxLayout()
         
-        # Corpus statistics widget
-        self.corpus_stats_widget = CorpusStatisticsWidget(self.config)
+        print("DEBUG: Creating CorpusStatistics...")
+        self.corpus_stats_widget = CorpusStatistics(self.config)
+        print("DEBUG: CorpusStatistics created.")
         top_layout.addWidget(self.corpus_stats_widget, 2)
         
-        # Storage usage widget
-        self.storage_usage_widget = StorageUsageWidget(self.config)
-        top_layout.addWidget(self.storage_usage_widget, 1)
+        # Storage usage widget (removed, file not found)
+        # self.storage_usage_widget = StorageUsageWidget(self.config)
+        # top_layout.addWidget(self.storage_usage_widget, 1)
         
         main_layout.addLayout(top_layout)
         
         # Create middle layout for domain distribution
         middle_layout = QHBoxLayout()
         
-        # Domain distribution widget
-        self.domain_distribution_widget = DomainDistributionWidget(self.config)
+        print("DEBUG: Creating DomainDistribution...")
+        self.domain_distribution_widget = DomainDistribution(self.config)
+        print("DEBUG: DomainDistribution created.")
         middle_layout.addWidget(self.domain_distribution_widget)
         
         main_layout.addLayout(middle_layout)
@@ -84,8 +88,9 @@ class DashboardTab(QWidget):
         activity_header.setStyleSheet("font-size: 14px; font-weight: bold;")
         bottom_layout.addWidget(activity_header)
         
-        # Activity log widget
-        self.activity_log_widget = ActivityLogWidget(self.config)
+        print("DEBUG: Creating ActivityLog...")
+        self.activity_log_widget = ActivityLog(self.config)
+        print("DEBUG: ActivityLog created.")
         bottom_layout.addWidget(self.activity_log_widget)
         
         main_layout.addLayout(bottom_layout)
@@ -108,11 +113,11 @@ class DashboardTab(QWidget):
             
             # Load storage usage
             storage_usage = self.get_storage_usage()
-            self.storage_usage_widget.update_storage_usage(storage_usage)
+            # self.storage_usage_widget.update_storage_usage(storage_usage)
             
             # Load domain distribution
             domain_distribution = self.get_domain_distribution()
-            self.domain_distribution_widget.update_distribution(domain_distribution)
+            self.domain_distribution_widget.update_distribution_data(domain_distribution)
             
             # Load activity log
             activity_log = self.get_activity_log()
@@ -138,11 +143,11 @@ class DashboardTab(QWidget):
             
             # Update storage usage
             storage_usage = self.get_storage_usage()
-            self.storage_usage_widget.update_storage_usage(storage_usage)
+            # self.storage_usage_widget.update_storage_usage(storage_usage)
             
             # Update domain distribution
             domain_distribution = self.get_domain_distribution()
-            self.domain_distribution_widget.update_distribution(domain_distribution)
+            self.domain_distribution_widget.update_distribution_data(domain_distribution)
             
             # Update activity log
             activity_log = self.get_activity_log()
@@ -184,16 +189,16 @@ class DashboardTab(QWidget):
         """Get domain distribution statistics"""
         # In a production app, this would query the actual domain distribution
         # For now, we'll return mock data for demonstration
-        return [
-            {"name": "Crypto Derivatives", "allocation": 0.20, "current": 0.18, "documents": 456, "quality": 0.85},
-            {"name": "DeFi", "allocation": 0.12, "current": 0.15, "documents": 289, "quality": 0.82},
-            {"name": "High Frequency Trading", "allocation": 0.15, "current": 0.13, "documents": 378, "quality": 0.88},
-            {"name": "Market Microstructure", "allocation": 0.15, "current": 0.16, "documents": 423, "quality": 0.79},
-            {"name": "Portfolio Construction", "allocation": 0.10, "current": 0.09, "documents": 234, "quality": 0.76},
-            {"name": "Regulation & Compliance", "allocation": 0.05, "current": 0.04, "documents": 145, "quality": 0.91},
-            {"name": "Risk Management", "allocation": 0.15, "current": 0.17, "documents": 467, "quality": 0.83},
-            {"name": "Valuation Models", "allocation": 0.08, "current": 0.08, "documents": 178, "quality": 0.77}
-        ]
+        return {
+            "Crypto Derivatives": {"allocation": 0.20, "current": 0.18, "documents": 456, "quality": 0.85},
+            "DeFi": {"allocation": 0.12, "current": 0.15, "documents": 289, "quality": 0.82},
+            "High Frequency Trading": {"allocation": 0.15, "current": 0.13, "documents": 378, "quality": 0.88},
+            "Market Microstructure": {"allocation": 0.15, "current": 0.16, "documents": 423, "quality": 0.79},
+            "Portfolio Construction": {"allocation": 0.10, "current": 0.09, "documents": 234, "quality": 0.76},
+            "Regulation & Compliance": {"allocation": 0.05, "current": 0.04, "documents": 145, "quality": 0.91},
+            "Risk Management": {"allocation": 0.15, "current": 0.17, "documents": 467, "quality": 0.83},
+            "Valuation Models": {"allocation": 0.08, "current": 0.08, "documents": 178, "quality": 0.77},
+        }
     
     def get_activity_log(self):
         """Get recent activity log"""
@@ -224,4 +229,3 @@ class DashboardTab(QWidget):
              "status": "success",
              "details": "8 domains rebalanced"}
         ]
-```

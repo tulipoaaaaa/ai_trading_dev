@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List
 import yaml
 from pydantic import BaseModel, Field, validator
+from dotenv import load_dotenv
+from app.helpers.crypto_utils import encrypt_value, decrypt_value
 
 class EnvironmentConfig(BaseModel):
     """Schema for environment-specific configuration."""
@@ -137,91 +139,112 @@ class ProjectConfigSchema(BaseModel):
     )
 
 class ProjectConfig:
-    """
-    Manages and enforces the standard folder structure for a corpus project.
-    Auto-creates all required directories on initialization.
-    Supports multiple environments (production/test) with environment-specific settings.
-    """
-    def __init__(self, config_path: str, environment: Optional[str] = None, create_dirs: bool = True):
-        # Load and validate config
-        self.config_data = self._load_config(config_path)
-        self.schema = ProjectConfigSchema(**self.config_data)
+    """Project configuration manager with .env support"""
+    
+    def __init__(self, config_path: str, environment: Optional[str] = None):
+        """Initialize configuration with .env support"""
+        self.config_path = Path(config_path)
+        self.environment = environment or os.getenv('ENVIRONMENT', 'test')
         
-        # Set environment
-        self.environment = environment or self.schema.environment
-        if self.environment not in self.schema.environments:
-            raise ValueError(f"Environment '{self.environment}' not found in config")
+        # Load .env file if it exists
+        env_path = self.config_path.parent / '.env'
+        if env_path.exists():
+            load_dotenv(env_path)
         
-        # Get environment-specific config
-        env_config = self.schema.environments[self.environment]
+        # Load configuration
+        self.config = self._load_config()
         
-        # Set up paths
-        self.corpus_dir = Path(env_config.corpus_dir)
-        self.cache_dir = Path(env_config.cache_dir) if env_config.cache_dir else None
-        self.log_dir = Path(env_config.log_dir) if env_config.log_dir else None
+    def _load_config(self) -> Dict[str, Any]:
+        """Load configuration from YAML and environment variables"""
+        config = {}
         
-        # Standard subfolders
-        self.raw_data_dir = self.corpus_dir / 'raw_data'
-        self.extracted_dir = self.corpus_dir / 'extracted'
-        self.pdf_extracted_dir = self.corpus_dir / 'pdf_extracted'
-        self.nonpdf_extracted_dir = self.corpus_dir / 'nonpdf_extracted'
-        self.balance_reports_dir = self.corpus_dir / 'balance_reports'
-        self.processed_dir = self.corpus_dir / 'processed'
-        self.reports_dir = self.corpus_dir / 'reports'
-        self.config_dir = self.corpus_dir / 'config'
-        self.cache_data_dir = self.cache_dir / 'corpus_cache' if self.cache_dir else None
+        # Load from YAML if it exists
+        if self.config_path.exists():
+            with open(self.config_path, 'r') as f:
+                config = yaml.safe_load(f)
         
-        # Store domain configs
-        self.domain_configs = self.schema.domains
-        
-        if create_dirs:
-            self._validate_and_create_dirs()
-
-    def _load_config(self, config_path: str) -> dict:
-        """Load configuration from YAML file."""
-        with open(config_path, 'r') as f:
-            return yaml.safe_load(f)
-
-    def _validate_and_create_dirs(self):
-        """Validate and create required directories."""
-        # Create base directories
-        for dir_path in [
-            self.raw_data_dir, self.extracted_dir, self.pdf_extracted_dir,
-            self.nonpdf_extracted_dir, self.balance_reports_dir, self.processed_dir,
-            self.reports_dir, self.log_dir, self.config_dir
-        ]:
-            dir_path.mkdir(parents=True, exist_ok=True)
-        
-        # Create domain-specific directories
-        for domain in self.domain_configs:
-            domain_dir = self.raw_data_dir / domain
-            for content_type in ['papers', 'reports', 'articles']:
-                (domain_dir / content_type).mkdir(parents=True, exist_ok=True)
-
-    def set_cache_dir(self, cache_dir: str):
-        """Update cache directory path."""
-        self.cache_dir = Path(cache_dir)
-        self.cache_data_dir = self.cache_dir / 'corpus_cache'
-        self.cache_data_dir.mkdir(parents=True, exist_ok=True)
-
-    def to_yaml(self, yaml_path: str) -> None:
-        """Save config to YAML file."""
-        config_data = {
-            'environment': self.environment,
-            'environments': {
-                env: {
-                    'corpus_dir': str(config.corpus_dir),
-                    'cache_dir': str(config.cache_dir) if config.cache_dir else None,
-                    'log_dir': str(config.log_dir) if config.log_dir else None
-                }
-                for env, config in self.schema.environments.items()
+        # Override with environment variables
+        env_config = {
+            'environment': {
+                'active': os.getenv('ENVIRONMENT', 'test'),
+                'python_path': os.getenv('PYTHON_PATH', ''),
+                'venv_path': os.getenv('VENV_PATH', ''),
+                'temp_dir': os.getenv('TEMP_DIR', '')
             },
-            'domains': self.domain_configs
+            'api_keys': {
+                'github_token': os.getenv('GITHUB_TOKEN', ''),
+                'aa_cookie': os.getenv('AA_COOKIE', ''),
+                'fred_key': os.getenv('FRED_API_KEY', ''),
+                'bitmex_key': os.getenv('BITMEX_API_KEY', ''),
+                'bitmex_secret': os.getenv('BITMEX_API_SECRET', ''),
+                'arxiv_email': os.getenv('ARXIV_EMAIL', '')
+            },
+            'processing': {
+                'pdf': {
+                    'threads': int(os.getenv('PDF_THREADS', '4')),
+                    'enable_ocr': True,
+                    'enable_formula': True,
+                    'enable_tables': True
+                },
+                'text': {
+                    'threads': int(os.getenv('TEXT_THREADS', '4')),
+                    'enable_language': True,
+                    'min_quality': 70,
+                    'enable_deduplication': True
+                },
+                'advanced': {
+                    'batch_size': int(os.getenv('BATCH_SIZE', '50')),
+                    'max_retries': int(os.getenv('MAX_RETRIES', '3')),
+                    'timeout': int(os.getenv('TIMEOUT', '300'))
+                }
+            },
+            'directories': {
+                'corpus_root': os.getenv('CORPUS_ROOT', '~/crypto_corpus'),
+                'raw_data_dir': os.getenv('RAW_DATA_DIR', '~/crypto_corpus/raw'),
+                'processed_dir': os.getenv('PROCESSED_DIR', '~/crypto_corpus/processed'),
+                'metadata_dir': os.getenv('METADATA_DIR', '~/crypto_corpus/metadata'),
+                'logs_dir': os.getenv('LOGS_DIR', '~/crypto_corpus/logs')
+            }
         }
         
-        with open(yaml_path, 'w') as f:
-            yaml.safe_dump(config_data, f, default_flow_style=False)
-
+        # Deep merge configs, with env vars taking precedence
+        self._deep_merge(config, env_config)
+        return config
+    
+    def _deep_merge(self, target: Dict[str, Any], source: Dict[str, Any]) -> None:
+        """Deep merge two dictionaries"""
+        for key, value in source.items():
+            if key in target and isinstance(target[key], dict) and isinstance(value, dict):
+                self._deep_merge(target[key], value)
+            else:
+                target[key] = value
+    
+    def get(self, key: str, default: Any = None) -> Any:
+        """Get configuration value"""
+        keys = key.split('.')
+        value = self.config
+        for k in keys:
+            if isinstance(value, dict):
+                value = value.get(k, default)
+            else:
+                return default
+        return value
+    
+    def set(self, key: str, value: Any) -> None:
+        """Set configuration value"""
+        keys = key.split('.')
+        config = self.config
+        for k in keys[:-1]:
+            if k not in config:
+                config[k] = {}
+            config = config[k]
+        config[keys[-1]] = value
+    
+    def save(self) -> None:
+        """Save configuration to YAML file"""
+        with open(self.config_path, 'w') as f:
+            yaml.dump(self.config, f, default_flow_style=False)
+    
     @classmethod
     def from_yaml(cls, yaml_path: str, environment: Optional[str] = None) -> 'ProjectConfig':
         """Load config from YAML file with schema validation."""
