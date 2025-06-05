@@ -21,12 +21,15 @@ import threading
 from app.ui.widgets.corpus_statistics import CorpusStatistics
 from app.ui.widgets.activity_log import ActivityLog
 from app.ui.widgets.domain_distribution import DomainDistribution
+from app.ui.widgets.active_operations import ActiveOperations
+from app.ui.widgets.recent_activity import RecentActivity
 # from ..widgets.storage_usage import StorageUsageWidget
 
 class DashboardTab(QWidget):
     """Dashboard Tab with overview of corpus and activities"""
     
     update_needed = pyqtSignal()
+    view_all_activity_requested = pyqtSignal()  # Signal to request full activity tab
     
     def __init__(self, project_config, parent=None):
         print(f"DEBUG: DashboardTab received config type: {type(project_config)}")
@@ -45,58 +48,73 @@ class DashboardTab(QWidget):
         self.load_data()
     
     def init_ui(self):
-        """Initialize the user interface"""
-        # Main layout
+        """Initialize the user interface with professional 4-column layout"""
+        # Main layout with improved spacing
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(20, 15, 20, 20)
+        main_layout.setSpacing(15)
         
-        # Header
+        # Header with better positioning
         header_label = QLabel("Corpus Overview Dashboard")
-        header_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        header_label.setObjectName("dashboard-header")
+        header_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         main_layout.addWidget(header_label)
         
-        # Create top widgets layout
-        top_layout = QHBoxLayout()
+        # Create 4-column layout using QSplitter for responsiveness
+        dashboard_splitter = QSplitter(Qt.Orientation.Horizontal)
+        dashboard_splitter.setObjectName("dashboard-splitter")
+        dashboard_splitter.setChildrenCollapsible(False)  # Prevent columns from collapsing
         
+        # Column 1: Corpus Statistics - Improved sizing
         print("DEBUG: Creating CorpusStatistics...")
         self.corpus_stats_widget = CorpusStatistics(self.config)
+        self.corpus_stats_widget.setObjectName("card")
+        self.corpus_stats_widget.setMinimumSize(300, 450)  # Increased height for better space usage
         print("DEBUG: CorpusStatistics created.")
-        top_layout.addWidget(self.corpus_stats_widget, 2)
+        dashboard_splitter.addWidget(self.corpus_stats_widget)
         
-        # Storage usage widget (removed, file not found)
-        # self.storage_usage_widget = StorageUsageWidget(self.config)
-        # top_layout.addWidget(self.storage_usage_widget, 1)
-        
-        main_layout.addLayout(top_layout)
-        
-        # Create middle layout for domain distribution
-        middle_layout = QHBoxLayout()
-        
+        # Column 2: Domain Distribution Chart - Improved sizing  
         print("DEBUG: Creating DomainDistribution...")
         self.domain_distribution_widget = DomainDistribution(self.config)
+        self.domain_distribution_widget.setObjectName("card")
+        self.domain_distribution_widget.setMinimumSize(350, 450)  # Larger for better pie chart display
         print("DEBUG: DomainDistribution created.")
-        middle_layout.addWidget(self.domain_distribution_widget)
+        dashboard_splitter.addWidget(self.domain_distribution_widget)
         
-        main_layout.addLayout(middle_layout)
+        # Column 3: Active Operations - Improved sizing
+        print("DEBUG: Creating ActiveOperations...")
+        self.active_operations_widget = ActiveOperations(self.config)
+        self.active_operations_widget.setObjectName("card")
+        self.active_operations_widget.setMinimumSize(300, 450)  # Increased height
+        print("DEBUG: ActiveOperations created.")
+        dashboard_splitter.addWidget(self.active_operations_widget)
         
-        # Create bottom layout for activity log
-        bottom_layout = QVBoxLayout()
+        # Column 4: Recent Activity - Improved sizing
+        print("DEBUG: Creating RecentActivity...")
+        self.recent_activity_widget = RecentActivity(self.config)
+        self.recent_activity_widget.setObjectName("card")
+        self.recent_activity_widget.setMinimumSize(300, 450)  # Increased height
+        print("DEBUG: RecentActivity created.")
+        dashboard_splitter.addWidget(self.recent_activity_widget)
         
-        # Activity log header
-        activity_header = QLabel("Recent Activity")
-        activity_header.setStyleSheet("font-size: 14px; font-weight: bold;")
-        bottom_layout.addWidget(activity_header)
+        # Set proportions optimized for content (domain chart gets more space)
+        dashboard_splitter.setSizes([300, 350, 300, 300])
         
-        print("DEBUG: Creating ActivityLog...")
+        # Add the splitter to main layout with stretch to use full space
+        main_layout.addWidget(dashboard_splitter, 1)  # Stretch factor 1 to fill available space
+        
+        # Legacy activity log (moved to separate tab or accessible via "View All")
+        # We can remove this or make it accessible through the compact recent activity widget
+        print("DEBUG: Creating legacy ActivityLog for full view...")
         self.activity_log_widget = ActivityLog(self.config)
-        print("DEBUG: ActivityLog created.")
-        bottom_layout.addWidget(self.activity_log_widget)
-        
-        main_layout.addLayout(bottom_layout)
+        print("DEBUG: Legacy ActivityLog created (hidden by default).")
         
         # Connect signals
         self.update_needed.connect(self.on_update_needed)
+        
+        # Connect recent activity signals
+        self.recent_activity_widget.activity_clicked.connect(self.handle_activity_click)
+        self.recent_activity_widget.view_all_requested.connect(self.handle_view_all_request)
     
     def setup_update_timer(self):
         """Setup timer for periodic updates"""
@@ -153,8 +171,22 @@ class DashboardTab(QWidget):
             activity_log = self.get_activity_log()
             self.activity_log_widget.update_activity_log(activity_log)
             
+            # Note: Active Operations and Recent Activity have their own auto-refresh timers
+            # so they don't need manual updates here
+            
         except Exception as e:
             self.logger.error(f"Error updating dashboard data: {e}")
+    
+    def handle_activity_click(self, activity):
+        """Handle when an activity item is clicked"""
+        # This could show a detailed view or switch to the full activity log
+        self.logger.info(f"Activity clicked: {activity.get('action', 'Unknown')}")
+        # For now, just log it - could be extended to show details dialog
+    
+    def handle_view_all_request(self):
+        """Handle when View All is requested from Recent Activity"""
+        self.logger.info("View All activity requested from dashboard")
+        self.view_all_activity_requested.emit()
     
     def get_corpus_statistics(self):
         """Get corpus statistics"""

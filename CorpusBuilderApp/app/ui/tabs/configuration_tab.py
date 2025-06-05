@@ -70,7 +70,7 @@ class ConfigurationTab(QWidget):
         # Add drag-and-drop area for importing config files
         self.drop_area = QLabel("Drop config file here to import")
         self.drop_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.drop_area.setStyleSheet("border: 2px dashed #aaa; padding: 20px;")
+        self.drop_area.setObjectName("config-drop-area")
         main_layout.addWidget(self.drop_area)
     
     def create_environment_tab(self):

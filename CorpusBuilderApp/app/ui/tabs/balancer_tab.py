@@ -402,16 +402,16 @@ class BalancerTab(QWidget):
             deviation = abs(percentage - target)
             if deviation <= 1:
                 status = "Optimal"
-                progress.setStyleSheet("QProgressBar::chunk { background-color: #2ecc71; }")
-                status_color = QColor(46, 204, 113)
+                progress.setObjectName("progress-on-target")
+                status_color = QColor(50, 184, 198)  # Brand color for optimal
             elif deviation <= 3:
                 status = "Good"
-                progress.setStyleSheet("QProgressBar::chunk { background-color: #f39c12; }")
-                status_color = QColor(243, 156, 18)
+                progress.setObjectName("progress-good")
+                status_color = QColor(230, 129, 97)  # Orange for good
             else:
                 status = "Needs Attention"
-                progress.setStyleSheet("QProgressBar::chunk { background-color: #e74c3c; }")
-                status_color = QColor(231, 76, 60)
+                progress.setObjectName("progress-needs-attention")
+                status_color = QColor(255, 84, 89)  # Red for needs attention
                 
             # Update status column
             status_item = QTableWidgetItem(status)

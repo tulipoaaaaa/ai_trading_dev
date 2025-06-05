@@ -1,9 +1,10 @@
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
                              QLabel, QPushButton, QComboBox, QDateEdit,
-                             QTabWidget, QSpinBox, QCheckBox, QSlider)
+                             QGridLayout, QSpinBox, QCheckBox, QSlider, QFrame)
 from PySide6.QtCore import Qt, QDate, Slot as pyqtSlot
 from PySide6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPainter, QColor
+from app.helpers.chart_manager import ChartManager
 
 import random
 import datetime
@@ -13,28 +14,52 @@ class AnalyticsTab(QWidget):
     def __init__(self, project_config, parent=None):
         super().__init__(parent)
         self.project_config = project_config
+        self.chart_manager = ChartManager('dark')  # Will be updated based on actual theme
         self.setup_ui()
         
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
         
-        # Filter bar
-        filter_group = QGroupBox("Analytics Filters")
-        filter_layout = QHBoxLayout(filter_group)
+        # Analytics Filters header (restored as requested)
+        filters_header = QLabel("Analytics Filters")
+        filters_header.setObjectName("analytics-filters-header")
+        filters_header.setStyleSheet("font-size: 16px; font-weight: 600; color: #32B8C6; margin-bottom: 8px;")
+        main_layout.addWidget(filters_header)
         
-        # Date range filter
-        filter_layout.addWidget(QLabel("From:"))
+        # Filter bar with improved spacing and layout (moved down to create separation)
+        filter_group = QGroupBox()  # Remove text to eliminate gray background behind header
+        filter_group.setObjectName("filter_group")
+        filter_layout = QHBoxLayout(filter_group)
+        filter_layout.setContentsMargins(20, 16, 20, 12)  # More right padding as requested
+        filter_layout.setSpacing(12)  # Better spacing between elements
+        
+        # Date range filter with smaller, left-aligned controls
+        date_label = QLabel("From:")
+        date_label.setMinimumWidth(40)
+        filter_layout.addWidget(date_label)
+        
         self.date_from = QDateEdit()
         self.date_from.setDate(QDate.currentDate().addMonths(-3))
+        self.date_from.setMaximumWidth(85)  # Even smaller as requested
         filter_layout.addWidget(self.date_from)
         
-        filter_layout.addWidget(QLabel("To:"))
+        to_label = QLabel("To:")
+        to_label.setMinimumWidth(25)
+        filter_layout.addWidget(to_label)
+        
         self.date_to = QDateEdit()
         self.date_to.setDate(QDate.currentDate())
+        self.date_to.setMaximumWidth(85)  # Even smaller as requested
         filter_layout.addWidget(self.date_to)
         
-        # Domain filter
-        filter_layout.addWidget(QLabel("Domain:"))
+        # Add larger spacer to push domain selector further away from dates
+        filter_layout.addSpacing(30)
+        
+        # Domain filter with even more space allocation
+        domain_label = QLabel("Domain:")
+        domain_label.setMinimumWidth(50)
+        filter_layout.addWidget(domain_label)
+        
         self.domain_filter = QComboBox()
         self.domain_filter.addItem("All Domains")
         domains = [
@@ -48,116 +73,167 @@ class AnalyticsTab(QWidget):
             "Regulation & Compliance"
         ]
         self.domain_filter.addItems(domains)
+        self.domain_filter.setMinimumWidth(240)  # Even more space for domain selector
         filter_layout.addWidget(self.domain_filter)
         
         # Quality filter
-        filter_layout.addWidget(QLabel("Min Quality:"))
+        quality_label = QLabel("Min Quality:")
+        quality_label.setMinimumWidth(75)
+        filter_layout.addWidget(quality_label)
+        
         self.quality_filter = QSpinBox()
         self.quality_filter.setRange(0, 100)
         self.quality_filter.setValue(0)
+        self.quality_filter.setMaximumWidth(80)
         filter_layout.addWidget(self.quality_filter)
         
         # Apply button
         self.apply_filters_btn = QPushButton("Apply Filters")
         self.apply_filters_btn.clicked.connect(self.update_charts)
+        self.apply_filters_btn.setMinimumWidth(120)
         filter_layout.addWidget(self.apply_filters_btn)
         
         main_layout.addWidget(filter_group)
         
-        # Analytics tabs
-        self.analytics_tabs = QTabWidget()
+        # Consolidated headers bar with dark gray background
+        headers_bar = QFrame()
+        headers_bar.setObjectName("analytics-headers-bar")
+        headers_bar.setStyleSheet("""
+            QFrame#analytics-headers-bar {
+                background-color: #2D2F31;
+                border-radius: 8px;
+                padding: 12px;
+                margin: 8px 0px;
+            }
+        """)
         
-        # Distribution tab
-        dist_tab = QWidget()
-        dist_layout = QVBoxLayout(dist_tab)
+        headers_layout = QGridLayout(headers_bar)
+        headers_layout.setSpacing(16)
         
-        # Domain distribution chart
-        self.domain_chart = self.create_domain_distribution_chart()
-        dist_layout.addWidget(self.domain_chart)
+        # Create consolidated headers with dark gray backgrounds
+        domain_header = QLabel("Corpus Domain Distribution")
+        domain_header.setStyleSheet("color: #FFFFFF; font-weight: 600; font-size: 14px; padding: 8px 12px; background-color: #2D2F31; border-radius: 6px;")
+        headers_layout.addWidget(domain_header, 0, 0)
         
-        self.analytics_tabs.addTab(dist_tab, "Domain Distribution")
+        quality_header = QLabel("Document Quality by Domain / Quality Score")
+        quality_header.setStyleSheet("color: #FFFFFF; font-weight: 600; font-size: 14px; padding: 8px 12px; background-color: #2D2F31; border-radius: 6px;")
+        headers_layout.addWidget(quality_header, 0, 1)
         
-        # Quality metrics tab
-        quality_tab = QWidget()
-        quality_layout = QVBoxLayout(quality_tab)
+        time_header = QLabel("Document Collection Over Time / Document Count")
+        time_header.setStyleSheet("color: #FFFFFF; font-weight: 600; font-size: 14px; padding: 8px 12px; background-color: #2D2F31; border-radius: 6px;")
+        headers_layout.addWidget(time_header, 1, 0)
         
-        # Quality metrics chart
-        self.quality_chart = self.create_quality_metrics_chart()
-        quality_layout.addWidget(self.quality_chart)
+        lang_header = QLabel("Language Distribution / Language Count")
+        lang_header.setStyleSheet("color: #FFFFFF; font-weight: 600; font-size: 14px; padding: 8px 12px; background-color: #2D2F31; border-radius: 6px;")
+        headers_layout.addWidget(lang_header, 1, 1)
         
-        self.analytics_tabs.addTab(quality_tab, "Quality Metrics")
+        main_layout.addWidget(headers_bar)
         
-        # Time trends tab
-        time_tab = QWidget()
-        time_layout = QVBoxLayout(time_tab)
+        # Modern 2x2 grid layout for charts without individual headers
+        charts_grid = QGridLayout()
+        charts_grid.setSpacing(16)
+        charts_grid.setContentsMargins(8, 8, 8, 8)
         
-        # Time trends chart
-        self.time_chart = self.create_time_trends_chart()
-        time_layout.addWidget(self.time_chart)
+        # Create chart containers WITHOUT headers (charts only, bigger size)
+        self.domain_chart_container = self.create_chart_container_no_header(
+            self.create_domain_distribution_chart()
+        )
+        self.quality_chart_container = self.create_chart_container_no_header(
+            self.create_quality_metrics_chart()
+        )
+        self.time_chart_container = self.create_chart_container_no_header(
+            self.create_time_trends_chart()
+        )
+        self.lang_chart_container = self.create_chart_container_no_header(
+            self.create_language_chart()
+        )
         
-        self.analytics_tabs.addTab(time_tab, "Time Trends")
+        # Add to grid: 2x2 layout
+        charts_grid.addWidget(self.domain_chart_container, 0, 0)    # Top-left
+        charts_grid.addWidget(self.quality_chart_container, 0, 1)   # Top-right
+        charts_grid.addWidget(self.time_chart_container, 1, 0)      # Bottom-left
+        charts_grid.addWidget(self.lang_chart_container, 1, 1)      # Bottom-right
         
-        # Language analysis tab
-        lang_tab = QWidget()
-        lang_layout = QVBoxLayout(lang_tab)
+        # Set equal column and row stretch
+        charts_grid.setColumnStretch(0, 1)
+        charts_grid.setColumnStretch(1, 1)
+        charts_grid.setRowStretch(0, 1)
+        charts_grid.setRowStretch(1, 1)
         
-        # Language chart
-        self.lang_chart = self.create_language_chart()
-        lang_layout.addWidget(self.lang_chart)
-        
-        self.analytics_tabs.addTab(lang_tab, "Language Analysis")
-        
-        main_layout.addWidget(self.analytics_tabs)
+        # Create container widget for the grid
+        charts_container = QWidget()
+        charts_container.setLayout(charts_grid)
+        main_layout.addWidget(charts_container)
         
         # Update charts with initial data
         self.update_charts()
     
+    def update_theme(self, theme_name):
+        """Update the chart manager theme and refresh charts"""
+        self.chart_manager.set_theme(theme_name)
+        self.update_charts()
+    
+    def create_chart_container_no_header(self, chart_view):
+        """Create a chart container without header to maximize chart space"""
+        container = QFrame()
+        container.setObjectName("card")
+        container.setFrameShape(QFrame.Shape.Box)
+        container.setLineWidth(1)
+        
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(8, 8, 8, 8)  # Minimal margins for bigger charts
+        layout.setSpacing(0)
+        
+        # Chart view takes full space
+        chart_view.setMinimumSize(450, 350)  # Bigger charts to fill space
+        layout.addWidget(chart_view)
+        
+        return container
+    
+    def create_chart_container(self, title, chart_view, subtitle=None):
+        """Create a styled container for a chart with modern consolidated title"""
+        container = QFrame()
+        container.setObjectName("card")
+        container.setFrameShape(QFrame.Shape.Box)
+        container.setLineWidth(1)
+        
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(16, 12, 16, 16)
+        layout.setSpacing(8)
+        
+        # Simple title (no more consolidated format)
+        title_label = QLabel(title)
+        title_label.setObjectName("card__header")
+        layout.addWidget(title_label)
+        
+        # Chart view
+        chart_view.setMinimumSize(400, 300)
+        layout.addWidget(chart_view)
+        
+        return container
+    
     def create_domain_distribution_chart(self):
-        # Create a pie chart for domain distribution
-        chart = QChart()
-        chart.setTitle("Corpus Domain Distribution")
-        chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
-        
-        # Create a chart view
-        chart_view = QChartView(chart)
-        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
+        # Create a pie chart for domain distribution using ChartManager with bigger size
+        chart_view = self.chart_manager.create_chart_view("Corpus Domain Distribution")
+        self.domain_chart = chart_view  # Store reference for updates
         return chart_view
     
     def create_quality_metrics_chart(self):
-        # Create a bar chart for quality metrics
-        chart = QChart()
-        chart.setTitle("Document Quality by Domain")
-        chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
-        
-        # Create a chart view
-        chart_view = QChartView(chart)
-        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
+        # Create a bar chart for quality metrics using ChartManager
+        chart_view = self.chart_manager.create_chart_view("Document Quality by Domain")
+        self.quality_chart = chart_view  # Store reference for updates
         return chart_view
     
     def create_time_trends_chart(self):
-        # Create a line chart for time trends
-        chart = QChart()
-        chart.setTitle("Document Collection Over Time")
-        chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
-        
-        # Create a chart view
-        chart_view = QChartView(chart)
-        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
+        # Create a line chart for time trends using ChartManager
+        chart_view = self.chart_manager.create_chart_view("Document Collection Over Time")
+        self.time_chart = chart_view  # Store reference for updates
         return chart_view
     
     def create_language_chart(self):
-        # Create a bar chart for language distribution
-        chart = QChart()
-        chart.setTitle("Language Distribution")
-        chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
-        
-        # Create a chart view
-        chart_view = QChartView(chart)
-        chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
-        
+        # Create a bar chart for language distribution using ChartManager
+        chart_view = self.chart_manager.create_chart_view("Language Distribution")
+        self.lang_chart = chart_view  # Store reference for updates
         return chart_view
     
     def update_charts(self):
@@ -216,13 +292,28 @@ class AnalyticsTab(QWidget):
             40    # Regulation & Compliance
         ]
         
-        # Add slices to the pie series
+        # Add slices to the pie series with improved styling and colors
         for domain, count in zip(domains, counts):
             if domain_filter == "All Domains" or domain == domain_filter:
-                slice = series.append(domain, count)
-                slice.setLabelVisible(True)
+                slice_obj = series.append(f"{domain} ({count})", count)
+                slice_obj.setLabelVisible(True)
+                
+                # Apply consistent domain colors from ChartManager
+                slice_obj.setColor(self.chart_manager.get_domain_color(domain))
+                
+                # Add white borders for better definition (same as dashboard)
+                slice_obj.setBorderColor(QColor(255, 255, 255))
+                slice_obj.setBorderWidth(2)
+                
+                # Set label color to white for better contrast
+                slice_obj.setLabelColor(QColor(255, 255, 255))
+                # Note: Label position will use default positioning for compatibility
         
         chart.addSeries(series)
+        
+        # Hide legend to make pie circle bigger as requested
+        legend = chart.legend()
+        legend.setVisible(False)
         
         # Update chart title
         title = "Corpus Domain Distribution"
@@ -274,20 +365,29 @@ class AnalyticsTab(QWidget):
             79   # Regulation & Compliance
         ]
         
-        # Create a bar set for quality scores
+        # Create a bar set for quality scores with consistent colors
         quality_set = QBarSet("Average Quality Score")
         
         # Add values to the bar set
+        filtered_domains = []
         for domain, score in zip(domains, quality_scores):
             if domain_filter == "All Domains" or domain == domain_filter:
+                filtered_domains.append(domain)
                 if score >= min_quality:
                     quality_set.append(score)
                 else:
                     # If below min quality, still show but with lower value
                     quality_set.append(min_quality)
         
+        # Use orange for top right position as requested - harmonious with pie chart colors
+        quality_set.setColor(QColor("#E68161"))  # Orange matching the pie chart
         series.append(quality_set)
         chart.addSeries(series)
+        
+        # Apply white legend text for better contrast
+        legend = chart.legend()
+        if legend:
+            legend.setLabelColor(QColor(255, 255, 255))  # White text for maximum contrast
         
         # Set up the axes
         axis_x = QBarCategoryAxis()
@@ -340,8 +440,9 @@ class AnalyticsTab(QWidget):
             count = base_count + i*20 + random.randint(-10, 10)
             document_counts.append(count)
         
-        # Create a bar set for document counts
+        # Create a bar set for document counts with harmonious color
         count_set = QBarSet("Document Count")
+        count_set.setColor(QColor("#26A69A"))  # Medium teal that works well with brand
         
         # Add values to the bar set
         for count in document_counts:
@@ -349,6 +450,11 @@ class AnalyticsTab(QWidget):
         
         series.append(count_set)
         chart.addSeries(series)
+        
+        # Apply white legend text for better contrast
+        legend = chart.legend()
+        if legend:
+            legend.setLabelColor(QColor(255, 255, 255))  # White text for maximum contrast
         
         # Set up the axes
         axis_x = QBarCategoryAxis()
@@ -389,8 +495,11 @@ class AnalyticsTab(QWidget):
         # Simulated language counts
         language_counts = [850, 150, 100, 50, 40, 30, 30]  # Total: 1250
         
-        # Create a bar set for language counts
+        # Create a bar set for language counts with harmonious color
         lang_set = QBarSet("Document Count")
+        
+        # Use purple for bottom right position as requested - same tones as pie chart
+        lang_set.setColor(QColor("#B45BCF"))  # Purple matching the pie chart Valuation Models
         
         # Add values to the bar set
         for count in language_counts:
@@ -403,6 +512,11 @@ class AnalyticsTab(QWidget):
         
         series.append(lang_set)
         chart.addSeries(series)
+        
+        # Apply white legend text for better contrast
+        legend = chart.legend()
+        if legend:
+            legend.setLabelColor(QColor(255, 255, 255))  # White text for maximum contrast
         
         # Set up the axes
         axis_x = QBarCategoryAxis()

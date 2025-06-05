@@ -25,9 +25,9 @@ class CorpusStatistics(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Add header
+        # Add header with consistent styling
         header_label = QLabel("Corpus Statistics")
-        header_label.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+        header_label.setObjectName("dashboard-section-header")
         header_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         main_layout.addWidget(header_label)
         
@@ -72,23 +72,54 @@ class CorpusStatistics(QWidget):
         separator2.setFrameShadow(QFrame.Shadow.Sunken)
         main_layout.addWidget(separator2)
         
-        # Storage usage
-        storage_layout = QVBoxLayout()
-        storage_layout.setContentsMargins(10, 5, 10, 5)
+        # Storage usage with proper spacing and alignment
+        storage_outer_container = QFrame()
+        storage_outer_layout = QHBoxLayout(storage_outer_container)
+        storage_outer_layout.setContentsMargins(10, 5, 25, 5)  # Add right margin for spacing from pie chart
         
+        # Gray background container for storage usage (no black background)
+        storage_container = QFrame()
+        storage_container.setObjectName("storage-usage-container")
+        storage_container.setStyleSheet("""
+            QFrame#storage-usage-container {
+                background-color: #232525;
+                border-radius: 6px;
+                padding: 8px;
+                margin: 0px;
+            }
+        """)
+        
+        storage_layout = QVBoxLayout(storage_container)
+        storage_layout.setContentsMargins(8, 6, 8, 6)
+        storage_layout.setSpacing(4)
+        
+        # Header with aligned text and orange percentage
         storage_header = QHBoxLayout()
-        storage_header.addWidget(QLabel("Storage Usage:"))
+        storage_header.setContentsMargins(0, 0, 0, 0)
+        
+        storage_label = QLabel("Storage Usage:")
+        storage_label.setStyleSheet("color: #C5C7C7; font-weight: 500;")
+        storage_header.addWidget(storage_label)
+        
         self.storage_percentage = QLabel("0%")
+        self.storage_percentage.setStyleSheet("color: #E68161; font-weight: 600;")  # Orange matching pie chart
         storage_header.addWidget(self.storage_percentage, alignment=Qt.AlignmentFlag.AlignRight)
+        
         storage_layout.addLayout(storage_header)
         
+        # Progress bar aligned with the header
         self.storage_bar = QProgressBar()
         self.storage_bar.setRange(0, 100)
         self.storage_bar.setValue(0)
         self.storage_bar.setTextVisible(False)
+        self.storage_bar.setFixedHeight(8)
         storage_layout.addWidget(self.storage_bar)
         
-        main_layout.addLayout(storage_layout)
+        # Add storage container to outer container with left alignment
+        storage_outer_layout.addWidget(storage_container)
+        storage_outer_layout.addStretch()  # Push everything to the left
+        
+        main_layout.addWidget(storage_outer_container)
         
         # Domain distribution header
         main_layout.addWidget(QLabel("Domain Distribution:"))
@@ -184,18 +215,18 @@ class CorpusStatistics(QWidget):
             percentage = domain_distribution.get(domain, {}).get('percentage', 0)
             progress_bar.setValue(int(percentage))
             count_label.setText(str(count))
-            
+
             # Color code based on target vs actual
             target = domain_distribution.get(domain, {}).get('target', 0)
             if abs(percentage - target) <= 2:
                 # On target (±2%)
-                progress_bar.setStyleSheet("QProgressBar::chunk { background-color: green; }")
+                progress_bar.setObjectName("progress-on-target")
             elif percentage < target:
                 # Below target
-                progress_bar.setStyleSheet("QProgressBar::chunk { background-color: orange; }")
+                progress_bar.setObjectName("progress-below-target")
             else:
                 # Above target
-                progress_bar.setStyleSheet("QProgressBar::chunk { background-color: blue; }")
+                progress_bar.setObjectName("progress-above-target")
     
     def _format_size(self, size_bytes):
         """Format file size in a human-readable format."""

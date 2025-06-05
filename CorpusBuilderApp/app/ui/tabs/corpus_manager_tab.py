@@ -22,7 +22,7 @@ class NotificationManager(QWidget):
     def setup_ui(self):
         layout = QVBoxLayout(self)
         header = QLabel("System Notifications")
-        header.setStyleSheet("font-weight: bold; font-size: 14px; padding: 5px;")
+        header.setObjectName("notifications-header")
         layout.addWidget(header)
         self.notification_area = QVBoxLayout()
         layout.addLayout(self.notification_area)

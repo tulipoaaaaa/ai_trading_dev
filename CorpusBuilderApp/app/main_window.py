@@ -20,6 +20,7 @@ from ui.tabs.analytics_tab import AnalyticsTab
 from ui.tabs.configuration_tab import ConfigurationTab
 from ui.tabs.logs_tab import LogsTab
 from ui.tabs.maintenance_tab import MaintenanceTab
+from ui.tabs.full_activity_tab import FullActivityTab
 
 class CryptoCorpusMainWindow(QMainWindow):
     """Main application window"""
@@ -42,6 +43,7 @@ class CryptoCorpusMainWindow(QMainWindow):
         self.configuration_tab = None
         self.logs_tab = None
         self.maintenance_tab = None
+        self.full_activity_tab = None
         
         # Initialize UI
         self.init_ui()
@@ -222,6 +224,10 @@ class CryptoCorpusMainWindow(QMainWindow):
         if getattr(self, "processors_tab", None) and hasattr(self.processors_tab, 'processing_started'):
             self.processors_tab.processing_started.connect(self.on_processing_started)
             self.processors_tab.processing_finished.connect(self.on_processing_finished)
+        
+        # Connect dashboard View All signal to show full activity tab
+        if getattr(self, "dashboard_tab", None) and hasattr(self.dashboard_tab, 'view_all_activity_requested'):
+            self.dashboard_tab.view_all_activity_requested.connect(self.show_full_activity_tab)
     
     def setup_update_timer(self):
         """Setup timer for periodic updates"""
@@ -309,6 +315,30 @@ class CryptoCorpusMainWindow(QMainWindow):
     def show_error(self, title, message):
         """Show error dialog"""
         QMessageBox.critical(self, title, message)
+    
+    def show_full_activity_tab(self):
+        """Show the full activity tab when View All is clicked"""
+        try:
+            # Check if Full Activity tab already exists
+            for i in range(self.tab_widget.count()):
+                if self.tab_widget.tabText(i) == "📊 Full Activity":
+                    # Tab exists, switch to it
+                    self.tab_widget.setCurrentIndex(i)
+                    return
+            
+            # Create new Full Activity tab
+            if not self.full_activity_tab:
+                self.full_activity_tab = FullActivityTab(self.config)
+            
+            # Add the tab and switch to it
+            tab_index = self.tab_widget.addTab(self.full_activity_tab, "📊 Full Activity")
+            self.tab_widget.setCurrentIndex(tab_index)
+            
+            self.logger.info("Full Activity tab opened successfully")
+            
+        except Exception as e:
+            self.logger.error(f"Error opening Full Activity tab: {e}")
+            self.show_error("Tab Error", f"Failed to open Full Activity tab: {e}")
     
     def center_on_screen(self):
         """Center the window on the screen"""

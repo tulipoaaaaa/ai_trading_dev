@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 from PySide6.QtCore import Qt, Signal as pyqtSignal
 from PySide6.QtCharts import QChart, QChartView, QPieSeries, QBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PySide6.QtGui import QColor, QPainter
+from app.helpers.chart_manager import ChartManager
 
 class DomainDistribution(QWidget):
     """Widget for displaying corpus domain distribution."""
@@ -15,6 +16,7 @@ class DomainDistribution(QWidget):
     def __init__(self, config, parent=None):
         super().__init__(parent)
         self.config = config
+        self.chart_manager = ChartManager('dark')  # Will be updated based on actual theme
         self.setup_ui()
         
     def setup_ui(self):
@@ -22,44 +24,61 @@ class DomainDistribution(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Controls layout
-        controls_layout = QHBoxLayout()
+        # Set widget object name for styling
+        self.setObjectName("card")
         
-        # Chart type selector
-        controls_layout.addWidget(QLabel("Chart Type:"))
+        # Header with consistent styling
+        header = QLabel("Domain Distribution")
+        header.setObjectName("dashboard-section-header")
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(header)
+        
+        # Controls layout with better alignment
+        controls_layout = QHBoxLayout()
+        controls_layout.setContentsMargins(10, 5, 10, 5)
+        
+        # Left side controls
+        left_controls = QHBoxLayout()
+        left_controls.addWidget(QLabel("Chart Type:"))
         self.chart_type = QComboBox()
         self.chart_type.addItems(["Pie Chart", "Bar Chart"])
         self.chart_type.currentTextChanged.connect(self.update_chart_type)
-        controls_layout.addWidget(self.chart_type)
+        left_controls.addWidget(self.chart_type)
         
         # Compare with target option
         self.show_target = QCheckBox("Compare with Target")
         self.show_target.setChecked(True)
         self.show_target.stateChanged.connect(self.update_chart)
-        controls_layout.addWidget(self.show_target)
+        left_controls.addWidget(self.show_target)
         
-        # Add stretch to push buttons to the right
+        controls_layout.addLayout(left_controls)
+        
+        # Add stretch to separate left and right controls
         controls_layout.addStretch()
+        
+        # Right side buttons with better spacing
+        right_controls = QHBoxLayout()
+        right_controls.setSpacing(8)
         
         # Refresh button
         refresh_btn = QPushButton("Refresh")
         refresh_btn.clicked.connect(self.refresh_requested)
-        controls_layout.addWidget(refresh_btn)
+        right_controls.addWidget(refresh_btn)
         
         # Balance button
         balance_btn = QPushButton("Balance Corpus")
         balance_btn.clicked.connect(self.balance_requested)
-        controls_layout.addWidget(balance_btn)
+        right_controls.addWidget(balance_btn)
         
+        controls_layout.addLayout(right_controls)
         main_layout.addLayout(controls_layout)
         
-        # Chart view
-        self.chart = QChart()
-        self.chart.setTitle("Corpus Domain Distribution")
-        self.chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
+        # Chart view using ChartManager for consistent styling
+        self.chart_view = self.chart_manager.create_chart_view("Corpus Domain Distribution", "chart-view")
+        self.chart = self.chart_view.chart()
         
-        self.chart_view = QChartView(self.chart)
-        self.chart_view.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # Set minimum size to prevent content cropping
+        self.chart_view.setMinimumSize(500, 350)
         
         main_layout.addWidget(self.chart_view)
         
@@ -100,6 +119,12 @@ class DomainDistribution(QWidget):
         # Initial chart
         self.update_chart()
     
+    def update_theme(self, theme_name):
+        """Update chart colors based on current theme"""
+        self.chart_manager.set_theme(theme_name)
+        self.chart_manager.update_chart_theme(self.chart_view)
+        self.update_chart()  # Refresh chart with new colors
+    
     def update_distribution_data(self, current_distribution, target_distribution=None):
         """Update the distribution data and refresh the chart."""
         self.current_distribution = current_distribution
@@ -127,14 +152,14 @@ class DomainDistribution(QWidget):
             self._create_bar_chart()
     
     def _create_pie_chart(self):
-        """Create and display a pie chart."""
+        """Create and display a pie chart with white borders and better text contrast."""
         # Create pie series for current distribution
         series = QPieSeries()
         
         # Set chart title
         self.chart.setTitle("Current Corpus Domain Distribution")
         
-        # Add slices
+        # Add slices with improved styling
         for domain, data in self.current_distribution.items():
             # Handle both integer values and dictionary values
             if isinstance(data, dict):
@@ -146,23 +171,36 @@ class DomainDistribution(QWidget):
             slice = series.append(f"{domain} ({value:.1f}%)", value)
             slice.setLabelVisible(True)
             
-            # Color based on comparison with target
-            target_data = self.target_distribution.get(domain, {})
-            if isinstance(target_data, dict):
-                target = target_data.get("allocation", 0) * 100
-            else:
-                target = target_data if target_data else 0
-                
+            # Apply consistent brand colors using ChartManager
+            slice.setColor(QColor(self.chart_manager.get_domain_color(domain)))
+            
+            # Add white borders to all slices for better definition
+            slice.setBorderColor(QColor(255, 255, 255))  # White border
+            slice.setBorderWidth(2)  # 2px border width for visibility
+            
+            # Set label color to white for better contrast
+            slice.setLabelColor(QColor(255, 255, 255))
+            # Note: Label position will use default positioning for compatibility
+            
+            # Optional: Add status indication based on target comparison
             if self.show_target.isChecked():
-                if abs(value - target) <= 2:
-                    # On target (±2%)
-                    slice.setColor(QColor("green"))
-                elif value < target:
-                    # Below target
-                    slice.setColor(QColor("orange"))
+                target_data = self.target_distribution.get(domain, {})
+                if isinstance(target_data, dict):
+                    target = target_data.get("allocation", 0) * 100
                 else:
-                    # Above target
-                    slice.setColor(QColor("blue"))
+                    target = target_data if target_data else 0
+                # Status indication via border thickness, keeping white color
+                deviation = abs(value - target)
+                if deviation <= 2:
+                    slice.setBorderWidth(3)  # Thicker border for optimal
+                elif deviation <= 5:
+                    slice.setBorderWidth(2)  # Normal border for good
+                else:
+                    slice.setBorderWidth(4)  # Thickest border for warning
+        
+        # Improve overall series presentation
+        series.setLabelsVisible(True)
+        series.setUseOpenGL(True)  # Better rendering performance
         
         self.chart.addSeries(series)
     

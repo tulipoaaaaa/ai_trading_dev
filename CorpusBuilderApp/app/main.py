@@ -12,6 +12,8 @@ from PySide6.QtGui import QIcon, QPalette, QColor
 import traceback
 import json
 from dotenv import load_dotenv
+# Add import for qdarktheme
+import qdarktheme
 
 # Add shared_tools to path for imports
 current_dir = Path(__file__).parent.parent
@@ -51,24 +53,6 @@ def load_user_sound_setting():
             return True
     return True
 
-def set_dark_theme(app):
-    dark_palette = QPalette()
-    dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
-    dark_palette.setColor(QPalette.WindowText, QColor(245, 245, 245))
-    dark_palette.setColor(QPalette.Base, QColor(35, 35, 35))
-    dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-    dark_palette.setColor(QPalette.ToolTipBase, QColor(245, 245, 245))
-    dark_palette.setColor(QPalette.ToolTipText, QColor(245, 245, 245))
-    dark_palette.setColor(QPalette.Text, QColor(245, 245, 245))
-    dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
-    dark_palette.setColor(QPalette.ButtonText, QColor(245, 245, 245))
-    dark_palette.setColor(QPalette.BrightText, QColor(255, 0, 0))
-    dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
-    dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-    dark_palette.setColor(QPalette.HighlightedText, QColor(35, 35, 35))
-    app.setPalette(dark_palette)
-    app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
-
 class CryptoCorpusApp(QApplication):
     """Main application class"""
     
@@ -91,21 +75,14 @@ class CryptoCorpusApp(QApplication):
         self.logger.debug(f"Config has 'get' method: {hasattr(self.config, 'get')}")
         self.main_window = CryptoCorpusMainWindow(self.config)
         
-        # APPLY THEME AFTER WINDOW CREATION
+        # === Apply qdarktheme for global dark theming ===
+        qdarktheme.setup_theme("dark")
+        # === End qdarktheme ===
+        
+        # APPLY THEME AFTER WINDOW CREATION (custom QSS)
         user_theme = load_user_theme()
         print(f"DEBUG: Applying theme after window creation: {user_theme}")
         ThemeManager.apply_theme(user_theme)
-        
-        # TEST: Apply a simple style to see if styling works at all
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #2b2b2b;
-            }
-            QTabWidget {
-                background-color: #3c3c3c;
-            }
-        """)
-        print("DEBUG: Applied test stylesheet")
         
         # Show the window
         self.main_window.show()
